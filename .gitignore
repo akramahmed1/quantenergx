@@ -1,3 +1,7 @@
+# QuantEnergx .gitignore
+# Comprehensive .gitignore for Node.js/React full-stack energy trading platform
+# Excludes dependencies, build artifacts, coverage reports, caches, IDE files, logs, and generated files
+
 # Dependencies
 node_modules/
 npm-debug.log*
@@ -220,3 +224,17 @@ Desktop.ini
 
 # Application specific
 # Add any project-specific patterns here
+
+# QuantEnergx specific
+# Energy trading platform specific artifacts
+*.sqlite
+*.sqlite3
+trading-data-cache/
+market-data-temp/
+energy-reports/
+
+# Docker and deployment
+.dockerignore
+docker-compose.override.yml
+.env.docker
+deployment-config.local.yml
