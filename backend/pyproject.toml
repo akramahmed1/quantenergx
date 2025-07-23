@@ -1,0 +1,38 @@
+# QuantEnergX MVP - Python Configuration  
+# Copyright (c) 2025 QuantEnergX. All rights reserved.
+# Patent Pending - Energy Trading Platform Technology
+# Confidential and Proprietary - SaaS Energy Trading Platform
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quantenergx-backend"
+version = "1.0.0"
+description = "QuantEnergX MVP - Enterprise Energy Trading Platform Backend"
+authors = [{name = "QuantEnergX Team", email = "dev@quantenergx.com"}]
+license = {text = "Proprietary"}
+readme = "README.md"
+requires-python = ">=3.9"
+
+[project.urls]
+Homepage = "https://quantenergx.com"
+Documentation = "https://docs.quantenergx.com"
+Repository = "https://github.com/akramahmed1/quantenergx"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-v --cov=app --cov-report=html --cov-report=term-missing"
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
