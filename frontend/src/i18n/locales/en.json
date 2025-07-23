@@ -1,0 +1,125 @@
+/*
+ * Copyright (c) 2025 QuantEnergX. All rights reserved.
+ * This software contains proprietary and confidential information.
+ * Unauthorized copying, distribution, or use is strictly prohibited.
+ * Patent Pending - Application filed under applicable jurisdictions.
+ */
+
+{
+  "common": {
+    "welcome": "Welcome",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Sign Up",
+    "dashboard": "Dashboard",
+    "trading": "Trading",
+    "portfolio": "Portfolio",
+    "devices": "Devices",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "profile": "Profile",
+    "notifications": "Notifications",
+    "help": "Help",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information"
+  },
+  "navigation": {
+    "overview": "Overview",
+    "positions": "Positions",
+    "orders": "Orders",
+    "history": "History",
+    "market_data": "Market Data",
+    "device_registry": "Device Registry",
+    "reports": "Reports",
+    "alerts": "Alerts",
+    "security": "Security",
+    "preferences": "Preferences"
+  },
+  "trading": {
+    "buy": "Buy",
+    "sell": "Sell",
+    "order": "Order",
+    "position": "Position",
+    "market_price": "Market Price",
+    "limit_order": "Limit Order",
+    "stop_order": "Stop Order",
+    "quantity": "Quantity",
+    "price": "Price",
+    "total": "Total",
+    "available_balance": "Available Balance",
+    "place_order": "Place Order",
+    "order_placed": "Order placed successfully",
+    "order_cancelled": "Order cancelled",
+    "profit_loss": "P&L",
+    "unrealized_pnl": "Unrealized P&L",
+    "realized_pnl": "Realized P&L",
+    "portfolio_value": "Portfolio Value",
+    "day_change": "Day Change",
+    "symbols": "Symbols",
+    "open_positions": "Open Positions",
+    "pending_orders": "Pending Orders"
+  },
+  "devices": {
+    "register_device": "Register Device",
+    "device_name": "Device Name",
+    "device_type": "Device Type",
+    "location": "Location",
+    "status": "Status",
+    "online": "Online",
+    "offline": "Offline",
+    "maintenance": "Maintenance",
+    "last_seen": "Last Seen",
+    "sensor_data": "Sensor Data",
+    "device_alerts": "Device Alerts",
+    "energy_consumption": "Energy Consumption",
+    "power_generation": "Power Generation",
+    "device_health": "Device Health"
+  },
+  "analytics": {
+    "performance_metrics": "Performance Metrics",
+    "energy_efficiency": "Energy Efficiency",
+    "cost_savings": "Cost Savings",
+    "carbon_footprint": "Carbon Footprint",
+    "generate_report": "Generate Report",
+    "export_data": "Export Data",
+    "time_range": "Time Range",
+    "chart_type": "Chart Type",
+    "insights": "Insights",
+    "recommendations": "Recommendations"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "forgot_password": "Forgot Password?",
+    "remember_me": "Remember Me",
+    "sign_in": "Sign In",
+    "sign_up": "Sign Up",
+    "sign_out": "Sign Out",
+    "create_account": "Create Account",
+    "invalid_credentials": "Invalid email or password",
+    "registration_success": "Account created successfully",
+    "password_reset_sent": "Password reset email sent",
+    "name": "Full Name",
+    "terms_accept": "I accept the Terms of Service and Privacy Policy"
+  },
+  "errors": {
+    "network_error": "Network connection error",
+    "server_error": "Server error occurred",
+    "unauthorized": "Unauthorized access",
+    "not_found": "Resource not found",
+    "validation_error": "Please check your input",
+    "session_expired": "Your session has expired. Please login again."
+  }
+}

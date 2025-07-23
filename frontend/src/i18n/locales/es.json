@@ -1,0 +1,125 @@
+/*
+ * Copyright (c) 2025 QuantEnergX. All rights reserved.
+ * This software contains proprietary and confidential information.
+ * Unauthorized copying, distribution, or use is strictly prohibited.
+ * Patent Pending - Application filed under applicable jurisdictions.
+ */
+
+{
+  "common": {
+    "welcome": "Bienvenido",
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "register": "Registrarse",
+    "dashboard": "Panel de control",
+    "trading": "Trading",
+    "portfolio": "Cartera",
+    "devices": "Dispositivos",
+    "analytics": "Análisis",
+    "settings": "Configuración",
+    "profile": "Perfil",
+    "notifications": "Notificaciones",
+    "help": "Ayuda",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "view": "Ver",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "warning": "Advertencia",
+    "info": "Información"
+  },
+  "navigation": {
+    "overview": "Resumen",
+    "positions": "Posiciones",
+    "orders": "Órdenes",
+    "history": "Historial",
+    "market_data": "Datos de mercado",
+    "device_registry": "Registro de dispositivos",
+    "reports": "Informes",
+    "alerts": "Alertas",
+    "security": "Seguridad",
+    "preferences": "Preferencias"
+  },
+  "trading": {
+    "buy": "Comprar",
+    "sell": "Vender",
+    "order": "Orden",
+    "position": "Posición",
+    "market_price": "Precio de mercado",
+    "limit_order": "Orden limitada",
+    "stop_order": "Orden de parada",
+    "quantity": "Cantidad",
+    "price": "Precio",
+    "total": "Total",
+    "available_balance": "Saldo disponible",
+    "place_order": "Colocar orden",
+    "order_placed": "Orden colocada exitosamente",
+    "order_cancelled": "Orden cancelada",
+    "profit_loss": "P&G",
+    "unrealized_pnl": "P&G no realizada",
+    "realized_pnl": "P&G realizada",
+    "portfolio_value": "Valor de cartera",
+    "day_change": "Cambio del día",
+    "symbols": "Símbolos",
+    "open_positions": "Posiciones abiertas",
+    "pending_orders": "Órdenes pendientes"
+  },
+  "devices": {
+    "register_device": "Registrar dispositivo",
+    "device_name": "Nombre del dispositivo",
+    "device_type": "Tipo de dispositivo",
+    "location": "Ubicación",
+    "status": "Estado",
+    "online": "En línea",
+    "offline": "Fuera de línea",
+    "maintenance": "Mantenimiento",
+    "last_seen": "Última vez visto",
+    "sensor_data": "Datos del sensor",
+    "device_alerts": "Alertas del dispositivo",
+    "energy_consumption": "Consumo de energía",
+    "power_generation": "Generación de energía",
+    "device_health": "Salud del dispositivo"
+  },
+  "analytics": {
+    "performance_metrics": "Métricas de rendimiento",
+    "energy_efficiency": "Eficiencia energética",
+    "cost_savings": "Ahorros de costos",
+    "carbon_footprint": "Huella de carbono",
+    "generate_report": "Generar informe",
+    "export_data": "Exportar datos",
+    "time_range": "Rango de tiempo",
+    "chart_type": "Tipo de gráfico",
+    "insights": "Conocimientos",
+    "recommendations": "Recomendaciones"
+  },
+  "auth": {
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirm_password": "Confirmar contraseña",
+    "forgot_password": "¿Olvidaste tu contraseña?",
+    "remember_me": "Recordarme",
+    "sign_in": "Iniciar sesión",
+    "sign_up": "Registrarse",
+    "sign_out": "Cerrar sesión",
+    "create_account": "Crear cuenta",
+    "invalid_credentials": "Correo o contraseña inválidos",
+    "registration_success": "Cuenta creada exitosamente",
+    "password_reset_sent": "Correo de restablecimiento enviado",
+    "name": "Nombre completo",
+    "terms_accept": "Acepto los Términos de Servicio y la Política de Privacidad"
+  },
+  "errors": {
+    "network_error": "Error de conexión de red",
+    "server_error": "Error del servidor ocurrido",
+    "unauthorized": "Acceso no autorizado",
+    "not_found": "Recurso no encontrado",
+    "validation_error": "Por favor verifique su entrada",
+    "session_expired": "Su sesión ha expirado. Por favor inicie sesión nuevamente."
+  }
+}

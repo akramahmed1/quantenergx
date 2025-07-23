@@ -1,0 +1,125 @@
+/*
+ * Copyright (c) 2025 QuantEnergX. All rights reserved.
+ * This software contains proprietary and confidential information.
+ * Unauthorized copying, distribution, or use is strictly prohibited.
+ * Patent Pending - Application filed under applicable jurisdictions.
+ */
+
+{
+  "common": {
+    "welcome": "Bienvenue",
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "register": "S'inscrire",
+    "dashboard": "Tableau de bord",
+    "trading": "Trading",
+    "portfolio": "Portefeuille",
+    "devices": "Appareils",
+    "analytics": "Analyses",
+    "settings": "Paramètres",
+    "profile": "Profil",
+    "notifications": "Notifications",
+    "help": "Aide",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "warning": "Avertissement",
+    "info": "Information"
+  },
+  "navigation": {
+    "overview": "Aperçu",
+    "positions": "Positions",
+    "orders": "Ordres",
+    "history": "Historique",
+    "market_data": "Données de marché",
+    "device_registry": "Registre des appareils",
+    "reports": "Rapports",
+    "alerts": "Alertes",
+    "security": "Sécurité",
+    "preferences": "Préférences"
+  },
+  "trading": {
+    "buy": "Acheter",
+    "sell": "Vendre",
+    "order": "Ordre",
+    "position": "Position",
+    "market_price": "Prix du marché",
+    "limit_order": "Ordre à cours limité",
+    "stop_order": "Ordre stop",
+    "quantity": "Quantité",
+    "price": "Prix",
+    "total": "Total",
+    "available_balance": "Solde disponible",
+    "place_order": "Passer l'ordre",
+    "order_placed": "Ordre passé avec succès",
+    "order_cancelled": "Ordre annulé",
+    "profit_loss": "P&L",
+    "unrealized_pnl": "P&L non réalisé",
+    "realized_pnl": "P&L réalisé",
+    "portfolio_value": "Valeur du portefeuille",
+    "day_change": "Variation du jour",
+    "symbols": "Symboles",
+    "open_positions": "Positions ouvertes",
+    "pending_orders": "Ordres en attente"
+  },
+  "devices": {
+    "register_device": "Enregistrer un appareil",
+    "device_name": "Nom de l'appareil",
+    "device_type": "Type d'appareil",
+    "location": "Emplacement",
+    "status": "Statut",
+    "online": "En ligne",
+    "offline": "Hors ligne",
+    "maintenance": "Maintenance",
+    "last_seen": "Dernière vue",
+    "sensor_data": "Données du capteur",
+    "device_alerts": "Alertes de l'appareil",
+    "energy_consumption": "Consommation d'énergie",
+    "power_generation": "Génération d'énergie",
+    "device_health": "Santé de l'appareil"
+  },
+  "analytics": {
+    "performance_metrics": "Métriques de performance",
+    "energy_efficiency": "Efficacité énergétique",
+    "cost_savings": "Économies de coûts",
+    "carbon_footprint": "Empreinte carbone",
+    "generate_report": "Générer un rapport",
+    "export_data": "Exporter les données",
+    "time_range": "Plage temporelle",
+    "chart_type": "Type de graphique",
+    "insights": "Insights",
+    "recommendations": "Recommandations"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirm_password": "Confirmer le mot de passe",
+    "forgot_password": "Mot de passe oublié ?",
+    "remember_me": "Se souvenir de moi",
+    "sign_in": "Se connecter",
+    "sign_up": "S'inscrire",
+    "sign_out": "Se déconnecter",
+    "create_account": "Créer un compte",
+    "invalid_credentials": "Email ou mot de passe invalide",
+    "registration_success": "Compte créé avec succès",
+    "password_reset_sent": "Email de réinitialisation envoyé",
+    "name": "Nom complet",
+    "terms_accept": "J'accepte les Conditions d'utilisation et la Politique de confidentialité"
+  },
+  "errors": {
+    "network_error": "Erreur de connexion réseau",
+    "server_error": "Erreur serveur survenue",
+    "unauthorized": "Accès non autorisé",
+    "not_found": "Ressource introuvable",
+    "validation_error": "Veuillez vérifier votre saisie",
+    "session_expired": "Votre session a expiré. Veuillez vous reconnecter."
+  }
+}

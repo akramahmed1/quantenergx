@@ -1,0 +1,125 @@
+/*
+ * Copyright (c) 2025 QuantEnergX. All rights reserved.
+ * This software contains proprietary and confidential information.
+ * Unauthorized copying, distribution, or use is strictly prohibited.
+ * Patent Pending - Application filed under applicable jurisdictions.
+ */
+
+{
+  "common": {
+    "welcome": "أهلاً وسهلاً",
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "register": "إنشاء حساب",
+    "dashboard": "لوحة التحكم",
+    "trading": "التداول",
+    "portfolio": "المحفظة",
+    "devices": "الأجهزة",
+    "analytics": "التحليلات",
+    "settings": "الإعدادات",
+    "profile": "الملف الشخصي",
+    "notifications": "الإشعارات",
+    "help": "المساعدة",
+    "search": "البحث",
+    "filter": "تصفية",
+    "sort": "ترتيب",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "view": "عرض",
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجح",
+    "warning": "تحذير",
+    "info": "معلومات"
+  },
+  "navigation": {
+    "overview": "نظرة عامة",
+    "positions": "المراكز",
+    "orders": "الأوامر",
+    "history": "التاريخ",
+    "market_data": "بيانات السوق",
+    "device_registry": "سجل الأجهزة",
+    "reports": "التقارير",
+    "alerts": "التنبيهات",
+    "security": "الأمان",
+    "preferences": "التفضيلات"
+  },
+  "trading": {
+    "buy": "شراء",
+    "sell": "بيع",
+    "order": "أمر",
+    "position": "مركز",
+    "market_price": "سعر السوق",
+    "limit_order": "أمر محدود",
+    "stop_order": "أمر إيقاف",
+    "quantity": "الكمية",
+    "price": "السعر",
+    "total": "المجموع",
+    "available_balance": "الرصيد المتاح",
+    "place_order": "تنفيذ الأمر",
+    "order_placed": "تم تنفيذ الأمر بنجاح",
+    "order_cancelled": "تم إلغاء الأمر",
+    "profit_loss": "الربح والخسارة",
+    "unrealized_pnl": "ربح/خسارة غير محققة",
+    "realized_pnl": "ربح/خسارة محققة",
+    "portfolio_value": "قيمة المحفظة",
+    "day_change": "تغيير اليوم",
+    "symbols": "الرموز",
+    "open_positions": "المراكز المفتوحة",
+    "pending_orders": "الأوامر المعلقة"
+  },
+  "devices": {
+    "register_device": "تسجيل جهاز",
+    "device_name": "اسم الجهاز",
+    "device_type": "نوع الجهاز",
+    "location": "الموقع",
+    "status": "الحالة",
+    "online": "متصل",
+    "offline": "غير متصل",
+    "maintenance": "صيانة",
+    "last_seen": "آخر ظهور",
+    "sensor_data": "بيانات الاستشعار",
+    "device_alerts": "تنبيهات الجهاز",
+    "energy_consumption": "استهلاك الطاقة",
+    "power_generation": "توليد الطاقة",
+    "device_health": "صحة الجهاز"
+  },
+  "analytics": {
+    "performance_metrics": "مقاييس الأداء",
+    "energy_efficiency": "كفاءة الطاقة",
+    "cost_savings": "توفير التكاليف",
+    "carbon_footprint": "البصمة الكربونية",
+    "generate_report": "إنشاء تقرير",
+    "export_data": "تصدير البيانات",
+    "time_range": "النطاق الزمني",
+    "chart_type": "نوع المخطط",
+    "insights": "رؤى",
+    "recommendations": "التوصيات"
+  },
+  "auth": {
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirm_password": "تأكيد كلمة المرور",
+    "forgot_password": "نسيت كلمة المرور؟",
+    "remember_me": "تذكرني",
+    "sign_in": "تسجيل الدخول",
+    "sign_up": "إنشاء حساب",
+    "sign_out": "تسجيل الخروج",
+    "create_account": "إنشاء حساب",
+    "invalid_credentials": "بريد إلكتروني أو كلمة مرور غير صحيحة",
+    "registration_success": "تم إنشاء الحساب بنجاح",
+    "password_reset_sent": "تم إرسال رابط إعادة تعيين كلمة المرور",
+    "name": "الاسم الكامل",
+    "terms_accept": "أوافق على شروط الخدمة وسياسة الخصوصية"
+  },
+  "errors": {
+    "network_error": "خطأ في الاتصال بالشبكة",
+    "server_error": "حدث خطأ في الخادم",
+    "unauthorized": "وصول غير مصرح به",
+    "not_found": "المورد غير موجود",
+    "validation_error": "يرجى التحقق من المدخلات",
+    "session_expired": "انتهت جلستك. يرجى تسجيل الدخول مرة أخرى."
+  }
+}
