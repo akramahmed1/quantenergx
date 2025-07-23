@@ -161,16 +161,11 @@ npm run lint:frontend
 
 Comprehensive documentation is available in the `/docs` directory:
 
-- [API Documentation](./docs/api/README.md)
-- [Frontend Architecture](./docs/frontend/README.md)
-- [Backend Architecture](./docs/backend/README.md)
-- [Deployment Guide](./docs/deployment/README.md)
-- [Compliance Requirements](./docs/compliance/README.md)
-- [Market Integration](./docs/market-integration/README.md)
+- [Documentation Index](./docs/README.md) - Complete documentation overview and organization
 
 ## 🤝 Contributing
 
-We welcome contributions to QuantEnergx! Please read our [Contributing Guide](./CONTRIBUTING.md) and [Code of Conduct](./CODE_OF_CONDUCT.md) before submitting pull requests.
+We welcome contributions to QuantEnergx! Please read our [Contributing Guide](./CONTRIBUTING.md) before submitting pull requests.
 
 ### Development Workflow
 1. Fork the repository
@@ -188,7 +183,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Project Board](https://github.com/akramahmed1/quantenergx/projects)
 - [Issue Tracker](https://github.com/akramahmed1/quantenergx/issues)
 - [Security Policy](./SECURITY.md)
-- [Changelog](./CHANGELOG.md)
 
 ## 📞 Support
 
