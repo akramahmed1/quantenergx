@@ -1,0 +1,68 @@
+{
+  "common": {
+    "app_name": "كوانت إنرجي إكس",
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "register": "إنشاء حساب",
+    "dashboard": "لوحة القيادة",
+    "analytics": "التحليلات",
+    "settings": "الإعدادات",
+    "profile": "الملف الشخصي",
+    "loading": "جاري التحميل...",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "submit": "إرسال",
+    "success": "نجح",
+    "error": "خطأ",
+    "warning": "تحذير",
+    "info": "معلومات"
+  },
+  "energy": {
+    "power": "القدرة",
+    "voltage": "الجهد",
+    "current": "التيار",
+    "frequency": "التردد",
+    "energy_consumption": "استهلاك الطاقة",
+    "carbon_footprint": "البصمة الكربونية",
+    "renewable_energy": "الطاقة المتجددة",
+    "grid_stability": "استقرار الشبكة",
+    "demand_response": "استجابة الطلب",
+    "load_forecasting": "توقع الأحمال"
+  },
+  "trading": {
+    "market_data": "بيانات السوق",
+    "energy_prices": "أسعار الطاقة",
+    "trading_volume": "حجم التداول",
+    "bid_ask_spread": "فارق العرض والطلب",
+    "market_depth": "عمق السوق",
+    "price_volatility": "تقلبات الأسعار",
+    "risk_management": "إدارة المخاطر",
+    "portfolio": "المحفظة",
+    "positions": "المراكز",
+    "orders": "الأوامر"
+  },
+  "analytics": {
+    "real_time_analytics": "التحليلات في الوقت الفعلي",
+    "performance_metrics": "مقاييس الأداء",
+    "efficiency_analysis": "تحليل الكفاءة",
+    "predictive_modeling": "النمذجة التنبؤية",
+    "anomaly_detection": "كشف الشذوذ",
+    "optimization": "التحسين",
+    "reports": "التقارير",
+    "insights": "الرؤى",
+    "trends": "الاتجاهات",
+    "forecasting": "التنبؤ"
+  },
+  "compliance": {
+    "regulatory_compliance": "الامتثال التنظيمي",
+    "audit_trail": "مسار التدقيق",
+    "security_monitoring": "مراقبة الأمان",
+    "data_protection": "حماية البيانات",
+    "nerc_cip": "امتثال NERC CIP",
+    "ferc_compliance": "امتثال FERC",
+    "gdpr_compliance": "امتثال GDPR",
+    "cybersecurity": "الأمن السيبراني",
+    "risk_assessment": "تقييم المخاطر",
+    "incident_response": "الاستجابة للحوادث"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "common": {
+    "app_name": "QuantEnerGx",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "dashboard": "Dashboard",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "profile": "Profile",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Information"
+  },
+  "energy": {
+    "power": "Power",
+    "voltage": "Voltage",
+    "current": "Current",
+    "frequency": "Frequency",
+    "energy_consumption": "Energy Consumption",
+    "carbon_footprint": "Carbon Footprint",
+    "renewable_energy": "Renewable Energy",
+    "grid_stability": "Grid Stability",
+    "demand_response": "Demand Response",
+    "load_forecasting": "Load Forecasting"
+  },
+  "trading": {
+    "market_data": "Market Data",
+    "energy_prices": "Energy Prices",
+    "trading_volume": "Trading Volume",
+    "bid_ask_spread": "Bid-Ask Spread",
+    "market_depth": "Market Depth",
+    "price_volatility": "Price Volatility",
+    "risk_management": "Risk Management",
+    "portfolio": "Portfolio",
+    "positions": "Positions",
+    "orders": "Orders"
+  },
+  "analytics": {
+    "real_time_analytics": "Real-time Analytics",
+    "performance_metrics": "Performance Metrics",
+    "efficiency_analysis": "Efficiency Analysis",
+    "predictive_modeling": "Predictive Modeling",
+    "anomaly_detection": "Anomaly Detection",
+    "optimization": "Optimization",
+    "reports": "Reports",
+    "insights": "Insights",
+    "trends": "Trends",
+    "forecasting": "Forecasting"
+  },
+  "compliance": {
+    "regulatory_compliance": "Regulatory Compliance",
+    "audit_trail": "Audit Trail",
+    "security_monitoring": "Security Monitoring",
+    "data_protection": "Data Protection",
+    "nerc_cip": "NERC CIP Compliance",
+    "ferc_compliance": "FERC Compliance",
+    "gdpr_compliance": "GDPR Compliance",
+    "cybersecurity": "Cybersecurity",
+    "risk_assessment": "Risk Assessment",
+    "incident_response": "Incident Response"
+  }
+}
