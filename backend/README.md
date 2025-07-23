@@ -281,15 +281,8 @@ kubectl get pods -n quantenergx
 
 ## 📚 Additional Resources
 
-- [API Documentation](./docs/api.md)
-- [Database Schema](./docs/database.md)
-- [Development Guidelines](./docs/development.md)
-- [Deployment Guide](./docs/deployment.md)
-- [Troubleshooting](./docs/troubleshooting.md)
-
-## 🤝 Contributing
-
-Please read the [Contributing Guidelines](../CONTRIBUTING.md) before submitting pull requests.
+- [Main Project Documentation](../docs/README.md)
+- [Contributing Guidelines](../CONTRIBUTING.md)
 
 ## 📄 License
 

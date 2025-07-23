@@ -24,6 +24,15 @@
   ],
   "author": "QuantEnergx Team",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/akramahmed1/quantenergx.git",
+    "directory": "frontend"
+  },
+  "bugs": {
+    "url": "https://github.com/akramahmed1/quantenergx/issues"
+  },
+  "homepage": "https://github.com/akramahmed1/quantenergx#readme",
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
