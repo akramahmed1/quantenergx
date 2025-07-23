@@ -1,0 +1,202 @@
+name: Compliance Module Request
+description: Track regulatory compliance requirements and implementations
+title: "[COMPLIANCE] "
+labels: ["compliance", "regulatory", "priority-high"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Compliance Module Request
+        Use this template to track regulatory compliance requirements for oil, gas, and energy trading across different markets.
+
+  - type: dropdown
+    id: regulatory-region
+    attributes:
+      label: Regulatory Region
+      description: Select the primary regulatory jurisdiction
+      options:
+        - United States
+        - United Kingdom
+        - European Union
+        - Middle East
+        - Global/Multi-jurisdiction
+    validations:
+      required: true
+
+  - type: dropdown
+    id: commodity-type
+    attributes:
+      label: Commodity Type
+      description: Select the commodity type this compliance applies to
+      options:
+        - Crude Oil
+        - Refined Oil Products
+        - Natural Gas
+        - LNG (Liquefied Natural Gas)
+        - Renewable Energy Certificates
+        - Carbon Credits/Emissions
+        - Electricity
+        - All Commodities
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: regulatory-bodies
+    attributes:
+      label: Regulatory Bodies
+      description: Check all applicable regulatory authorities
+      options:
+        - label: CFTC (Commodity Futures Trading Commission) - US
+        - label: FERC (Federal Energy Regulatory Commission) - US
+        - label: EPA (Environmental Protection Agency) - US
+        - label: FCA (Financial Conduct Authority) - UK
+        - label: Ofgem (Office of Gas and Electricity Markets) - UK
+        - label: ESMA (European Securities and Markets Authority) - EU
+        - label: ACER (Agency for the Cooperation of Energy Regulators) - EU
+        - label: Local Middle East regulatory authorities
+        - label: Other (specify in description)
+
+  - type: textarea
+    id: compliance-requirement
+    attributes:
+      label: Compliance Requirement Description
+      description: Detailed description of the regulatory requirement
+      placeholder: Describe the specific compliance rule, regulation, or reporting requirement
+    validations:
+      required: true
+
+  - type: dropdown
+    id: compliance-type
+    attributes:
+      label: Compliance Type
+      description: Category of compliance requirement
+      options:
+        - Transaction Reporting
+        - Position Reporting
+        - Risk Reporting
+        - Market Surveillance
+        - Trade Surveillance
+        - KYC (Know Your Customer)
+        - AML (Anti-Money Laundering)
+        - Record Keeping
+        - Data Retention
+        - Audit Trail
+        - Real-time Monitoring
+        - Periodic Reporting
+    validations:
+      required: true
+
+  - type: textarea
+    id: regulatory-reference
+    attributes:
+      label: Regulatory Reference
+      description: Specific regulation, rule, or directive references
+      placeholder: |
+        Include:
+        - Regulation names and numbers
+        - Effective dates
+        - Links to official documentation
+        - Relevant sections or articles
+    validations:
+      required: true
+
+  - type: dropdown
+    id: implementation-urgency
+    attributes:
+      label: Implementation Urgency
+      description: Timeline urgency based on regulatory deadlines
+      options:
+        - Critical - Required for market launch
+        - High - Required within 3 months
+        - Medium - Required within 6 months
+        - Low - Required within 12 months
+        - Future - No immediate deadline
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-requirements
+    attributes:
+      label: Technical Implementation Requirements
+      description: Specific technical requirements for compliance
+      placeholder: |
+        Include:
+        - Data formats and standards
+        - API requirements
+        - Database schema needs
+        - Real-time vs batch processing
+        - Integration points
+        - Security requirements
+
+  - type: textarea
+    id: data-requirements
+    attributes:
+      label: Data Collection & Reporting Requirements
+      description: What data must be collected, stored, and reported
+      placeholder: |
+        Specify:
+        - Required data fields
+        - Data retention periods
+        - Reporting formats
+        - Submission frequencies
+        - Data quality requirements
+
+  - type: checkboxes
+    id: compliance-features
+    attributes:
+      label: Required Compliance Features
+      description: Check all features needed for this compliance requirement
+      options:
+        - label: Data Collection & Validation
+        - label: Real-time Monitoring
+        - label: Automated Reporting
+        - label: Manual Report Generation
+        - label: Audit Trail Creation
+        - label: Data Export/Import
+        - label: Compliance Dashboard
+        - label: Alert System
+        - label: Workflow Management
+        - label: Document Management
+        - label: Electronic Signatures
+        - label: Secure Data Transmission
+
+  - type: textarea
+    id: penalties-risks
+    attributes:
+      label: Non-Compliance Penalties & Risks
+      description: Consequences of non-compliance
+      placeholder: |
+        Include:
+        - Financial penalties
+        - Operational restrictions
+        - License implications
+        - Reputational risks
+        - Market access limitations
+
+  - type: textarea
+    id: testing-validation
+    attributes:
+      label: Testing & Validation Requirements
+      description: How compliance will be tested and validated
+      placeholder: |
+        Include:
+        - Compliance testing procedures
+        - Validation criteria
+        - Regulatory sandbox requirements
+        - Third-party validation needs
+        - Audit requirements
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies & Prerequisites
+      description: Dependencies on other systems, data feeds, or features
+      placeholder: Market data feeds, third-party services, internal systems, etc.
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context & References
+      description: Additional information, documentation, or industry guidance
+      placeholder: Industry best practices, legal opinions, implementation guides, etc.

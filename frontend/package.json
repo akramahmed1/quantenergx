@@ -1,0 +1,61 @@
+{
+  "name": "quantenergx-frontend",
+  "version": "1.0.0",
+  "description": "Frontend application for QuantEnergx energy trading platform",
+  "main": "src/index.tsx",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "test:coverage": "react-scripts test --coverage --watchAll=false",
+    "eject": "react-scripts eject",
+    "lint": "eslint src/ --ext .ts,.tsx",
+    "lint:fix": "eslint src/ --ext .ts,.tsx --fix",
+    "type-check": "tsc --noEmit",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
+  },
+  "keywords": [
+    "react",
+    "typescript",
+    "energy-trading",
+    "trading-platform",
+    "commodities"
+  ],
+  "author": "QuantEnergx Team",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.9.5",
+    "@reduxjs/toolkit": "^1.9.5",
+    "react-redux": "^8.0.5",
+    "@mui/material": "^5.13.0",
+    "@mui/icons-material": "^5.13.0",
+    "react-router-dom": "^6.11.0",
+    "recharts": "^2.6.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.6",
+    "@types/react-dom": "^18.2.4",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/user-event": "^14.4.3",
+    "eslint": "^8.40.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.6",
+    "@typescript-eslint/parser": "^5.59.6"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
