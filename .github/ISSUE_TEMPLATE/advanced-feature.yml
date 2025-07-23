@@ -1,0 +1,136 @@
+name: Advanced Feature Request
+description: Track development of advanced features beyond MVP scope
+title: "[ADVANCED] "
+labels: ["advanced", "feature", "enhancement"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Advanced Feature Request
+        Use this template to track advanced features that extend beyond the MVP capabilities of QuantEnergx.
+
+  - type: dropdown
+    id: feature-category
+    attributes:
+      label: Feature Category
+      description: Select the primary category for this advanced feature
+      options:
+        - Advanced Analytics
+        - Machine Learning & AI
+        - Advanced Risk Management
+        - Algorithmic Trading
+        - Advanced Reporting
+        - Third-party Integrations
+        - Mobile Applications
+        - Advanced UI/UX
+        - Performance Optimization
+        - Scalability Enhancement
+    validations:
+      required: true
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature Description
+      description: Provide a detailed description of the advanced feature
+      placeholder: Describe what this feature should accomplish and how it enhances the platform
+    validations:
+      required: true
+
+  - type: textarea
+    id: business-value
+    attributes:
+      label: Business Value
+      description: Explain the business value and competitive advantage this feature provides
+      placeholder: How does this feature improve user experience, increase revenue, or provide competitive advantage?
+    validations:
+      required: true
+
+  - type: textarea
+    id: user-stories
+    attributes:
+      label: User Stories
+      description: Define user stories for this feature
+      placeholder: |
+        As a [user type], I want [functionality] so that [benefit]
+        
+        - As a trader, I want...
+        - As a risk manager, I want...
+        - As a compliance officer, I want...
+
+  - type: dropdown
+    id: target-release
+    attributes:
+      label: Target Release
+      description: Planned release timeline
+      options:
+        - Post-MVP v1.1
+        - v1.2
+        - v1.3
+        - v2.0
+        - Future/Backlog
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-approach
+    attributes:
+      label: Technical Approach
+      description: Outline the proposed technical implementation
+      placeholder: Architecture changes, new technologies, data models, APIs, etc.
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies & Prerequisites
+      description: List dependencies on MVP features or other advanced features
+      placeholder: What must be completed before this feature can be implemented?
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Implementation Complexity
+      description: Assess the technical complexity of this feature
+      options:
+        - Low - Uses existing patterns and technologies
+        - Medium - Requires some new components or integrations
+        - High - Significant architectural changes or new technologies
+        - Very High - Major system redesign or cutting-edge technology
+
+  - type: checkboxes
+    id: impact-areas
+    attributes:
+      label: System Impact Areas
+      description: Check all areas that will be affected by this feature
+      options:
+        - label: Frontend UI/UX
+        - label: Backend APIs
+        - label: Database Schema
+        - label: Message Queues
+        - label: Third-party Integrations
+        - label: Security & Authentication
+        - label: Performance & Scalability
+        - label: Compliance & Reporting
+        - label: Infrastructure & DevOps
+
+  - type: textarea
+    id: success-metrics
+    attributes:
+      label: Success Metrics
+      description: Define how success will be measured for this feature
+      placeholder: User adoption rates, performance improvements, revenue impact, etc.
+
+  - type: textarea
+    id: risks-considerations
+    attributes:
+      label: Risks & Considerations
+      description: Identify potential risks, challenges, or trade-offs
+      placeholder: Technical risks, regulatory concerns, performance impacts, etc.
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any additional information, research, or references
+      placeholder: Market research, competitor analysis, user feedback, technical specifications

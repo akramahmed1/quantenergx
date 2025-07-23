@@ -1,0 +1,100 @@
+name: Bug Report
+description: Report a bug or issue with the QuantEnergx platform
+title: "[BUG] "
+labels: ["bug", "needs-investigation"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Bug Report
+        Use this template to report bugs or issues with the QuantEnergx trading platform.
+
+  - type: dropdown
+    id: bug-severity
+    attributes:
+      label: Bug Severity
+      description: How severe is this bug?
+      options:
+        - Critical - System down or major functionality broken
+        - High - Major feature not working as expected
+        - Medium - Minor feature issue or workaround available
+        - Low - Cosmetic issue or minor inconvenience
+    validations:
+      required: true
+
+  - type: dropdown
+    id: affected-component
+    attributes:
+      label: Affected Component
+      description: Which part of the system is affected?
+      options:
+        - Trading Engine
+        - Market Data
+        - Order Management
+        - Portfolio Management
+        - Risk Management
+        - User Management
+        - Compliance Module
+        - API
+        - Frontend UI
+        - Backend Services
+        - Database
+        - Infrastructure
+        - Documentation
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Bug Description
+      description: Provide a clear and concise description of the bug
+      placeholder: What happened? What was the unexpected behavior?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the bug
+      placeholder: |
+        1. Go to...
+        2. Click on...
+        3. See error...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What should have happened instead?
+      placeholder: Describe the expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: Describe what actually occurred
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment Information
+      description: Provide details about your environment
+      placeholder: |
+        - Operating System:
+        - Browser (if applicable):
+        - Version:
+        - Node.js version:
+        - Database version:
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any additional context, screenshots, or logs
+      placeholder: Error logs, screenshots, or any other relevant information

@@ -1,0 +1,106 @@
+name: MVP Feature Request
+description: Track development of core MVP features for the trading platform
+title: "[MVP] "
+labels: ["mvp", "feature", "priority-high"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## MVP Feature Request
+        Use this template to track essential features required for the Minimum Viable Product (MVP) of QuantEnergx.
+
+  - type: dropdown
+    id: feature-category
+    attributes:
+      label: Feature Category
+      description: Select the primary category for this MVP feature
+      options:
+        - Core Trading Engine
+        - Market Data Integration
+        - User Management
+        - Basic Compliance
+        - Order Management
+        - Portfolio Tracking
+        - Risk Management
+        - Settlement & Clearing
+    validations:
+      required: true
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature Description
+      description: Provide a detailed description of the MVP feature
+      placeholder: Describe what this feature should accomplish and why it's essential for the MVP
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: List the specific criteria that must be met for this feature to be considered complete
+      placeholder: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+        - [ ] Criterion 3
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: MVP Priority
+      description: Priority level within the MVP scope
+      options:
+        - P0 - Critical (blocks launch)
+        - P1 - High (required for MVP)
+        - P2 - Medium (important for MVP)
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-requirements
+    attributes:
+      label: Technical Requirements
+      description: Outline any specific technical requirements or constraints
+      placeholder: API endpoints, database schema changes, third-party integrations, etc.
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: List any dependencies on other features or external services
+      placeholder: List features, services, or infrastructure that must be in place first
+
+  - type: dropdown
+    id: estimated-effort
+    attributes:
+      label: Estimated Effort
+      description: Rough estimate of development effort
+      options:
+        - Small (1-3 days)
+        - Medium (1-2 weeks)
+        - Large (2-4 weeks)
+        - Extra Large (1+ months)
+
+  - type: checkboxes
+    id: testing-requirements
+    attributes:
+      label: Testing Requirements
+      description: Check all testing types that apply
+      options:
+        - label: Unit Tests
+        - label: Integration Tests
+        - label: End-to-End Tests
+        - label: Performance Tests
+        - label: Security Tests
+        - label: Compliance Tests
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any additional information, mockups, or references
+      placeholder: Include links to designs, specifications, or related documentation
