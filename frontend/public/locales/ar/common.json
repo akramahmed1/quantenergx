@@ -1,0 +1,148 @@
+{
+  "_comment": "QuantEnergX MVP - Arabic Translations (RTL)",
+  "_copyright": "حقوق الطبع والنشر (c) 2025 QuantEnergX. جميع الحقوق محفوظة.",
+  "_patent": "براءة اختراع معلقة - تكنولوجيا منصة تداول الطاقة",
+  
+  "common": {
+    "loading": "جارٍ التحميل...",
+    "error": "حدث خطأ",
+    "success": "نجح",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "edit": "تحرير",
+    "delete": "حذف",
+    "view": "عرض",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "close": "إغلاق",
+    "confirm": "تأكيد"
+  },
+  
+  "auth": {
+    "login": {
+      "title": "تسجيل الدخول إلى QuantEnergX",
+      "subtitle": "أدخل بيانات الاعتماد الخاصة بك للوصول إلى منصة تداول الطاقة",
+      "submit": "تسجيل الدخول",
+      "success": "تم تسجيل الدخول بنجاح! جارٍ إعادة التوجيه...",
+      "error": "فشل تسجيل الدخول. يرجى التحقق من بيانات الاعتماد الخاصة بك."
+    },
+    "register": {
+      "title": "إنشاء حساب QuantEnergX",
+      "subtitle": "انضم إلى منصة تداول الطاقة من الجيل القادم",
+      "link": "إنشاء حساب"
+    },
+    "fields": {
+      "email": "عنوان البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "fullName": "الاسم الكامل",
+      "company": "الشركة (اختياري)",
+      "confirmPassword": "تأكيد كلمة المرور"
+    },
+    "placeholders": {
+      "email": "أدخل عنوان بريدك الإلكتروني",
+      "password": "أدخل كلمة المرور",
+      "fullName": "أدخل اسمك الكامل",
+      "company": "أدخل اسم شركتك"
+    },
+    "rememberMe": "تذكرني",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "noAccount": "ليس لديك حساب؟",
+    "hasAccount": "لديك حساب بالفعل؟",
+    "orContinueWith": "أو المتابعة مع"
+  },
+  
+  "validation": {
+    "email": {
+      "required": "عنوان البريد الإلكتروني مطلوب",
+      "invalid": "يرجى إدخال عنوان بريد إلكتروني صحيح"
+    },
+    "password": {
+      "required": "كلمة المرور مطلوبة",
+      "minLength": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل",
+      "mismatch": "كلمات المرور غير متطابقة"
+    },
+    "fullName": {
+      "required": "الاسم الكامل مطلوب"
+    }
+  },
+  
+  "dashboard": {
+    "title": "لوحة تحكم تداول الطاقة",
+    "welcome": "مرحباً بعودتك، {{name}}",
+    "stats": {
+      "portfolioValue": "قيمة المحفظة",
+      "dailyPnL": "الربح والخسارة اليومية",
+      "activePositions": "المراكز النشطة",
+      "connectedDevices": "الأجهزة المتصلة"
+    },
+    "recentActivity": "النشاط الأخير",
+    "energyConsumption": "استهلاك الطاقة",
+    "riskScore": "درجة المخاطر",
+    "risk": {
+      "low": "مخاطر منخفضة",
+      "medium": "مخاطر متوسطة",
+      "high": "مخاطر عالية"
+    },
+    "quickActions": "إجراءات سريعة",
+    "actions": {
+      "newTrade": "صفقة جديدة",
+      "viewPortfolio": "عرض المحفظة",
+      "generateReport": "إنشاء تقرير"
+    },
+    "activity": {
+      "tradeExecuted": "تم تنفيذ الصفقة",
+      "riskAlert": "تنبيه المخاطر",
+      "deviceConnected": "تم توصيل الجهاز",
+      "reportGenerated": "تم إنشاء التقرير"
+    }
+  },
+  
+  "trading": {
+    "title": "تداول الطاقة",
+    "newPosition": "مركز جديد",
+    "portfolio": "المحفظة",
+    "orderBook": "دفتر الطلبيات",
+    "marketData": "بيانات السوق",
+    "riskAnalytics": "تحليلات المخاطر"
+  },
+  
+  "analytics": {
+    "title": "لوحة التحليلات",
+    "performance": "تحليلات الأداء",
+    "forecasting": "توقعات الطاقة",
+    "reports": "التقارير",
+    "insights": "رؤى السوق"
+  },
+  
+  "devices": {
+    "title": "إدارة الأجهزة",
+    "connected": "الأجهزة المتصلة",
+    "offline": "الأجهزة غير المتصلة",
+    "telemetry": "بيانات القياس عن بُعد",
+    "alerts": "تنبيهات الأجهزة"
+  },
+  
+  "notifications": {
+    "title": "الإشعارات",
+    "markAsRead": "وضع علامة كمقروء",
+    "markAllAsRead": "وضع علامة على الكل كمقروء",
+    "noNotifications": "لا توجد إشعارات"
+  },
+  
+  "settings": {
+    "title": "الإعدادات",
+    "profile": "إعدادات الملف الشخصي",
+    "security": "الأمان",
+    "notifications": "تفضيلات الإشعارات",
+    "language": "اللغة والمنطقة",
+    "api": "مفاتيح API"
+  },
+  
+  "languages": {
+    "en": "English",
+    "ar": "العربية",
+    "fr": "Français",
+    "es": "Español"
+  }
+}

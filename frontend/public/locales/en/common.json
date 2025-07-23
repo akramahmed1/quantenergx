@@ -1,0 +1,148 @@
+{
+  "_comment": "QuantEnergX MVP - English Translations",
+  "_copyright": "Copyright (c) 2025 QuantEnergX. All rights reserved.",
+  "_patent": "Patent Pending - Energy Trading Platform Technology",
+  
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "confirm": "Confirm"
+  },
+  
+  "auth": {
+    "login": {
+      "title": "Sign in to QuantEnergX",
+      "subtitle": "Enter your credentials to access the energy trading platform",
+      "submit": "Sign in",
+      "success": "Login successful! Redirecting...",
+      "error": "Login failed. Please check your credentials."
+    },
+    "register": {
+      "title": "Create QuantEnergX Account",
+      "subtitle": "Join the next generation energy trading platform",
+      "link": "Create account"
+    },
+    "fields": {
+      "email": "Email address",
+      "password": "Password",
+      "fullName": "Full name",
+      "company": "Company (optional)",
+      "confirmPassword": "Confirm password"
+    },
+    "placeholders": {
+      "email": "Enter your email address",
+      "password": "Enter your password",
+      "fullName": "Enter your full name",
+      "company": "Enter your company name"
+    },
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot your password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "orContinueWith": "Or continue with"
+  },
+  
+  "validation": {
+    "email": {
+      "required": "Email address is required",
+      "invalid": "Please enter a valid email address"
+    },
+    "password": {
+      "required": "Password is required",
+      "minLength": "Password must be at least 8 characters",
+      "mismatch": "Passwords do not match"
+    },
+    "fullName": {
+      "required": "Full name is required"
+    }
+  },
+  
+  "dashboard": {
+    "title": "Energy Trading Dashboard",
+    "welcome": "Welcome back, {{name}}",
+    "stats": {
+      "portfolioValue": "Portfolio Value",
+      "dailyPnL": "Daily P&L",
+      "activePositions": "Active Positions",
+      "connectedDevices": "Connected Devices"
+    },
+    "recentActivity": "Recent Activity",
+    "energyConsumption": "Energy Consumption",
+    "riskScore": "Risk Score",
+    "risk": {
+      "low": "Low Risk",
+      "medium": "Medium Risk",
+      "high": "High Risk"
+    },
+    "quickActions": "Quick Actions",
+    "actions": {
+      "newTrade": "New Trade",
+      "viewPortfolio": "View Portfolio",
+      "generateReport": "Generate Report"
+    },
+    "activity": {
+      "tradeExecuted": "Trade Executed",
+      "riskAlert": "Risk Alert",
+      "deviceConnected": "Device Connected",
+      "reportGenerated": "Report Generated"
+    }
+  },
+  
+  "trading": {
+    "title": "Energy Trading",
+    "newPosition": "New Position",
+    "portfolio": "Portfolio",
+    "orderBook": "Order Book",
+    "marketData": "Market Data",
+    "riskAnalytics": "Risk Analytics"
+  },
+  
+  "analytics": {
+    "title": "Analytics Dashboard",
+    "performance": "Performance Analytics",
+    "forecasting": "Energy Forecasting",
+    "reports": "Reports",
+    "insights": "Market Insights"
+  },
+  
+  "devices": {
+    "title": "Device Management",
+    "connected": "Connected Devices",
+    "offline": "Offline Devices",
+    "telemetry": "Telemetry Data",
+    "alerts": "Device Alerts"
+  },
+  
+  "notifications": {
+    "title": "Notifications",
+    "markAsRead": "Mark as read",
+    "markAllAsRead": "Mark all as read",
+    "noNotifications": "No notifications"
+  },
+  
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile Settings",
+    "security": "Security",
+    "notifications": "Notification Preferences",
+    "language": "Language & Region",
+    "api": "API Keys"
+  },
+  
+  "languages": {
+    "en": "English",
+    "ar": "العربية",
+    "fr": "Français",
+    "es": "Español"
+  }
+}
