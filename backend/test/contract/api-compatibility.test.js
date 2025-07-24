@@ -1,5 +1,5 @@
 const { Pact } = require('@pact-foundation/pact');
-const { like, eachLike, term } = require('@pact-foundation/pact/dist/dsl/matchers');
+const { like, eachLike, term } = require('@pact-foundation/pact').Matchers;
 const path = require('path');
 const axios = require('axios');
 

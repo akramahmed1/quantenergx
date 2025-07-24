@@ -1,0 +1,232 @@
+{
+  "consumer": {
+    "name": "quantenergx-frontend"
+  },
+  "interactions": [
+    {
+      "description": "a request for available channels",
+      "providerState": "notification service is available",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/notifications/channels"
+      },
+      "response": {
+        "body": {
+          "channels": {
+            "email": {
+              "available": true,
+              "configuration_required": [
+                "smtp_server"
+              ]
+            },
+            "telegram": {
+              "available": true,
+              "configuration_required": [
+                "bot_token"
+              ]
+            },
+            "whatsapp": {
+              "available": false,
+              "reason": "integration_pending"
+            }
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "$.body.channels.email.configuration_required": {
+            "match": "type",
+            "min": 1
+          },
+          "$.body.channels.telegram.configuration_required": {
+            "match": "type",
+            "min": 1
+          },
+          "$.body.channels.whatsapp.reason": {
+            "match": "type"
+          }
+        },
+        "status": 200
+      }
+    },
+    {
+      "description": "a request for commodity prices",
+      "providerState": "market is open",
+      "request": {
+        "headers": {
+          "Authorization": "Bearer token123"
+        },
+        "matchingRules": {
+          "$.header.Authorization": {
+            "match": "type"
+          }
+        },
+        "method": "GET",
+        "path": "/api/v1/market/prices/crude_oil"
+      },
+      "response": {
+        "body": {
+          "commodity": "crude_oil",
+          "currency": "USD",
+          "exchange": "NYMEX",
+          "prices": {
+            "ask": 75.3,
+            "bid": 75.2,
+            "change": -0.15,
+            "changePercent": -0.2,
+            "last": 75.25
+          },
+          "timestamp": "2024-01-15T10:35:00Z",
+          "unit": "barrel"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "$.body.exchange": {
+            "match": "type"
+          },
+          "$.body.prices.ask": {
+            "match": "type"
+          },
+          "$.body.prices.bid": {
+            "match": "type"
+          },
+          "$.body.prices.change": {
+            "match": "type"
+          },
+          "$.body.prices.changePercent": {
+            "match": "type"
+          },
+          "$.body.prices.last": {
+            "match": "type"
+          },
+          "$.body.timestamp": {
+            "match": "type"
+          }
+        },
+        "status": 200
+      }
+    },
+    {
+      "description": "a request to create a trading order",
+      "providerState": "user is authenticated",
+      "request": {
+        "body": {
+          "commodity": "crude_oil",
+          "price": 75.5,
+          "side": "buy",
+          "type": "limit",
+          "volume": 1000
+        },
+        "headers": {
+          "Authorization": "Bearer token123",
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "$.body.price": {
+            "match": "type"
+          },
+          "$.body.volume": {
+            "match": "type"
+          },
+          "$.header.Authorization": {
+            "match": "type"
+          }
+        },
+        "method": "POST",
+        "path": "/api/v1/trading/orders"
+      },
+      "response": {
+        "body": {
+          "commodity": "crude_oil",
+          "orderId": "order_123456",
+          "price": 75.5,
+          "side": "buy",
+          "status": "pending",
+          "timestamp": "2024-01-15T10:30:00Z",
+          "type": "limit",
+          "volume": 1000
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "$.body.orderId": {
+            "match": "type"
+          },
+          "$.body.price": {
+            "match": "type"
+          },
+          "$.body.timestamp": {
+            "match": "type"
+          },
+          "$.body.volume": {
+            "match": "type"
+          }
+        },
+        "status": 200
+      }
+    },
+    {
+      "description": "a request to process document",
+      "providerState": "OCR service is available",
+      "request": {
+        "headers": {
+          "Authorization": "Bearer token123",
+          "Content-Type": "multipart/form-data; boundary=----WebKitFormBoundary"
+        },
+        "matchingRules": {
+          "$.header.Authorization": {
+            "match": "type"
+          },
+          "$.header['Content-Type']": {
+            "match": "regex",
+            "regex": "multipart/form-data; boundary=.*"
+          }
+        },
+        "method": "POST",
+        "path": "/api/v1/ocr/process"
+      },
+      "response": {
+        "body": {
+          "documentId": "doc_789012",
+          "estimatedCompletion": "2024-01-15T10:37:00Z",
+          "queuePosition": 2,
+          "status": "processing"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "$.body.documentId": {
+            "match": "type"
+          },
+          "$.body.estimatedCompletion": {
+            "match": "type"
+          },
+          "$.body.queuePosition": {
+            "match": "type"
+          }
+        },
+        "status": 200
+      }
+    }
+  ],
+  "metadata": {
+    "pact-js": {
+      "version": "15.0.1"
+    },
+    "pactRust": {
+      "ffi": "0.4.22",
+      "models": "1.2.3"
+    },
+    "pactSpecification": {
+      "version": "2.0.0"
+    }
+  },
+  "provider": {
+    "name": "quantenergx-backend"
+  }
+}
