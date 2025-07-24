@@ -52,68 +52,68 @@ class NotificationService {
       };
     }
 
-    const result = await this.telegramBot.sendMessage(chatId, message, telegramOptions);
-    return {
-      success: true,
-      messageId: result.message_id,
-      channel: 'telegram'
-    };
-  }
+      const result = await this.telegramBot.sendMessage(chatId, message, telegramOptions);
+  return {
+    success: true,
+    messageId: result.message_id,
+    channel: 'telegram'
+  };
+}
 
-  async sendWhatsAppMessage(phoneNumber, message, _options = {}) {
-    // This is a placeholder for WhatsApp Business API integration
-    // In production, you would integrate with services like:
-    // - WhatsApp Business API
-    // - Twilio WhatsApp API
-    // - Facebook Graph API for WhatsApp
-    
-    console.log(`WhatsApp message would be sent to ${phoneNumber}: ${message}`);
-    
-    return {
-      success: true,
-      messageId: `wa_${Date.now()}`,
-      channel: 'whatsapp',
-      recipient: phoneNumber
-    };
-  }
+async sendWhatsAppMessage(phoneNumber, message) {
+  // This is a placeholder for WhatsApp Business API integration
+  // In production, you would integrate with services like:
+  // - WhatsApp Business API
+  // - Twilio WhatsApp API
+  // - Facebook Graph API for WhatsApp
+  
+  console.log(`WhatsApp message would be sent to ${phoneNumber}: ${message}`);
+  
+  return {
+    success: true,
+    messageId: `wa_${Date.now()}`,
+    channel: 'whatsapp',
+    recipient: phoneNumber
+  };
+}
 
-  async sendEmailNotification(email, message, options = {}) {
-    // Placeholder for email service integration
-    // In production, integrate with services like:
-    // - SendGrid
-    // - AWS SES
-    // - Mailgun
-    
-    const { subject = 'QuantEnergx Notification'} = _options;
-    
-    console.log(`Email would be sent to ${email}:`);
-    console.log(`Subject: ${subject}`);
-    console.log(`Message: ${message}`);
-    
-    return {
-      success: true,
-      messageId: `email_${Date.now()}`,
-      channel: 'email',
-      recipient: email
-    };
-  }
+async sendEmailNotification(email, message, options = {}) {
+  // Placeholder for email service integration
+  // In production, integrate with services like:
+  // - SendGrid
+  // - AWS SES
+  // - Mailgun
+  
+  const { subject = 'QuantEnergx Notification'} = options;
+  
+  console.log(`Email would be sent to ${email}:`);
+  console.log(`Subject: ${subject}`);
+  console.log(`Message: ${message}`);
+  
+  return {
+    success: true,
+    messageId: `email_${Date.now()}`,
+    channel: 'email',
+    recipient: email
+  };
+}
 
-  async sendSMSNotification(phoneNumber, message, _options = {}) {
-    // Placeholder for SMS service integration
-    // In production, integrate with services like:
-    // - Twilio
-    // - AWS SNS
-    // - Nexmo/Vonage
-    
-    console.log(`SMS would be sent to ${phoneNumber}: ${message}`);
-    
-    return {
-      success: true,
-      messageId: `sms_${Date.now()}`,
-      channel: 'sms',
-      recipient: phoneNumber
-    };
-  }
+async sendSMSNotification(phoneNumber, message) {
+  // Placeholder for SMS service integration
+  // In production, integrate with services like:
+  // - Twilio
+  // - AWS SNS
+  // - Nexmo/Vonage
+  
+  console.log(`SMS would be sent to ${phoneNumber}: ${message}`);
+  
+  return {
+    success: true,
+    messageId: `sms_${Date.now()}`,
+    channel: 'sms',
+    recipient: phoneNumber
+  };
+}
 
   // OCR-specific notification methods
   async notifyDocumentProcessed(documentId, result, userPreferences) {
