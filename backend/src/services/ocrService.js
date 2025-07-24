@@ -253,18 +253,6 @@ class OCRService {
     const fields = {};
 
   }
-
-  async _detectStamps(text) {
-    // Simple stamp detection based on text patterns
-    const stampPatterns = [
-      /APPROVED/i,
-      /RECEIVED/i,
-      /CONFIDENTIAL/i,
-      /URGENT/i,
-      /COPY/i,
-      /ORIGINAL/i,
-      /FILED/i
-    ];
     }
 
     return detectedStamps.length > 0 ? detectedStamps : null;
