@@ -64,6 +64,7 @@ app.use('/api/v1/*', (req, res) => {
 });
 
 // Error handling middleware
+app.use((err, req, res, next) => {
   logger.error(err.stack);
   res.status(500).json({ 
     error: 'Internal Server Error',
@@ -87,6 +88,8 @@ if (process.env.NODE_ENV !== 'test') {
   grpcService.start(GRPC_PORT);
   logger.info(`QuantEnergx gRPC Service running on port ${GRPC_PORT}`);
 }
+
+// Graceful shutdown
 process.on('SIGTERM', () => {
   logger.info('SIGTERM received, shutting down gracefully');
   grpcService.stop();
