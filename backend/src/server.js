@@ -59,7 +59,7 @@ app.get('/health', (req, res) => {
 app.use('/api/v1', require('./routes'));
 
 // Error handling middleware
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   logger.error(err.stack);
   res.status(500).json({ 
     error: 'Internal Server Error',
