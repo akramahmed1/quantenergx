@@ -1,0 +1,74 @@
+name: Safe Copilot Read/Write Workflow
+
+on:
+  push:
+    branches: [main, dev, staging]
+  pull_request:
+    branches: [main, dev, staging]
+  workflow_dispatch:
+
+jobs:
+  build-test-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Restricts to read/write, no branch deletes or forced pushes
+          fetch-depth: 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint code
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build docs
+        run: npm run docs
+
+      - name: Refactor check (optional, add your own script)
+        run: echo "Add your refactor scripts/checks here"
+
+      - name: Check for destructive DB commands (SQL, JS, TS)
+        run: |
+          # This script scans for dangerous DB commands that could harm data
+          if grep -r -E "(DROP|DELETE|TRUNCATE)" ./*.sql ./*.js ./*.ts; then
+            echo "Destructive DB command detected! Aborting workflow."
+            exit 1
+          fi
+          echo "No destructive DB commands found. Safe to proceed."
+
+  update-docs:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Update docs (example)
+        run: |
+          echo "Auto-update docs if needed"
+          # Add commands to generate/update docs
+
+# --- Branch Protection & Database Safety Notes (Permanent reminders) ---
+
+# 2. Branch Protection (Set in repo settings, not via workflow):
+#    - Require PR review before merging (Copilot can review and merge if all checks pass)
+#    - Disallow force pushes and branch deletions (No branch deletion in any workflow or script)
+#    - Require status checks to pass before merging (Workflows ensure checks before merge)
+
+# 3. Database Safety:
+#    - Do NOT expose production database secrets in workflow secrets.
+#    - Only allow minimal DB credentials for testing with isolated DB (never production).
+#    - Workflow checks for destructive SQL/DB ops (DROP, DELETE, TRUNCATE).
+#    - Dev/Stage/Prod DBs will be separate post-launch. No destructive actions permitted on prod.
+
+# ---------------------------------------------------------------
