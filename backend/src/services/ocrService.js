@@ -262,7 +262,7 @@ class OCRService {
   volume: /volume\s*:?\s*([\d,]+\.?\d*)\s*(barrels?|bbl|tons?|mt)/i,
   price: /price\s*:?\s*\$?([\d,]+\.?\d*)/i,
   commodity: /(crude\s*oil|natural\s*gas|lng|gasoline|diesel|fuel\s*oil)/i,
-  counterparty: /counterparty\s*:?\s*([A-Z][A-Za-z\s&,\.]+)/i
+  counterparty: /counterparty\s*:?\s*([A-Z][A-Za-z\s&,.]+)/i
 };
 
 for (const [fieldName, pattern] of Object.entries(patterns)) {
@@ -290,7 +290,7 @@ async _detectStamps(text) {
   const detectedStamps = [];
   for (const pattern of stampPatterns) {
     if (pattern.test(text)) {
-      detectedStamps.push(pattern.source.replace(/[\/\\i]/g, ''));
+      detectedStamps.push(pattern.source.replace(/[/\\i]/g, ''));
     }
   }
 

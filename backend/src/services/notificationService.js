@@ -84,7 +84,7 @@ class NotificationService {
     // - AWS SES
     // - Mailgun
     
-    const { subject = 'QuantEnergx Notification'} = _options;
+    const { subject = 'QuantEnergx Notification' } = options;
     
     console.log(`Email would be sent to ${email}:`);
     console.log(`Subject: ${subject}`);
