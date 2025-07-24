@@ -137,7 +137,6 @@ class OCRService {
     }
   }
 
-  async getProcessingHistory(page = 1, limit = 20) {
     // This would typically query a database
     // For now, return a placeholder structure
     return {
@@ -249,21 +248,6 @@ class OCRService {
       throw new Error(`OCR processing failed: ${error.message}`);
     }
   }
-
-  async _extractFields(text) {
-    // Simple field extraction using regex patterns
-    // In production, this would use ML models
-    const fields = {};
-    
-    // Extract common trading document fields
- const patterns = {
-  contractNumber: /contract\s*#?\s*:?\s*([A-Z0-9-]+)/i,
-  tradeDate: /trade\s*date\s*:?\s*(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})/i,
-  volume: /volume\s*:?\s*([\d,]+\.?\d*)\s*(barrels?|bbl|tons?|mt)/i,
-  price: /price\s*:?\s*\$?([\d,]+\.?\d*)/i,
-  commodity: /(crude\s*oil|natural\s*gas|lng|gasoline|diesel|fuel\s*oil)/i,
-  counterparty: /counterparty\s*:?\s*([A-Z][A-Za-z\s&,.]+)/i
-};
 
 for (const [fieldName, pattern] of Object.entries(patterns)) {
   const match = text.match(pattern);
