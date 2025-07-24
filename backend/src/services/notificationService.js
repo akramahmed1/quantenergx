@@ -52,14 +52,69 @@ class NotificationService {
       };
     }
 
-      const result = await this.telegramBot.sendMessage(chatId, message, telegramOptions);
-  return {
-    success: true,
-    messageId: result.message_id,
-    channel: 'telegram'
-  };
-}
+    const result = await this.telegramBot.sendMessage(chatId, message, telegramOptions);
+    return {
+      success: true,
+      messageId: result.message_id,
+      channel: 'telegram'
+    };
+  }
 
+  async sendWhatsAppMessage(phoneNumber, message) {
+    // This is a placeholder for WhatsApp Business API integration
+    // In production, you would integrate with services like:
+    // - WhatsApp Business API
+    // - Twilio WhatsApp API
+    // - Facebook Graph API for WhatsApp
+    
+    console.log(`WhatsApp message would be sent to ${phoneNumber}: ${message}`);
+    
+    return {
+      success: true,
+      messageId: `wa_${Date.now()}`,
+      channel: 'whatsapp',
+      recipient: phoneNumber
+    };
+  }
+
+  async sendEmailNotification(email, message, options = {}) {
+    // Placeholder for email service integration
+    // In production, integrate with services like:
+    // - SendGrid
+    // - AWS SES
+    // - Mailgun
+    
+    const { subject = 'QuantEnergx Notification'} = options;
+    
+    console.log(`Email would be sent to ${email}:`);
+    console.log(`Subject: ${subject}`);
+    console.log(`Message: ${message}`);
+    
+    return {
+      success: true,
+      messageId: `email_${Date.now()}`,
+      channel: 'email',
+      recipient: email
+    };
+  }
+
+  async sendSMSNotification(phoneNumber, message) {
+    // Placeholder for SMS service integration
+    // In production, integrate with services like:
+    // - Twilio
+    // - AWS SNS
+    // - Nexmo/Vonage
+    
+    console.log(`SMS would be sent to ${phoneNumber}: ${message}`);
+    
+    return {
+      success: true,
+      messageId: `sms_${Date.now()}`,
+      channel: 'sms',
+      recipient: phoneNumber
+    };
+  }
+  
   // OCR-specific notification methods
   async notifyDocumentProcessed(documentId, result, userPreferences) {
     const message = this.formatOCRCompletionMessage(documentId, result);
@@ -240,20 +295,5 @@ Please review your positions immediately.`;
     const notifications = [];
     for (const channel of userPreferences.channels || ['telegram', 'email']) {
       try {
-        const notificationResult = await this.sendNotification(
-          channel,
-          userPreferences[channel + '_address'],
-          message,
-          { subject: 'URGENT: Risk Alert' }
-        );
-        notifications.push(notificationResult);
-      } catch (error) {
-        console.error(`Failed to send ${channel} notification:`, error);
-      }
-    }
-    
-    return notifications;
-  }
-}
-
-module.exports = new NotificationService();
+        const notification
+
