@@ -137,7 +137,7 @@ class OCRService {
     }
   }
 
-  async getProcessingHistory(page = 1, limit = 20, language = null) {
+  async getProcessingHistory(page = 1, limit = 20, _language = null) {
     // This would typically query a database
     // For now, return a placeholder structure
     return {
@@ -207,7 +207,7 @@ class OCRService {
     }
   }
 
-  async _performOCR(filePath, options, documentId) {
+  async _performOCR(filePath, options, _documentId) {
     const { language = 'eng', extractFields = false, detectStamps = false, detectSignatures = false } = options;
     
     try {
@@ -256,43 +256,43 @@ class OCRService {
     const fields = {};
     
     // Extract common trading document fields
-    const patterns = {
-      contractNumber: /contract\s*#?\s*:?\s*([A-Z0-9-]+)/i,
-      tradeDate: /trade\s*date\s*:?\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i,
-      volume: /volume\s*:?\s*([\d,]+\.?\d*)\s*(barrels?|bbl|tons?|mt)/i,
-      price: /price\s*:?\s*\$?([\d,]+\.?\d*)/i,
-      commodity: /(crude\s*oil|natural\s*gas|lng|gasoline|diesel|fuel\s*oil)/i,
-      counterparty: /counterparty\s*:?\s*([A-Z][A-Za-z\s&,\.]+)/i
-    };
+ const patterns = {
+  contractNumber: /contract\s*#?\s*:?\s*([A-Z0-9-]+)/i,
+  tradeDate: /trade\s*date\s*:?\s*(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})/i,
+  volume: /volume\s*:?\s*([\d,]+\.?\d*)\s*(barrels?|bbl|tons?|mt)/i,
+  price: /price\s*:?\s*\$?([\d,]+\.?\d*)/i,
+  commodity: /(crude\s*oil|natural\s*gas|lng|gasoline|diesel|fuel\s*oil)/i,
+  counterparty: /counterparty\s*:?\s*([A-Z][A-Za-z\s&,\.]+)/i
+};
 
-    for (const [fieldName, pattern] of Object.entries(patterns)) {
-      const match = text.match(pattern);
-      if (match) {
-        fields[fieldName] = match[1];
-      }
-    }
-
-    return Object.keys(fields).length > 0 ? fields : null;
+for (const [fieldName, pattern] of Object.entries(patterns)) {
+  const match = text.match(pattern);
+  if (match) {
+    fields[fieldName] = match[1];
   }
+}
 
-  async _detectStamps(text) {
-    // Simple stamp detection based on text patterns
-    const stampPatterns = [
-      /APPROVED/i,
-      /RECEIVED/i,
-      /CONFIDENTIAL/i,
-      /URGENT/i,
-      /COPY/i,
-      /ORIGINAL/i,
-      /FILED/i
-    ];
+return Object.keys(fields).length > 0 ? fields : null;
+}
 
-    const detectedStamps = [];
-    for (const pattern of stampPatterns) {
-      if (pattern.test(text)) {
-        detectedStamps.push(pattern.source.replace(/[\/\\i]/g, ''));
-      }
+async _detectStamps(text) {
+  // Simple stamp detection based on text patterns
+  const stampPatterns = [
+    /APPROVED/i,
+    /RECEIVED/i,
+    /CONFIDENTIAL/i,
+    /URGENT/i,
+    /COPY/i,
+    /ORIGINAL/i,
+    /FILED/i
+  ];
+
+  const detectedStamps = [];
+  for (const pattern of stampPatterns) {
+    if (pattern.test(text)) {
+      detectedStamps.push(pattern.source.replace(/[\/\\i]/g, ''));
     }
+  }
 
     return detectedStamps.length > 0 ? detectedStamps : null;
   }
