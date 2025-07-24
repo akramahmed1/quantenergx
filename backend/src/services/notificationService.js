@@ -1,6 +1,4 @@
 const TelegramBot = require('node-telegram-bot-api');
-//const axios = require('axios');
-
 class NotificationService {
   constructor() {
     this.telegramBot = null;
@@ -60,7 +58,6 @@ class NotificationService {
     };
   }
 
-  async sendWhatsAppMessage(phoneNumber, message) {
     // This is a placeholder for WhatsApp Business API integration
     // In production, you would integrate with services like:
     // - WhatsApp Business API
@@ -84,8 +81,6 @@ class NotificationService {
     // - AWS SES
     // - Mailgun
     
-    const { subject = 'QuantEnergx Notification'} = options;
-    
     console.log(`Email would be sent to ${email}:`);
     console.log(`Subject: ${subject}`);
     console.log(`Message: ${message}`);
@@ -98,7 +93,6 @@ class NotificationService {
     };
   }
 
-  async sendSMSNotification(phoneNumber, message) {
     // Placeholder for SMS service integration
     // In production, integrate with services like:
     // - Twilio
