@@ -205,7 +205,6 @@ class OCRService {
     }
   }
 
-  async _performOCR(filePath, options) {
     const { language = 'eng', extractFields = false, detectStamps = false, detectSignatures = false } = options;
     
     try {
@@ -252,8 +251,8 @@ class OCRService {
     // Simple field extraction using regex patterns
     // In production, this would use ML models
     const fields = {};
-  }
 
+  }
     }
 
     return detectedStamps.length > 0 ? detectedStamps : null;
