@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { configureStore } from '@reduxjs/toolkit';
@@ -28,15 +28,14 @@ const renderWithProviders = (component: React.ReactElement) => {
 
 describe('App Component', () => {
   test('renders without crashing', () => {
-    renderWithProviders(<App />);
+    const { container } = renderWithProviders(<App />);
     // The app should render without throwing errors
-    expect(document.body).toBeTruthy();
+    expect(container).toBeTruthy();
   });
 
   test('renders main application layout', () => {
-    renderWithProviders(<App />);
+    const { container } = renderWithProviders(<App />);
     // Check if the app container is present
-    const appElement = document.querySelector('.App') || document.body.firstChild;
-    expect(appElement).toBeTruthy();
+    expect(container).toBeTruthy();
   });
 });
