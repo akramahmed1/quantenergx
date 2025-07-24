@@ -60,8 +60,6 @@ app.use('/api/v1', require('./routes'));
 
 // Error handling middleware
 app.use((err, req, res) => {
-  // error handling code...
-});
   logger.error(err.stack);
   res.status(500).json({ 
     error: 'Internal Server Error',

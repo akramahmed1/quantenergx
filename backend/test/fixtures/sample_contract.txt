@@ -1,0 +1,11 @@
+
+    TRADING CONTRACT
+    Contract Number: TC-2024-001
+    Trade Date: 2024-01-15
+    Volume: 50,000 barrels
+    Price: $75.50 per barrel
+    Counterparty: Energy Trading Corp
+    Commodity: Crude Oil
+    Delivery Location: Houston, TX
+    Incoterms: FOB
+  

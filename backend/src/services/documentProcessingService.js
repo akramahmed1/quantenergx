@@ -131,8 +131,8 @@ class DocumentProcessingService {
       volume: /(?:volume|quantity|amount)\s*:?\s*([\d,]+\.?\d*)\s*(?:barrels?|bbl|tons?|mt|gallons?)/i,
       price: /(?:price|rate|cost)\s*:?\s*\$?([\d,]+\.?\d*)/i,
       commodity: /(crude\s*oil|natural\s*gas|lng|gasoline|diesel|fuel\s*oil|heating\s*oil)/i,
-      counterparty: /(?:counterparty|buyer|seller|client)\s*:?\s*([A-Z][A-Za-z\s&,\.]+)/i,
-      delivery_location: /(?:delivery|location|terminal|depot)\s*:?\s*([A-Z][A-Za-z\s,\.]+)/i,
+      counterparty: /(?:counterparty|buyer|seller|client)\s*:?\s*([A-Z][A-Za-z\s&,.]+)/i,
+      delivery_location: /(?:delivery|location|terminal|depot)\s*:?\s*([A-Z][A-Za-z\s,.]+)/i,
       incoterms: /(FOB|CIF|CFR|DAP|DDP|FAS|FCA|CPT|CIP)/i,
       total_value: /(?:total|amount|value)\s*:?\s*\$?([\d,]+\.?\d*)/i
     };
