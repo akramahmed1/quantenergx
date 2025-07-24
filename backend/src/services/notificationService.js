@@ -114,7 +114,7 @@ class NotificationService {
       recipient: phoneNumber
     };
   }
-
+  
   // OCR-specific notification methods
   async notifyDocumentProcessed(documentId, result, userPreferences) {
     const message = this.formatOCRCompletionMessage(documentId, result);
@@ -293,23 +293,7 @@ Trade has been added to your portfolio.`;
 Please review your positions immediately.`;
 
     const notifications = [];
-    
     for (const channel of userPreferences.channels || ['telegram', 'email']) {
       try {
-        const notificationResult = await this.sendNotification(
-          channel,
-          userPreferences[channel + '_address'],
-          message,
-          { subject: 'URGENT: Risk Alert' }
-        );
-        notifications.push(notificationResult);
-      } catch (error) {
-        console.error(`Failed to send ${channel} notification:`, error);
-      }
-    }
-    
-    return notifications;
-  }
-}
-
-module.exports = new NotificationService();
+        const notification
+
