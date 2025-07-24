@@ -3,12 +3,14 @@ const cors = require('cors');
 const helmet = require('helmet');
 const dotenv = require('dotenv');
 const winston = require('winston');
+const OCRGRPCService = require('./grpc/services/ocrGrpcService');
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const GRPC_PORT = process.env.GRPC_PORT || 50051;
 
 // Configure logger
 const logger = winston.createLogger({
@@ -31,6 +33,9 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
+// Initialize gRPC service
+const grpcService = new OCRGRPCService();
+
 // Middleware
 app.use(helmet());
 app.use(cors());
@@ -42,7 +47,11 @@ app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'healthy', 
     timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version || '1.0.0'
+    version: process.env.npm_package_version || '1.0.0',
+    services: {
+      rest_api: 'online',
+      grpc_service: 'online'
+    }
   });
 });
 
@@ -63,10 +72,27 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// Start server
+// Start servers
 app.listen(PORT, () => {
   logger.info(`QuantEnergx Backend Server running on port ${PORT}`);
   logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+});
+
+// Start gRPC service
+grpcService.start(GRPC_PORT);
+logger.info(`QuantEnergx gRPC Service running on port ${GRPC_PORT}`);
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  logger.info('SIGTERM received, shutting down gracefully');
+  grpcService.stop();
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  logger.info('SIGINT received, shutting down gracefully');
+  grpcService.stop();
+  process.exit(0);
 });
 
 module.exports = app;
