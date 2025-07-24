@@ -293,7 +293,6 @@ Trade has been added to your portfolio.`;
 Please review your positions immediately.`;
 
     const notifications = [];
-    
     for (const channel of userPreferences.channels || ['telegram', 'email']) {
       try {
         const notificationResult = await this.sendNotification(
