@@ -114,7 +114,7 @@ class NotificationService {
       recipient: phoneNumber
     };
   }
-
+  
   // OCR-specific notification methods
   async notifyDocumentProcessed(documentId, result, userPreferences) {
     const message = this.formatOCRCompletionMessage(documentId, result);

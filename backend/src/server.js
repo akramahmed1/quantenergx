@@ -58,6 +58,11 @@ app.get('/health', (req, res) => {
 // API routes
 app.use('/api/v1', require('./routes'));
 
+// 404 handler for API routes
+app.use('/api/v1/*', (req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
 // Error handling middleware
 app.use((err, req, res) => {
   logger.error(err.stack);
@@ -67,22 +72,22 @@ app.use((err, req, res) => {
   });
 });
 
-// 404 handler
+// Catch-all 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// Start servers
-app.listen(PORT, () => {
-  logger.info(`QuantEnergx Backend Server running on port ${PORT}`);
-  logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+// Start servers only if not in test mode
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    logger.info(`QuantEnergx Backend Server running on port ${PORT}`);
+    logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
 
-// Start gRPC service
-grpcService.start(GRPC_PORT);
-logger.info(`QuantEnergx gRPC Service running on port ${GRPC_PORT}`);
-
-// Graceful shutdown
+  // Start gRPC service
+  grpcService.start(GRPC_PORT);
+  logger.info(`QuantEnergx gRPC Service running on port ${GRPC_PORT}`);
+}
 process.on('SIGTERM', () => {
   logger.info('SIGTERM received, shutting down gracefully');
   grpcService.stop();

@@ -136,8 +136,6 @@ class OCRService {
       throw new Error(`Failed to get batch status: ${error.message}`);
     }
   }
-
-  async getProcessingHistory(page = 1, limit = 20) {
     // This would typically query a database
     // For now, return a placeholder structure
     return {
@@ -271,6 +269,7 @@ class OCRService {
     }
 
     return Object.keys(fields).length > 0 ? fields : null;
+
   }
 
   async _detectStamps(text) {
@@ -285,11 +284,6 @@ class OCRService {
       /FILED/i
     ];
 
-    const detectedStamps = [];
-    for (const pattern of stampPatterns) {
-      if (pattern.test(text)) {
-        detectedStamps.push(pattern.source.replace(/[/\\i]/g, ''));
-      }
     }
 
     return detectedStamps.length > 0 ? detectedStamps : null;
