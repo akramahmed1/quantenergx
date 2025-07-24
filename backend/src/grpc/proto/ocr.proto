@@ -1,0 +1,155 @@
+syntax = "proto3";
+
+package quantenergx.ocr;
+
+// OCR service definition
+service OCRService {
+  // Process a single document
+  rpc ProcessDocument(ProcessDocumentRequest) returns (ProcessDocumentResponse);
+  
+  // Process multiple documents (batch)
+  rpc ProcessBatch(ProcessBatchRequest) returns (ProcessBatchResponse);
+  
+  // Get batch status
+  rpc GetBatchStatus(GetBatchStatusRequest) returns (GetBatchStatusResponse);
+  
+  // Extract specific fields from processed document
+  rpc ExtractFields(ExtractFieldsRequest) returns (ExtractFieldsResponse);
+  
+  // Submit manual review
+  rpc SubmitReview(SubmitReviewRequest) returns (SubmitReviewResponse);
+}
+
+// Messages
+message ProcessDocumentRequest {
+  bytes document_data = 1;
+  string filename = 2;
+  string mime_type = 3;
+  OCROptions options = 4;
+}
+
+message ProcessDocumentResponse {
+  string document_id = 1;
+  string extracted_text = 2;
+  double confidence = 3;
+  string detected_language = 4;
+  map<string, ExtractedField> fields = 5;
+  repeated string stamps_detected = 6;
+  repeated string signatures_detected = 7;
+  int64 processing_time_ms = 8;
+  string status = 9;
+  string error_message = 10;
+}
+
+message ProcessBatchRequest {
+  repeated DocumentItem documents = 1;
+  OCROptions options = 2;
+}
+
+message DocumentItem {
+  bytes document_data = 1;
+  string filename = 2;
+  string mime_type = 3;
+}
+
+message ProcessBatchResponse {
+  string batch_id = 1;
+  int32 total_documents = 2;
+  string status = 3;
+  string message = 4;
+}
+
+message GetBatchStatusRequest {
+  string batch_id = 1;
+}
+
+message GetBatchStatusResponse {
+  string batch_id = 1;
+  int32 total_documents = 2;
+  int32 completed = 3;
+  int32 failed = 4;
+  int32 processing = 5;
+  int32 waiting = 6;
+  repeated BatchResult results = 7;
+}
+
+message BatchResult {
+  string document_id = 1;
+  string filename = 2;
+  string status = 3;
+  double confidence = 4;
+  int32 text_length = 5;
+  string error_message = 6;
+}
+
+message ExtractFieldsRequest {
+  string document_id = 1;
+  repeated FieldDefinition field_definitions = 2;
+}
+
+message ExtractFieldsResponse {
+  string document_id = 1;
+  map<string, ExtractedField> extracted_fields = 2;
+  repeated FieldError field_errors = 3;
+  double overall_confidence = 4;
+  bool needs_manual_review = 5;
+}
+
+message SubmitReviewRequest {
+  string document_id = 1;
+  map<string, string> corrections = 2;
+  ReviewStatus review_status = 3;
+  string comments = 4;
+  string reviewer_id = 5;
+}
+
+message SubmitReviewResponse {
+  bool success = 1;
+  string review_id = 2;
+  string document_id = 3;
+  ReviewStatus status = 4;
+  string message = 5;
+}
+
+// Supporting messages
+message OCROptions {
+  string language = 1;
+  bool extract_fields = 2;
+  bool detect_stamps = 3;
+  bool detect_signatures = 4;
+}
+
+message ExtractedField {
+  string name = 1;
+  string value = 2;
+  FieldType type = 3;
+  double confidence = 4;
+  bool needs_review = 5;
+}
+
+message FieldDefinition {
+  string name = 1;
+  FieldType type = 2;
+  string pattern = 3;
+  bool required = 4;
+}
+
+message FieldError {
+  string field = 1;
+  string error = 2;
+}
+
+// Enums
+enum FieldType {
+  TEXT = 0;
+  NUMBER = 1;
+  DATE = 2;
+  CURRENCY = 3;
+}
+
+enum ReviewStatus {
+  PENDING = 0;
+  APPROVED = 1;
+  REJECTED = 2;
+  NEEDS_REVISION = 3;
+}
