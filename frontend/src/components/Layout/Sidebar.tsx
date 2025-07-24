@@ -13,13 +13,12 @@ import {
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
-  DocumentScanner as OCRIcon,
   TrendingUp as TradingIcon,
   Security as RiskIcon,
   Gavel as ComplianceIcon,
   Upload as UploadIcon,
   RateReview as ReviewIcon,
-  Batch as BatchIcon,
+  ViewList as BatchIcon,
 } from '@mui/icons-material';
 
 const drawerWidth = 240;
