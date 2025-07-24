@@ -21,11 +21,11 @@ class NotificationService {
         case 'telegram':
           return await this.sendTelegramMessage(recipient, message, options);
         case 'whatsapp':
-          return await this.sendWhatsAppMessage(recipient, message, options);
+          return await this.sendWhatsAppMessage(recipient, message);
         case 'email':
           return await this.sendEmailNotification(recipient, message, options);
         case 'sms':
-          return await this.sendSMSNotification(recipient, message, options);
+          return await this.sendSMSNotification(recipient, message);
         default:
           throw new Error(`Unsupported notification channel: ${channel}`);
       }

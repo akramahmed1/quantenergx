@@ -252,24 +252,6 @@ class OCRService {
     // Simple field extraction using regex patterns
     // In production, this would use ML models
     const fields = {};
-    const patterns = {
-      contractNumber: /contract\s*#?\s*:?\s*([A-Z0-9-]+)/i,
-      tradeDate: /trade\s*date\s*:?\s*(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})/i,
-      volume: /volume\s*:?\s*([\d,]+\.?\d*)\s*(barrels?|bbl|tons?|mt)/i,
-      price: /price\s*:?\s*\$?([\d,]+\.?\d*)/i,
-      commodity: /(crude\s*oil|natural\s*gas|lng|gasoline|diesel|fuel\s*oil)/i,
-      counterparty: /counterparty\s*:?\s*([A-Z][A-Za-z\s&,.]+)/i
-    };
-
-    for (const [fieldName, pattern] of Object.entries(patterns)) {
-      const match = text.match(pattern);
-      if (match) {
-        fields[fieldName] = match[1];
-      }
-    }
-
-    return Object.keys(fields).length > 0 ? fields : null;
-
   }
 
   async _detectStamps(text) {
