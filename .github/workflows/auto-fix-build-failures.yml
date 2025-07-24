@@ -1,0 +1,61 @@
+name: Auto Fix Build Failures and Merge
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main, dev, staging]
+  workflow_dispatch:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint code
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+
+  auto-fix:
+    needs: ci
+    runs-on: ubuntu-latest
+    if: ${{ failure() }}
+    steps:
+      - name: Analyze and Fix Build Failures with Copilot
+        uses: github/copilot-actions/fix@latest
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit and Push Fixes
+        run: |
+          git config --global user.name "Copilot[bot]"
+          git config --global user.email "copilot[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Auto-fix: Build/test/lint failures resolved by Copilot"
+          git push
+
+  automerge:
+    needs: [ci, auto-fix]
+    runs-on: ubuntu-latest
+    if: ${{ success() }}
+    steps:
+      - name: Merge PR
+        uses: pascalgn/automerge-action@v0.16.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+# Safety reminders:
+# - No branch deletions
+# - No destructive DB operations
+# - Only read/write/edit/update
