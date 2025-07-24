@@ -1,8 +1,8 @@
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 const path = require('path');
-const ocrService = require('../services/ocrService');
-const documentProcessingService = require('../services/documentProcessingService');
+const ocrService = require('../../services/ocrService');
+const documentProcessingService = require('../../services/documentProcessingService');
 
 // Load proto file
 const PROTO_PATH = path.join(__dirname, '../proto/ocr.proto');
