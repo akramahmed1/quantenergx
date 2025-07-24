@@ -265,7 +265,7 @@ class OCRService {
       /ORIGINAL/i,
       /FILED/i
     ];
-
+    
     }
 
     return detectedStamps.length > 0 ? detectedStamps : null;
