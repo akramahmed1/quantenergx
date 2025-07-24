@@ -25,7 +25,6 @@ import {
 import {
   CloudUpload as UploadIcon,
   Delete as DeleteIcon,
-  Visibility as PreviewIcon,
 } from '@mui/icons-material';
 import { useDropzone } from 'react-dropzone';
 import { AppDispatch, RootState } from '../../store/store';
@@ -33,7 +32,7 @@ import { uploadDocument, uploadBatch } from '../../store/slices/ocrSlice';
 
 export const OCRDocumentUpload: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { isProcessing, error, uploadProgress } = useSelector((state: RootState) => state.ocr);
+  const { isProcessing, error } = useSelector((state: RootState) => state.ocr);
   
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [language, setLanguage] = useState('eng');
