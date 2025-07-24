@@ -126,8 +126,6 @@ class DocumentProcessingService {
   async _extractByType(text, fieldName, type) {
     const patterns = {
       contract_number: /(?:contract|agreement|deal)\s*#?\s*:?\s*([A-Z0-9-]+)/i,
-      trade_date: /(?:trade|execution|deal)\s*date\s*:?\s*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/i,
-      settlement_date: /settlement\s*date\s*:?\s*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/i,
       volume: /(?:volume|quantity|amount)\s*:?\s*([\d,]+\.?\d*)\s*(?:barrels?|bbl|tons?|mt|gallons?)/i,
       price: /(?:price|rate|cost)\s*:?\s*\$?([\d,]+\.?\d*)/i,
       commodity: /(crude\s*oil|natural\s*gas|lng|gasoline|diesel|fuel\s*oil|heating\s*oil)/i,
@@ -165,10 +163,6 @@ class DocumentProcessingService {
   _parseDate(dateString) {
     // Handle various date formats
     const formats = [
-      /(\d{1,2})[/-](\d{1,2})[/-](\d{4})/,  // MM/DD/YYYY or DD/MM/YYYY
-      /(\d{1,2})[/-](\d{1,2})[/-](\d{2})/,  // MM/DD/YY or DD/MM/YY
-    ];
-    
     for (const format of formats) {
       const match = dateString.match(format);
       if (match) {
