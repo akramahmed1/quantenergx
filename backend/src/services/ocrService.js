@@ -30,8 +30,8 @@ class OCRService {
   setupWorkers() {
     // Process OCR jobs
     this.ocrQueue.process('ocr-document', async (job) => {
-      const { filePath, options, documentId } = job.data;
-      return await this._performOCR(filePath, options, documentId);
+      const { filePath, options } = job.data;
+      return await this._performOCR(filePath, options);
     });
 
     // Process batch jobs
@@ -50,7 +50,7 @@ class OCRService {
       const processedFilePath = await this._preprocessFile(file);
       
       // Perform OCR
-      const result = await this._performOCR(processedFilePath, options, documentId);
+      const result = await this._performOCR(processedFilePath, options);
       
       // Store result in database (placeholder for now)
       await this._storeResult(documentId, result, file.originalname);
@@ -137,7 +137,7 @@ class OCRService {
     }
   }
 
-  async getProcessingHistory(page = 1, limit = 20, _language = null) {
+  async getProcessingHistory(page = 1, limit = 20) {
     // This would typically query a database
     // For now, return a placeholder structure
     return {
@@ -207,7 +207,7 @@ class OCRService {
     }
   }
 
-  async _performOCR(filePath, options, _documentId) {
+  async _performOCR(filePath, options) {
     const { language = 'eng', extractFields = false, detectStamps = false, detectSignatures = false } = options;
     
     try {
@@ -262,7 +262,7 @@ class OCRService {
   volume: /volume\s*:?\s*([\d,]+\.?\d*)\s*(barrels?|bbl|tons?|mt)/i,
   price: /price\s*:?\s*\$?([\d,]+\.?\d*)/i,
   commodity: /(crude\s*oil|natural\s*gas|lng|gasoline|diesel|fuel\s*oil)/i,
-  counterparty: /counterparty\s*:?\s*([A-Z][A-Za-z\s&,\.]+)/i
+  counterparty: /counterparty\s*:?\s*([A-Z][A-Za-z\s&,.]+)/i
 };
 
 for (const [fieldName, pattern] of Object.entries(patterns)) {
@@ -290,7 +290,7 @@ async _detectStamps(text) {
   const detectedStamps = [];
   for (const pattern of stampPatterns) {
     if (pattern.test(text)) {
-      detectedStamps.push(pattern.source.replace(/[\/\\i]/g, ''));
+      detectedStamps.push(pattern.source.replace(/[/\\i]/g, ''));
     }
   }
 
@@ -322,7 +322,7 @@ async _detectStamps(text) {
     for (const file of files) {
       try {
         const documentId = uuidv4();
-        const result = await this._performOCR(file.path, options, documentId);
+        const result = await this._performOCR(file.path, options);
         
         results.push({
           documentId,

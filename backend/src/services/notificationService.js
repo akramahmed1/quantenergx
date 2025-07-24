@@ -21,11 +21,11 @@ class NotificationService {
         case 'telegram':
           return await this.sendTelegramMessage(recipient, message, options);
         case 'whatsapp':
-          return await this.sendWhatsAppMessage(recipient, message, options);
+          return await this.sendWhatsAppMessage(recipient, message);
         case 'email':
           return await this.sendEmailNotification(recipient, message, options);
         case 'sms':
-          return await this.sendSMSNotification(recipient, message, options);
+          return await this.sendSMSNotification(recipient, message);
         default:
           throw new Error(`Unsupported notification channel: ${channel}`);
       }
@@ -60,7 +60,7 @@ class NotificationService {
     };
   }
 
-  async sendWhatsAppMessage(phoneNumber, message, _options = {}) {
+  async sendWhatsAppMessage(phoneNumber, message) {
     // This is a placeholder for WhatsApp Business API integration
     // In production, you would integrate with services like:
     // - WhatsApp Business API
@@ -84,7 +84,7 @@ class NotificationService {
     // - AWS SES
     // - Mailgun
     
-    const { subject = 'QuantEnergx Notification'} = _options;
+    const { subject = 'QuantEnergx Notification'} = options;
     
     console.log(`Email would be sent to ${email}:`);
     console.log(`Subject: ${subject}`);
@@ -98,7 +98,7 @@ class NotificationService {
     };
   }
 
-  async sendSMSNotification(phoneNumber, message, _options = {}) {
+  async sendSMSNotification(phoneNumber, message) {
     // Placeholder for SMS service integration
     // In production, integrate with services like:
     // - Twilio
