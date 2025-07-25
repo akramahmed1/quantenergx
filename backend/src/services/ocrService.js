@@ -30,8 +30,8 @@ class OCRService {
   setupWorkers() {
     // Process OCR jobs
     this.ocrQueue.process('ocr-document', async (job) => {
-      const { filePath, options } = job.data;
-      return await this._performOCR(filePath, options);
+      const { filePath, options, documentId } = job.data;
+      return await this._performOCR(filePath, options, documentId);
     });
 
     // Process batch jobs
@@ -50,7 +50,7 @@ class OCRService {
       const processedFilePath = await this._preprocessFile(file);
       
       // Perform OCR
-      const result = await this._performOCR(processedFilePath, options);
+      const result = await this._performOCR(processedFilePath, options, documentId);
       
       // Store result in database (placeholder for now)
       await this._storeResult(documentId, result, file.originalname);
@@ -195,7 +195,6 @@ class OCRService {
     }
   }
 
-  async _performOCR(filePath, options = {}) {
     const { language = 'eng', extractFields = false, detectStamps = false, detectSignatures = false } = options;
     
     try {
@@ -242,22 +241,16 @@ class OCRService {
     // Simple field extraction using regex patterns
     // In production, this would use ML models
     const fields = {};
-    
-    return fields;
+
   }
 
   async _detectStamps(text) {
     // Simple stamp detection based on text patterns
     const stampPatterns = [
-      /\b(stamp|seal|notary|official)\b/i,
-      /\b(certified|authorized|approved)\b/i
     ];
 
     const detectedStamps = [];
     for (const pattern of stampPatterns) {
-      const match = text.match(pattern);
-      if (match) {
-        detectedStamps.push(match[0]);
       }
     }
 
@@ -289,7 +282,7 @@ class OCRService {
     for (const file of files) {
       try {
         const documentId = uuidv4();
-        const result = await this._performOCR(file.path, options);
+        const result = await this._performOCR(file.path, options, documentId);
         
         results.push({
           documentId,

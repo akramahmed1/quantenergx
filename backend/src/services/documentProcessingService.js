@@ -126,11 +126,13 @@ class DocumentProcessingService {
   async _extractByType(text, fieldName, type) {
     const patterns = {
       contract_number: /(?:contract|agreement|deal)\s*#?\s*:?\s*([A-Z0-9-]+)/i,
+      trade_date: /(?:trade|execution|deal)\s*date\s*:?\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i,
+      settlement_date: /settlement\s*date\s*:?\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i,
       volume: /(?:volume|quantity|amount)\s*:?\s*([\d,]+\.?\d*)\s*(?:barrels?|bbl|tons?|mt|gallons?)/i,
       price: /(?:price|rate|cost)\s*:?\s*\$?([\d,]+\.?\d*)/i,
       commodity: /(crude\s*oil|natural\s*gas|lng|gasoline|diesel|fuel\s*oil|heating\s*oil)/i,
-      counterparty: /(?:counterparty|buyer|seller|client)\s*:?\s*([A-Z][A-Za-z\s&,.]+)/i,
-      delivery_location: /(?:delivery|location|terminal|depot)\s*:?\s*([A-Z][A-Za-z\s,.]+)/i,
+      counterparty: /(?:counterparty|buyer|seller|client)\s*:?\s*([A-Z][A-Za-z\s&,\.]+)/i,
+      delivery_location: /(?:delivery|location|terminal|depot)\s*:?\s*([A-Z][A-Za-z\s,\.]+)/i,
       incoterms: /(FOB|CIF|CFR|DAP|DDP|FAS|FCA|CPT|CIP)/i,
       total_value: /(?:total|amount|value)\s*:?\s*\$?([\d,]+\.?\d*)/i
     };
@@ -148,23 +150,21 @@ class DocumentProcessingService {
     if (!value) return null;
     
     switch (type) {
-      case 'number':
-        return parseFloat(value.replace(/,/g, ''));
-      case 'currency':
-        return parseFloat(value.replace(/[$,]/g, ''));
-      case 'date':
-        return this._parseDate(value);
-      case 'text':
-      default:
-        return value.trim();
+    case 'number':
+      return parseFloat(value.replace(/,/g, ''));
+    case 'currency':
+      return parseFloat(value.replace(/[$,]/g, ''));
+    case 'date':
+      return this._parseDate(value);
+    case 'text':
+    default:
+      return value.trim();
     }
   }
 
   _parseDate(dateString) {
     // Handle various date formats
     const formats = [
-      /(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})/, // MM/DD/YYYY or MM-DD-YYYY
-      /(\d{2,4})[-/](\d{1,2})[-/](\d{1,2})/, // YYYY/MM/DD or YYYY-MM-DD
     ];
     
     for (const format of formats) {

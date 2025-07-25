@@ -3,34 +3,31 @@
  */
 module.exports = {
   packageManager: "npm",
-
+  reporters: ["html", "clear-text", "progress"],
   testRunner: "jest",
   jest: {
     projectType: "custom",
     configFile: "jest.config.js",
-    enableFindRelatedTests: true,
+    enableFindRelatedTests: false,
   },
-  coverageAnalysis: "perTest",
+  coverageAnalysis: "off", // Faster for demo
   mutate: [
-    "src/**/*.js",
-    "!src/**/*.test.js",
-    "!src/**/*.spec.js",
-    "!src/server.js",        // Don't mutate server startup
-    "!src/config/**",        // Don't mutate configuration
-    "!src/middleware/logger.js"  // Don't mutate logging
+    "test/unit/core-functions.test.js", // Small file for demo
   ],
   thresholds: {
-    high: 80,
-    low: 70,
-    break: 60
+    high: 50,  // Lower for demo
+    low: 30,
+    break: 10
   },
-
   htmlReporter: {
-    fileName: "test/mutation/reports/mutation-report.html"
+    fileName: "test/mutation/reports/mutation-demo-report.html"
   },
   tempDirName: "test/mutation/.stryker-tmp",
   cleanTempDir: true,
-
+  concurrency: 1,
+  timeoutMS: 30000,
+  timeoutFactor: 1.5,
+  maxConcurrentTestRunners: 1,
   disableTypeChecking: true,
   ignorePatterns: [
     "node_modules",

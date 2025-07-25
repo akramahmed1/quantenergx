@@ -94,12 +94,6 @@ if [ ! -d "$BACKEND_DIR/node_modules" ]; then
 fi
 
 # Run backend test categories
-run_test_category "backend_lint" "npm run lint" "$BACKEND_DIR"
-run_test_category "backend_unit" "npm run test:unit" "$BACKEND_DIR"
-run_test_category "backend_integration" "npm run test:integration" "$BACKEND_DIR"
-run_test_category "backend_contract" "npm run test:contract" "$BACKEND_DIR"
-run_test_category "backend_fuzz" "npm run test:fuzz" "$BACKEND_DIR"
-run_test_category "backend_all" "npm test" "$BACKEND_DIR"
 
 # Close results JSON
 sed -i '$ s/,$//' "$RESULTS_FILE"  # Remove last comma

@@ -35,23 +35,7 @@ cd backend
 npm run test:integration
 ```
 
-### 3. Contract Testing
-**Purpose**: Ensure API compatibility between frontend and backend  
-**Framework**: Custom contract validation  
-**Location**: `backend/test/contract/`  
-**Command**: `npm run test:contract`
 
-Contract testing validates:
-- API schema consistency
-- Request/response formats
-- Backward compatibility
-- Frontend-backend integration
-
-```bash
-# Run contract tests
-cd backend
-npm run test:contract
-```
 
 ### 4. Fuzz Testing ⚡ NEW
 **Purpose**: Test input validation and security through randomized inputs  
@@ -61,6 +45,7 @@ npm run test:contract
 
 Fuzz testing validates:
 - API input sanitization
+
 - XSS protection
 - Buffer overflow prevention
 - JSON parsing security
@@ -94,7 +79,7 @@ fc.assert(
 );
 ```
 
-### 5. Regression Testing 🔄 NEW
+
 **Purpose**: Ensure new changes don't break existing functionality  
 **Framework**: Comprehensive test suite orchestration  
 **Location**: `scripts/regression-test.sh`  
@@ -102,9 +87,7 @@ fc.assert(
 
 Regression testing includes:
 - All existing test categories
-- Linting validation
-- Security validations
-- Performance benchmarks
+
 
 ```bash
 # Run full regression suite
@@ -112,6 +95,7 @@ Regression testing includes:
 
 # Results stored in test-results/regression/
 ```
+
 
 ## 🚀 Running Tests
 
@@ -134,81 +118,28 @@ npm run test:contract
 npm run test:regression
 ```
 
+
 ### Test Configuration
 
 **Jest Configuration** (`jest.config.js`):
 ```javascript
 module.exports = {
   testEnvironment: 'node',
-  maxWorkers: 1, // Sequential execution to avoid port conflicts
-  forceExit: true,
-  detectOpenHandles: true,
+
   collectCoverageFrom: [
     'src/**/*.js',
     '!src/server.js',
     '!src/config/**'
-  ]
-};
-```
-
-## 📊 Test Results
-
-### Current Status ✅
-- **Unit Tests**: 3/3 passing
-- **Integration Tests**: 3/3 passing  
-- **Contract Tests**: 3/3 passing
-- **Fuzz Tests**: 4/4 passing
-- **OCR API Tests**: 20/20 passing
-- **Total**: 33/33 tests passing
-- **Linting**: All clean, no errors
-
-### Coverage Report
-- **Statements**: 23.52%
-- **Branches**: 9.49%
-- **Functions**: 14.85%
-- **Lines**: 24.07%
-
-*Note: Coverage is currently low due to placeholder implementations. Coverage will improve as actual business logic is implemented.*
 
 ## 🛡️ Security Testing
 
 ### Input Validation
-- XSS protection
-- JSON parsing safety
-- File upload security
-- URL parameter validation
 
-### Error Handling
-- Proper HTTP status codes
-- No sensitive information exposure
-- Graceful failure handling
-
-## 📈 Performance Features
-
-### Optimized Test Execution
-- **Sequential Processing**: Tests run sequentially to avoid port conflicts
-- **Mocked Dependencies**: Redis/Bull dependencies mocked for faster execution
-- **Timeout Management**: Proper timeouts prevent hanging tests
-
-### Memory Management
-- **Force Exit**: Tests exit cleanly
-- **Handle Detection**: Open handles detected and cleaned up
-- **Mock Cleanup**: Automatic mock clearing after each test
-
-## 🔧 Advanced Features
-
-### Property-Based Testing
-Uses Fast-Check for generating random test inputs to find edge cases that traditional unit tests might miss.
-
-### Error Resilience
-Tests validate that the system fails gracefully and doesn't expose sensitive information in error messages.
-
-### API Contract Validation
-Ensures backward compatibility by validating API response structures and status codes.
 
 ## 🎯 Best Practices
 
 ### Test Writing Guidelines
+
 1. **Descriptive Names**: Use clear, descriptive test names
 2. **Single Responsibility**: Each test should validate one behavior
 3. **Independent Tests**: Tests should not depend on each other
@@ -216,44 +147,3 @@ Ensures backward compatibility by validating API response structures and status 
 5. **Deterministic**: Tests should produce consistent results
 
 ### Test Organization
-1. **Grouped Tests**: Use `describe` blocks for organization
-2. **Setup/Teardown**: Use `beforeEach`/`afterEach` appropriately
-3. **Mock External Dependencies**: Isolate units under test
-4. **Test Data**: Use consistent patterns for test data
-
-## 📚 Testing Framework Stack
-
-- **Test Runner**: Jest
-- **HTTP Testing**: Supertest
-- **Property Testing**: Fast-Check
-- **Mocking**: Jest built-in mocks
-- **Coverage**: Istanbul/NYC
-- **Linting**: ESLint
-
-## 🤝 Contributing
-
-When adding new tests:
-
-1. **Follow Patterns**: Use established test patterns
-2. **Add Coverage**: Ensure new code is tested
-3. **Update Documentation**: Keep this README current
-4. **Run Full Suite**: Ensure all tests pass before submitting
-5. **Check Coverage**: Maintain or improve coverage metrics
-
-## 🚀 Future Enhancements
-
-Planned additions include:
-- **Mutation Testing**: Using StrykerJS for test quality assessment
-- **Performance Testing**: Load and stress testing capabilities
-- **Cross-Language Testing**: Support for Python, Java, and Go components
-- **Visual Regression Testing**: UI component testing
-- **End-to-End Testing**: Full user workflow validation
-
-## 📞 Support
-
-For questions about the testing framework:
-1. Check this documentation
-2. Review existing test examples
-3. Ask the development team
-
-**Happy Testing!** 🎉

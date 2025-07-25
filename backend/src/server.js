@@ -101,12 +101,7 @@ if (process.env.NODE_ENV !== 'test') {
   // Start gRPC service
   grpcService.start(GRPC_PORT);
   logger.info(`QuantEnergx gRPC Service running on port ${GRPC_PORT}`);
-  
-  process.on('SIGTERM', () => {
-    logger.info('SIGTERM received, shutting down gracefully');
-    grpcService.stop();
-    process.exit(0);
-  });
+
 
   process.on('SIGINT', () => {
     logger.info('SIGINT received, shutting down gracefully');

@@ -34,6 +34,7 @@ describe('Contract Testing - Basic API Contract Validation', () => {
     });
   });
 
+
   describe('Error Response Contract', () => {
     it('should maintain consistent error response format', async () => {
       const response = await request(app)

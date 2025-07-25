@@ -16,10 +16,5 @@ module.exports = {
   coverageDirectory: 'test/coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   setupFilesAfterEnv: ['<rootDir>/test/setup.js'],
-  testTimeout: 30000,
-  maxWorkers: 1, // Run tests sequentially to avoid port conflicts
-  bail: false,
-  verbose: true,
-  forceExit: true,
-  detectOpenHandles: true
+
 };
