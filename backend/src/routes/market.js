@@ -4,7 +4,15 @@ const MarketDataService = require('../services/marketDataService');
 const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
-const marketDataService = new MarketDataService();
+
+// Initialize market data service with error handling
+let marketDataService;
+try {
+  marketDataService = new MarketDataService();
+} catch (error) {
+  console.error('Failed to initialize MarketDataService:', error);
+  marketDataService = null;
+}
 
 // Market data API status
 router.get('/', (req, res) => {
@@ -16,12 +24,20 @@ router.get('/', (req, res) => {
       report: 'GET /market/report',
       commodities: 'GET /market/commodities'
     },
-    supportedCommodities: Object.keys(marketDataService.commodities)
+    supportedCommodities: marketDataService ? Object.keys(marketDataService.commodities) : [],
+    serviceStatus: marketDataService ? 'online' : 'offline'
   });
 });
 
 // Get supported commodities
 router.get('/commodities', (req, res) => {
+  if (!marketDataService) {
+    return res.status(503).json({
+      success: false,
+      error: 'Market data service unavailable'
+    });
+  }
+  
   res.json({
     success: true,
     commodities: marketDataService.commodities
@@ -36,6 +52,13 @@ router.get('/prices/:commodity',
   ],
   async (req, res) => {
     try {
+      if (!marketDataService) {
+        return res.status(503).json({
+          success: false,
+          error: 'Market data service unavailable'
+        });
+      }
+
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
