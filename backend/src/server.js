@@ -3,6 +3,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const dotenv = require('dotenv');
 const winston = require('winston');
+const rateLimit = require('express-rate-limit');
+const slowDown = require('express-slow-down');
 const OCRGRPCService = require('./grpc/services/ocrGrpcService');
 
 // Load environment variables
@@ -36,8 +38,100 @@ if (process.env.NODE_ENV !== 'production') {
 // Initialize gRPC service
 const grpcService = new OCRGRPCService();
 
-// Middleware
-app.use(helmet());
+// HTTPS/TLS enforcement middleware
+app.use((req, res, next) => {
+  // In production, enforce HTTPS
+  if (process.env.NODE_ENV === 'production') {
+    if (req.header('x-forwarded-proto') !== 'https') {
+      return res.redirect(`https://${req.header('host')}${req.url}`);
+    }
+  }
+  next();
+});
+
+// Enhanced security headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https:"],
+      scriptSrc: ["'self'"],
+      connectSrc: ["'self'"],
+      frameSrc: ["'none'"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
+  },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
+  }
+}));
+
+// Global rate limiting
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // Limit each IP to 1000 requests per windowMs
+  message: {
+    error: 'Too many requests from this IP, please try again later.',
+    retryAfter: '15 minutes'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    logger.warn(`Rate limit exceeded for IP: ${req.ip}`, {
+      ip: req.ip,
+      userAgent: req.get('User-Agent'),
+      path: req.path
+    });
+    res.status(429).json({
+      error: 'Too many requests from this IP, please try again later.',
+      retryAfter: '15 minutes'
+    });
+  }
+});
+
+// Speed limiting for sustained traffic
+const speedLimiter = slowDown({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  delayAfter: 100, // Allow 100 requests per windowMs without delay
+  delayMs: (hits) => hits * 100, // Add 100ms delay per request after delayAfter
+  maxDelayMs: 20000, // Maximum delay of 20 seconds
+});
+
+// Authentication rate limiting
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 auth requests per windowMs
+  message: {
+    error: 'Too many authentication attempts, please try again later.',
+    retryAfter: '15 minutes'
+  },
+  skipSuccessfulRequests: true,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    logger.warn(`Auth rate limit exceeded for IP: ${req.ip}`, {
+      ip: req.ip,
+      userAgent: req.get('User-Agent'),
+      path: req.path
+    });
+    res.status(429).json({
+      error: 'Too many authentication attempts, please try again later.',
+      retryAfter: '15 minutes'
+    });
+  }
+});
+
+// Apply rate limiting
+app.use(globalLimiter);
+app.use(speedLimiter);
+
+// Apply auth rate limiting to authentication endpoints
+app.use('/api/v1/users/auth', authLimiter);
 app.use(cors());
 
 // JSON parsing with error handling
