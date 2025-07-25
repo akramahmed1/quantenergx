@@ -2,16 +2,13 @@ const request = require('supertest');
 const app = require('../src/server');
 const path = require('path');
 const fs = require('fs');
-const jwt = require('jsonwebtoken');
 
 describe('OCR Service API Tests', () => {
   let authToken;
   
   beforeAll(async () => {
-    // Create a valid JWT token for testing
-    const testUser = { id: 1, username: 'testuser', role: 'admin' };
-    const jwtSecret = process.env.JWT_SECRET || 'fallback-secret-key';
-    authToken = jwt.sign(testUser, jwtSecret, { expiresIn: '1h' });
+    // Mock authentication token for testing
+    authToken = 'mock-jwt-token-for-testing';
   });
 
   describe('GET /health', () => {
@@ -178,7 +175,7 @@ describe('OCR Integration Tests', () => {
 
   describe('Field Extraction', () => {
     it('should extract contract number correctly', () => {
-      const contractNumberRegex = /contract\s*number\s*:?\s*([A-Z0-9-]+)/i;
+      const contractNumberRegex = /contract\s*#?\s*:?\s*([A-Z0-9-]+)/i;
       const match = sampleText.match(contractNumberRegex);
       expect(match).toBeTruthy();
       expect(match[1]).toBe('TC-2024-001');
@@ -206,7 +203,7 @@ describe('OCR Integration Tests', () => {
     });
 
     it('should extract counterparty correctly', () => {
-      const counterpartyRegex = /counterparty\s*:?\s*([A-Z][A-Za-z\s&,]+?)(?:\s*\n|\s*$)/i;
+      const counterpartyRegex = /counterparty\s*:?\s*([A-Z][A-Za-z\s&,\.]+)/i;
       const match = sampleText.match(counterpartyRegex);
       expect(match).toBeTruthy();
       expect(match[1]).toBe('Energy Trading Corp');

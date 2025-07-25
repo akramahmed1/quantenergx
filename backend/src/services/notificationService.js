@@ -1,4 +1,5 @@
 const TelegramBot = require('node-telegram-bot-api');
+
 class NotificationService {
   constructor() {
     this.telegramBot = null;
@@ -16,16 +17,16 @@ class NotificationService {
   async sendNotification(channel, recipient, message, options = {}) {
     try {
       switch (channel) {
-        case 'telegram':
-          return await this.sendTelegramMessage(recipient, message, options);
-        case 'whatsapp':
-          return await this.sendWhatsAppMessage(recipient, message);
-        case 'email':
-          return await this.sendEmailNotification(recipient, message, options);
-        case 'sms':
-          return await this.sendSMSNotification(recipient, message);
-        default:
-          throw new Error(`Unsupported notification channel: ${channel}`);
+      case 'telegram':
+        return await this.sendTelegramMessage(recipient, message, options);
+      case 'whatsapp':
+        return await this.sendWhatsAppMessage(recipient, message, options);
+      case 'email':
+        return await this.sendEmailNotification(recipient, message, options);
+      case 'sms':
+        return await this.sendSMSNotification(recipient, message, options);
+      default:
+        throw new Error(`Unsupported notification channel: ${channel}`);
       }
     } catch (error) {
       console.error(`Notification failed for channel ${channel}:`, error);
@@ -58,6 +59,7 @@ class NotificationService {
     };
   }
 
+  async sendWhatsAppMessage(phoneNumber, message, options = {}) {
     // This is a placeholder for WhatsApp Business API integration
     // In production, you would integrate with services like:
     // - WhatsApp Business API
@@ -81,6 +83,8 @@ class NotificationService {
     // - AWS SES
     // - Mailgun
     
+    const { subject = 'QuantEnergx Notification', html = false } = options;
+    
     console.log(`Email would be sent to ${email}:`);
     console.log(`Subject: ${subject}`);
     console.log(`Message: ${message}`);
@@ -93,6 +97,7 @@ class NotificationService {
     };
   }
 
+  async sendSMSNotification(phoneNumber, message, options = {}) {
     // Placeholder for SMS service integration
     // In production, integrate with services like:
     // - Twilio
@@ -108,7 +113,7 @@ class NotificationService {
       recipient: phoneNumber
     };
   }
-  
+
   // OCR-specific notification methods
   async notifyDocumentProcessed(documentId, result, userPreferences) {
     const message = this.formatOCRCompletionMessage(documentId, result);
@@ -287,7 +292,23 @@ Trade has been added to your portfolio.`;
 Please review your positions immediately.`;
 
     const notifications = [];
+    
     for (const channel of userPreferences.channels || ['telegram', 'email']) {
       try {
-        const notification
-
+        const notificationResult = await this.sendNotification(
+          channel,
+          userPreferences[channel + '_address'],
+          message,
+          { subject: 'URGENT: Risk Alert' }
+        );
+        notifications.push(notificationResult);
+      } catch (error) {
+        console.error(`Failed to send ${channel} notification:`, error);
+      }
+    }
+    
+    return notifications;
+  }
+}
+
+module.exports = new NotificationService();

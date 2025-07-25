@@ -30,8 +30,8 @@ class OCRService {
   setupWorkers() {
     // Process OCR jobs
     this.ocrQueue.process('ocr-document', async (job) => {
-      const { filePath, options } = job.data;
-      return await this._performOCR(filePath, options);
+      const { filePath, options, documentId } = job.data;
+      return await this._performOCR(filePath, options, documentId);
     });
 
     // Process batch jobs
@@ -50,7 +50,7 @@ class OCRService {
       const processedFilePath = await this._preprocessFile(file);
       
       // Perform OCR
-      const result = await this._performOCR(processedFilePath, options);
+      const result = await this._performOCR(processedFilePath, options, documentId);
       
       // Store result in database (placeholder for now)
       await this._storeResult(documentId, result, file.originalname);
@@ -136,6 +136,8 @@ class OCRService {
       throw new Error(`Failed to get batch status: ${error.message}`);
     }
   }
+
+  async getProcessingHistory(page = 1, limit = 20, language = null) {
     // This would typically query a database
     // For now, return a placeholder structure
     return {
@@ -205,6 +207,7 @@ class OCRService {
     }
   }
 
+  async _performOCR(filePath, options, documentId) {
     const { language = 'eng', extractFields = false, detectStamps = false, detectSignatures = false } = options;
     
     try {
@@ -251,8 +254,44 @@ class OCRService {
     // Simple field extraction using regex patterns
     // In production, this would use ML models
     const fields = {};
+    
+    // Extract common trading document fields
+    const patterns = {
+      contractNumber: /contract\s*#?\s*:?\s*([A-Z0-9-]+)/i,
+      tradeDate: /trade\s*date\s*:?\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i,
+      volume: /volume\s*:?\s*([\d,]+\.?\d*)\s*(barrels?|bbl|tons?|mt)/i,
+      price: /price\s*:?\s*\$?([\d,]+\.?\d*)/i,
+      commodity: /(crude\s*oil|natural\s*gas|lng|gasoline|diesel|fuel\s*oil)/i,
+      counterparty: /counterparty\s*:?\s*([A-Z][A-Za-z\s&,\.]+)/i
+    };
 
+    for (const [fieldName, pattern] of Object.entries(patterns)) {
+      const match = text.match(pattern);
+      if (match) {
+        fields[fieldName] = match[1];
+      }
+    }
+
+    return Object.keys(fields).length > 0 ? fields : null;
   }
+
+  async _detectStamps(text) {
+    // Simple stamp detection based on text patterns
+    const stampPatterns = [
+      /APPROVED/i,
+      /RECEIVED/i,
+      /CONFIDENTIAL/i,
+      /URGENT/i,
+      /COPY/i,
+      /ORIGINAL/i,
+      /FILED/i
+    ];
+
+    const detectedStamps = [];
+    for (const pattern of stampPatterns) {
+      if (pattern.test(text)) {
+        detectedStamps.push(pattern.source.replace(/[\/\\i]/g, ''));
+      }
     }
 
     return detectedStamps.length > 0 ? detectedStamps : null;
@@ -283,7 +322,7 @@ class OCRService {
     for (const file of files) {
       try {
         const documentId = uuidv4();
-        const result = await this._performOCR(file.path, options);
+        const result = await this._performOCR(file.path, options, documentId);
         
         results.push({
           documentId,
