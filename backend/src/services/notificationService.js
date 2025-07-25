@@ -1,5 +1,4 @@
 const TelegramBot = require('node-telegram-bot-api');
-const axios = require('axios');
 
 class NotificationService {
   constructor() {
@@ -18,16 +17,16 @@ class NotificationService {
   async sendNotification(channel, recipient, message, options = {}) {
     try {
       switch (channel) {
-        case 'telegram':
-          return await this.sendTelegramMessage(recipient, message, options);
-        case 'whatsapp':
-          return await this.sendWhatsAppMessage(recipient, message, options);
-        case 'email':
-          return await this.sendEmailNotification(recipient, message, options);
-        case 'sms':
-          return await this.sendSMSNotification(recipient, message, options);
-        default:
-          throw new Error(`Unsupported notification channel: ${channel}`);
+      case 'telegram':
+        return await this.sendTelegramMessage(recipient, message, options);
+      case 'whatsapp':
+        return await this.sendWhatsAppMessage(recipient, message, options);
+      case 'email':
+        return await this.sendEmailNotification(recipient, message, options);
+      case 'sms':
+        return await this.sendSMSNotification(recipient, message, options);
+      default:
+        throw new Error(`Unsupported notification channel: ${channel}`);
       }
     } catch (error) {
       console.error(`Notification failed for channel ${channel}:`, error);

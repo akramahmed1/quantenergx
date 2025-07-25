@@ -150,15 +150,15 @@ class DocumentProcessingService {
     if (!value) return null;
     
     switch (type) {
-      case 'number':
-        return parseFloat(value.replace(/,/g, ''));
-      case 'currency':
-        return parseFloat(value.replace(/[$,]/g, ''));
-      case 'date':
-        return this._parseDate(value);
-      case 'text':
-      default:
-        return value.trim();
+    case 'number':
+      return parseFloat(value.replace(/,/g, ''));
+    case 'currency':
+      return parseFloat(value.replace(/[$,]/g, ''));
+    case 'date':
+      return this._parseDate(value);
+    case 'text':
+    default:
+      return value.trim();
     }
   }
 
