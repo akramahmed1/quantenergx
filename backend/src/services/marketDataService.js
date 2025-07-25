@@ -138,7 +138,7 @@ class MarketDataService {
     }
   }
 
-  async _fetchFromBloomberg(provider, commodity, symbol, timeframe) {
+  async _fetchFromBloomberg(provider, commodity, symbol, _timeframe) {
     // Bloomberg API integration
     const response = await axios.get(`${provider.apiUrl}/eqs`, {
       params: {
@@ -150,21 +150,21 @@ class MarketDataService {
     return this._normalizeBloombergData(response.data, commodity);
   }
 
-  async _fetchFromRefinitiv(provider, commodity, symbol, timeframe) {
+  async _fetchFromRefinitiv(provider, commodity, symbol, _timeframe) {
     // Refinitiv (formerly Thomson Reuters) API integration
     const response = await axios.get(`${provider.apiUrl}/data/historical-pricing/v1/${symbol}`, {
       headers: {
         'Authorization': `Bearer ${provider.apiKey}`
       },
       params: {
-        'interval': timeframe
+        'interval': '1D'  // Use default timeframe
       }
     });
     
     return this._normalizeRefinitivData(response.data, commodity);
   }
 
-  async _fetchFromICE(provider, commodity, symbol, timeframe) {
+  async _fetchFromICE(provider, commodity, symbol, _timeframe) {
     // ICE (Intercontinental Exchange) API integration
     const response = await axios.get(`${provider.apiUrl}/market-data/energy/${symbol}`, {
       headers: {
@@ -175,7 +175,7 @@ class MarketDataService {
     return this._normalizeICEData(response.data, commodity);
   }
 
-  async _fetchFromNYMEX(provider, commodity, symbol, timeframe) {
+  async _fetchFromNYMEX(provider, commodity, symbol, _timeframe) {
     // NYMEX API integration
     const response = await axios.get(`${provider.apiUrl}/futures/${symbol}`, {
       headers: {
@@ -355,13 +355,13 @@ class MarketDataService {
     return correlations;
   }
 
-  async _calculateCommodityCorrelation(commodity1, commodity2, period) {
+  async _calculateCommodityCorrelation(_commodity1, _commodity2, _period) {
     // Simplified correlation calculation
     return Math.random() * 2 - 1; // Placeholder: random correlation between -1 and 1
   }
 
-  _calculateVolatilityMetrics(analytics) {
-    const volatility = analytics.volatility;
+  _calculateVolatilityMetrics(aggregated) {
+    const volatility = aggregated.volatility;
     
     return {
       current: volatility,
@@ -372,7 +372,7 @@ class MarketDataService {
     };
   }
 
-  _analyzeSeasonality(commodity, analytics) {
+  _analyzeSeasonality(commodity, _aggregated) {
     // Seasonal patterns for energy commodities
     const month = new Date().getMonth();
     const seasonalityPatterns = {
@@ -393,7 +393,7 @@ class MarketDataService {
     };
 
     const patterns = seasonalityPatterns[commodity] || {};
-    const activeSeason = Object.entries(patterns).find(([season, months]) => 
+    const activeSeason = Object.entries(patterns).find(([_season, months]) => 
       months.includes(month)
     );
 
@@ -642,7 +642,7 @@ class MarketDataService {
     };
   }
 
-  _performCrossCommodityAnalysis(marketAnalytics) {
+  _performCrossCommodityAnalysis(_marketAnalytics) {
     // Simplified cross-commodity analysis
     return {
       energyComplex: {

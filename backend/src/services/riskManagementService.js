@@ -70,7 +70,7 @@ class RiskManagementService {
 
   async _calculateVaR(portfolioData) {
     // Value at Risk calculation using Monte Carlo simulation
-    const { positions, historicalData, confidenceLevel = 0.95 } = portfolioData;
+    const { positions, confidenceLevel = 0.95 } = portfolioData;
     
     let portfolioValue = 0;
     let portfolioVolatility = 0;
@@ -457,16 +457,16 @@ class RiskManagementService {
     return zScores[confidenceLevel] || 1.645;
   }
 
-  _buildCorrelationMatrix(positions) {
+  _buildCorrelationMatrix(_positions) {
     // Simplified correlation matrix
     return {}; // Would implement actual correlation calculations
   }
 
-  _assessCorrelationRisk(correlationMatrix) {
+  _assessCorrelationRisk(_correlationMatrix) {
     return { score: 0.5, level: 'medium' }; // Placeholder
   }
 
-  _calculateLeverage(portfolioData) {
+  _calculateLeverage(_portfolioData) {
     // Calculate portfolio leverage ratio
     return 1.0; // Placeholder
   }

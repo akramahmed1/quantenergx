@@ -99,7 +99,7 @@ router.get('/audit',
   authenticateToken,
   async (req, res) => {
     try {
-      const { page = 1, limit = 50, _traderId, _region } = req.query;
+      const { page = 1, limit = 50 } = req.query;
       
       // This would query the database for audit records
       const auditTrail = {
@@ -135,7 +135,7 @@ router.get('/violations',
   authenticateToken,
   async (req, res) => {
     try {
-      const { status = 'open', _severity, _region } = req.query;
+      const { status = 'open' } = req.query;
       
       // This would query the database for violations
       const violations = {

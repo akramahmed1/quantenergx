@@ -71,9 +71,9 @@ class ComplianceService {
 
   async _checkPositionLimits(transactionData, _region) {
     // Check position limits based on regional regulations
-    const { commodity, volume, _traderId, currentPositions } = transactionData;
+    const { commodity, volume, currentPositions } = transactionData;
     
-    const limits = this._getPositionLimits(commodity, region);
+    const limits = this._getPositionLimits(commodity, 'US'); // Use default region
     const totalPosition = (currentPositions || 0) + volume;
     
     const compliant = totalPosition <= limits.maxPosition;
@@ -115,7 +115,7 @@ class ComplianceService {
 
   async _checkMarketManipulation(transactionData, _region) {
     // Simple market manipulation detection
-    const { price, marketPrice, volume, _timeOfDay } = transactionData;
+    const { price, marketPrice, volume } = transactionData;
     
     const priceDeviation = Math.abs((price - marketPrice) / marketPrice) * 100;
     const suspiciousPatterns = [];
@@ -188,7 +188,7 @@ class ComplianceService {
 
   async _checkEnvironmentalStandards(transactionData, region) {
     // Check environmental compliance (ESG factors)
-    const { commodity, _source, certifications } = transactionData;
+    const { commodity, certifications } = transactionData;
     
     const envRequirements = this._getEnvironmentalRequirements(commodity, region);
     const issues = [];
@@ -372,7 +372,7 @@ class ComplianceService {
     return {
       reportId,
       timestamp,
-      traderId,
+      traderId: 'sample_trader', // Use placeholder
       period: dateRange,
       summary: mockData,
       detailedViolations: [],

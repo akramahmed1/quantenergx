@@ -88,7 +88,7 @@ class NotificationService {
         };
       }
 
-      const { templateName, templateParams, messageType = 'text' } = options;
+      const { templateName, templateParams } = options;
       
       let requestBody;
       
@@ -231,13 +231,13 @@ class NotificationService {
     return { messageId: response.headers['x-message-id'] || `sg_${Date.now()}` };
   }
 
-  async _sendEmailViaSES(email, subject, message, html, attachments) {
+  async _sendEmailViaSES(_email, _subject, _message, _html, _attachments) {
     // For AWS SES, you would use AWS SDK
     // This is a placeholder implementation
     throw new Error('AWS SES integration not yet implemented');
   }
 
-  async _sendEmailViaMailgun(email, subject, message, html, attachments) {
+  async _sendEmailViaMailgun(email, subject, message, html, _attachments) {
     // For Mailgun API
     const domain = process.env.MAILGUN_DOMAIN;
     const response = await axios.post(
@@ -308,7 +308,7 @@ class NotificationService {
     }
   }
 
-  async _sendSMSViaTwilio(phoneNumber, message, options) {
+  async _sendSMSViaTwilio(phoneNumber, message, _options) {
     const response = await axios.post(
       `https://api.twilio.com/2010-04-01/Accounts/${this.smsConfig.accountSid}/Messages.json`,
       new URLSearchParams({
@@ -327,13 +327,13 @@ class NotificationService {
     return { messageId: response.data.sid };
   }
 
-  async _sendSMSViaSNS(phoneNumber, message, options) {
+  async _sendSMSViaSNS(_phoneNumber, _message, _options) {
     // For AWS SNS, you would use AWS SDK
     // This is a placeholder implementation
     throw new Error('AWS SNS integration not yet implemented');
   }
 
-  async _sendSMSViaVonage(phoneNumber, message, options) {
+  async _sendSMSViaVonage(phoneNumber, message, _options) {
     // For Vonage (Nexmo) API
     const response = await axios.post(
       'https://rest.nexmo.com/sms/json',
