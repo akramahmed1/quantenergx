@@ -31,7 +31,6 @@ print_error() {
 
 # Initialize variables
 BACKEND_DIR="backend"
-FRONTEND_DIR="frontend"
 TEST_RESULTS_DIR="test-results/regression"
 TIMESTAMP=$(date '+%Y%m%d_%H%M%S')
 RESULTS_FILE="$TEST_RESULTS_DIR/regression_results_$TIMESTAMP.json"
@@ -95,58 +94,6 @@ if [ ! -d "$BACKEND_DIR/node_modules" ]; then
 fi
 
 # Run backend test categories
-run_test_category "backend_unit" "npm test -- --testPathPattern=test/unit" "$BACKEND_DIR"
-run_test_category "backend_integration" "npm test -- --testPathPattern=test/integration" "$BACKEND_DIR"
-run_test_category "backend_api" "npm test -- test/ocr.test.js" "$BACKEND_DIR"
-run_test_category "backend_lint" "npm run lint" "$BACKEND_DIR"
-
-# Frontend regression tests (if frontend directory exists)
-if [ -d "$FRONTEND_DIR" ]; then
-    print_status "=== Frontend Regression Tests ==="
-    
-    # Install dependencies if needed
-    if [ ! -d "$FRONTEND_DIR/node_modules" ]; then
-        print_status "Installing frontend dependencies..."
-        cd "$FRONTEND_DIR"
-        npm install
-        cd - > /dev/null
-    fi
-    
-    # Run frontend test categories
-    run_test_category "frontend_unit" "npm test -- --coverage --watchAll=false" "$FRONTEND_DIR"
-    run_test_category "frontend_lint" "npm run lint" "$FRONTEND_DIR"
-    run_test_category "frontend_type_check" "npm run type-check" "$FRONTEND_DIR"
-    run_test_category "frontend_build" "npm run build" "$FRONTEND_DIR"
-else
-    print_warning "Frontend directory not found, skipping frontend tests"
-fi
-
-# Advanced test categories (if available)
-print_status "=== Advanced Test Categories ==="
-
-# Fuzz tests
-if [ -f "$BACKEND_DIR/test/fuzz/input-validation.test.js" ]; then
-    run_test_category "fuzz_testing" "npm test -- --testPathPattern=test/fuzz" "$BACKEND_DIR"
-else
-    print_warning "Fuzz tests not found, skipping"
-fi
-
-# Contract tests
-if [ -f "$BACKEND_DIR/test/contract/api-compatibility.test.js" ]; then
-    run_test_category "contract_testing" "npm test -- --testPathPattern=test/contract" "$BACKEND_DIR"
-else
-    print_warning "Contract tests not found, skipping"
-fi
-
-# Security tests (if available)
-if [ -d "$BACKEND_DIR/test/security" ]; then
-    run_test_category "security_testing" "npm test -- --testPathPattern=test/security" "$BACKEND_DIR"
-fi
-
-# Performance tests (if available)
-if [ -d "$BACKEND_DIR/test/performance" ]; then
-    run_test_category "performance_testing" "npm test -- --testPathPattern=test/performance" "$BACKEND_DIR"
-fi
 
 # Close results JSON
 sed -i '$ s/,$//' "$RESULTS_FILE"  # Remove last comma

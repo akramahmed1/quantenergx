@@ -39,7 +39,21 @@ const grpcService = new OCRGRPCService();
 // Middleware
 app.use(helmet());
 app.use(cors());
-app.use(express.json({ limit: '50mb' })); // Increased limit for document uploads
+
+// JSON parsing with error handling
+app.use(express.json({ 
+  limit: '50mb',
+  type: 'application/json'
+}));
+
+// Handle JSON parsing errors
+app.use((err, req, res, _next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ error: 'Invalid JSON' });
+  }
+  _next(err);
+});
+
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Health check endpoint
@@ -87,19 +101,13 @@ if (process.env.NODE_ENV !== 'test') {
   // Start gRPC service
   grpcService.start(GRPC_PORT);
   logger.info(`QuantEnergx gRPC Service running on port ${GRPC_PORT}`);
+
+
+  process.on('SIGINT', () => {
+    logger.info('SIGINT received, shutting down gracefully');
+    grpcService.stop();
+    process.exit(0);
+  });
 }
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM received, shutting down gracefully');
-  grpcService.stop();
-  process.exit(0);
-});
-
-process.on('SIGINT', () => {
-  logger.info('SIGINT received, shutting down gracefully');
-  grpcService.stop();
-  process.exit(0);
-});
 
 module.exports = app;

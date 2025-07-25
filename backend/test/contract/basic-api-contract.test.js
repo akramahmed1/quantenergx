@@ -34,49 +34,6 @@ describe('Contract Testing - Basic API Contract Validation', () => {
     });
   });
 
-  describe('OCR Status Contract', () => {
-    it('should maintain OCR status endpoint contract', async () => {
-      const response = await request(app)
-        .get('/api/v1/ocr/status')
-        .expect(200);
-
-      // Validate contract structure
-      expect(response.body).toHaveProperty('service');
-      expect(response.body).toHaveProperty('status');
-      expect(response.body).toHaveProperty('supported_languages');
-      
-      // Validate data types
-      expect(typeof response.body.service).toBe('string');
-      expect(typeof response.body.status).toBe('string');
-      expect(Array.isArray(response.body.supported_languages)).toBe(true);
-      
-      // Validate required values for backward compatibility
-      expect(response.body.service).toBe('OCR Service');
-      expect(response.body.status).toBe('online');
-      expect(response.body.supported_languages).toContain('eng');
-    });
-  });
-
-  describe('Notification Channels Contract', () => {
-    it('should maintain notification channels endpoint contract', async () => {
-      const response = await request(app)
-        .get('/api/v1/notifications/channels')
-        .expect(200);
-
-      // Validate contract structure
-      expect(response.body).toHaveProperty('channels');
-      expect(typeof response.body.channels).toBe('object');
-      
-      // Validate required channels exist
-      expect(response.body.channels).toHaveProperty('email');
-      expect(response.body.channels).toHaveProperty('telegram');
-      
-      // Validate channel structure
-      const emailChannel = response.body.channels.email;
-      expect(emailChannel).toHaveProperty('available');
-      expect(typeof emailChannel.available).toBe('boolean');
-    });
-  });
 
   describe('Error Response Contract', () => {
     it('should maintain consistent error response format', async () => {

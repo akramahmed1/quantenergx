@@ -165,8 +165,6 @@ class DocumentProcessingService {
   _parseDate(dateString) {
     // Handle various date formats
     const formats = [
-      /(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/,  // MM/DD/YYYY or DD/MM/YYYY
-      /(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})/,  // MM/DD/YY or DD/MM/YY
     ];
     
     for (const format of formats) {

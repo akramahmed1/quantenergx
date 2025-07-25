@@ -3,7 +3,7 @@
  */
 module.exports = {
   packageManager: "npm",
-  reporters: ["html", "clear-text", "progress", "dashboard"],
+
   testRunner: "jest",
   jest: {
     projectType: "custom",
@@ -24,18 +24,13 @@ module.exports = {
     low: 70,
     break: 60
   },
-  dashboard: {
-    reportType: "full"
-  },
+
   htmlReporter: {
     fileName: "test/mutation/reports/mutation-report.html"
   },
   tempDirName: "test/mutation/.stryker-tmp",
   cleanTempDir: true,
-  concurrency: 4,
-  timeoutMS: 60000,
-  timeoutFactor: 2,
-  maxConcurrentTestRunners: 2,
+
   disableTypeChecking: true,
   ignorePatterns: [
     "node_modules",
