@@ -59,6 +59,7 @@ class NotificationService {
     };
   }
 
+  async sendWhatsAppMessage(phoneNumber, message, _options = {}) {
     // This is a placeholder for WhatsApp Business API integration
     // In production, you would integrate with services like:
     // - WhatsApp Business API
@@ -76,6 +77,7 @@ class NotificationService {
   }
 
   async sendEmailNotification(email, message, options = {}) {
+    const { subject = 'QuantEnergx Notification' } = options;
     // Placeholder for email service integration
     // In production, integrate with services like:
     // - SendGrid
@@ -94,6 +96,7 @@ class NotificationService {
     };
   }
 
+  async sendSMSNotification(phoneNumber, message, _options = {}) {
     // Placeholder for SMS service integration
     // In production, integrate with services like:
     // - Twilio
@@ -291,8 +294,25 @@ Please review your positions immediately.`;
     
     for (const channel of userPreferences.channels || ['telegram', 'email']) {
       try {
+        const result = await this.sendNotification(
+          channel,
+          userPreferences[channel] || userPreferences.email,
+          message
+        );
+        notifications.push(result);
+      } catch (error) {
+        console.error(`Failed to send ${channel} notification:`, error);
+        notifications.push({
+          success: false,
+          channel,
+          error: error.message
+        });
+      }
+    }
 
     return notifications;
   }
 }
+
+module.exports = NotificationService;
 
