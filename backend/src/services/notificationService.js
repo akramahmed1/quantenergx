@@ -1,11 +1,27 @@
 const TelegramBot = require('node-telegram-bot-api');
+const axios = require('axios');
 
 class NotificationService {
   constructor() {
     this.telegramBot = null;
     this.whatsappConfig = {
-      apiUrl: process.env.WHATSAPP_API_URL || 'https://api.whatsapp.com/send',
-      token: process.env.WHATSAPP_API_TOKEN
+      apiUrl: process.env.WHATSAPP_API_URL || 'https://graph.facebook.com/v18.0',
+      token: process.env.WHATSAPP_API_TOKEN,
+      phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID
+    };
+    
+    this.emailConfig = {
+      provider: process.env.EMAIL_PROVIDER || 'sendgrid', // sendgrid, ses, mailgun
+      apiKey: process.env.EMAIL_API_KEY,
+      fromEmail: process.env.FROM_EMAIL || 'notifications@quantenergx.com',
+      fromName: process.env.FROM_NAME || 'QuantEnergx'
+    };
+    
+    this.smsConfig = {
+      provider: process.env.SMS_PROVIDER || 'twilio', // twilio, aws-sns, vonage
+      accountSid: process.env.TWILIO_ACCOUNT_SID,
+      authToken: process.env.TWILIO_AUTH_TOKEN,
+      fromNumber: process.env.TWILIO_FROM_NUMBER
     };
     
     // Initialize Telegram bot if token is provided
@@ -59,55 +75,278 @@ class NotificationService {
     };
   }
 
-    // This is a placeholder for WhatsApp Business API integration
-    // In production, you would integrate with services like:
-    // - WhatsApp Business API
-    // - Twilio WhatsApp API
-    // - Facebook Graph API for WhatsApp
-    
-    console.log(`WhatsApp message would be sent to ${phoneNumber}: ${message}`);
-    
-    return {
-      success: true,
-      messageId: `wa_${Date.now()}`,
-      channel: 'whatsapp',
-      recipient: phoneNumber
-    };
+  async sendWhatsAppMessage(phoneNumber, message, options = {}) {
+    try {
+      if (!this.whatsappConfig.token || !this.whatsappConfig.phoneNumberId) {
+        console.log(`WhatsApp credentials missing. Would send to ${phoneNumber}: ${message}`);
+        return {
+          success: true,
+          messageId: `wa_${Date.now()}`,
+          channel: 'whatsapp',
+          recipient: phoneNumber,
+          status: 'simulated'
+        };
+      }
+
+      const { templateName, templateParams } = options;
+      
+      let requestBody;
+      
+      if (templateName && templateParams) {
+        // Use WhatsApp template message
+        requestBody = {
+          messaging_product: 'whatsapp',
+          to: phoneNumber,
+          type: 'template',
+          template: {
+            name: templateName,
+            language: { code: 'en_US' },
+            components: [{
+              type: 'body',
+              parameters: templateParams.map(param => ({
+                type: 'text',
+                text: param
+              }))
+            }]
+          }
+        };
+      } else {
+        // Use regular text message
+        requestBody = {
+          messaging_product: 'whatsapp',
+          to: phoneNumber,
+          type: 'text',
+          text: { body: message }
+        };
+      }
+
+      const response = await axios.post(
+        `${this.whatsappConfig.apiUrl}/${this.whatsappConfig.phoneNumberId}/messages`,
+        requestBody,
+        {
+          headers: {
+            'Authorization': `Bearer ${this.whatsappConfig.token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      return {
+        success: true,
+        messageId: response.data.messages[0].id,
+        channel: 'whatsapp',
+        recipient: phoneNumber,
+        status: 'sent'
+      };
+
+    } catch (error) {
+      console.error('WhatsApp message failed:', error.response?.data || error.message);
+      return {
+        success: false,
+        channel: 'whatsapp',
+        recipient: phoneNumber,
+        error: error.response?.data?.error || error.message
+      };
+    }
   }
 
   async sendEmailNotification(email, message, options = {}) {
-    // Placeholder for email service integration
-    // In production, integrate with services like:
-    // - SendGrid
-    // - AWS SES
-    // - Mailgun
-    
-    console.log(`Email would be sent to ${email}:`);
-    console.log(`Subject: ${subject}`);
-    console.log(`Message: ${message}`);
-    
-    return {
-      success: true,
-      messageId: `email_${Date.now()}`,
-      channel: 'email',
-      recipient: email
-    };
+    try {
+      const { subject = 'QuantEnergx Notification', html, attachments } = options;
+      
+      if (!this.emailConfig.apiKey) {
+        console.log(`Email credentials missing. Would send to ${email}:`);
+        console.log(`Subject: ${subject}`);
+        console.log(`Message: ${message}`);
+        return {
+          success: true,
+          messageId: `email_${Date.now()}`,
+          channel: 'email',
+          recipient: email,
+          status: 'simulated'
+        };
+      }
+
+      let result;
+      
+      switch (this.emailConfig.provider) {
+      case 'sendgrid':
+        result = await this._sendEmailViaSendGrid(email, subject, message, html, attachments);
+        break;
+      case 'ses':
+        result = await this._sendEmailViaSES(email, subject, message, html, attachments);
+        break;
+      case 'mailgun':
+        result = await this._sendEmailViaMailgun(email, subject, message, html, attachments);
+        break;
+      default:
+        throw new Error(`Unsupported email provider: ${this.emailConfig.provider}`);
+      }
+
+      return {
+        success: true,
+        messageId: result.messageId,
+        channel: 'email',
+        recipient: email,
+        status: 'sent'
+      };
+
+    } catch (error) {
+      console.error('Email sending failed:', error.message);
+      return {
+        success: false,
+        channel: 'email',
+        recipient: email,
+        error: error.message
+      };
+    }
   }
 
-    // Placeholder for SMS service integration
-    // In production, integrate with services like:
-    // - Twilio
-    // - AWS SNS
-    // - Nexmo/Vonage
+  async _sendEmailViaSendGrid(email, subject, message, html, attachments) {
+    const response = await axios.post(
+      'https://api.sendgrid.com/v3/mail/send',
+      {
+        personalizations: [{
+          to: [{ email }],
+          subject
+        }],
+        from: {
+          email: this.emailConfig.fromEmail,
+          name: this.emailConfig.fromName
+        },
+        content: [
+          { type: 'text/plain', value: message },
+          ...(html ? [{ type: 'text/html', value: html }] : [])
+        ],
+        ...(attachments && { attachments })
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${this.emailConfig.apiKey}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
     
-    console.log(`SMS would be sent to ${phoneNumber}: ${message}`);
+    return { messageId: response.headers['x-message-id'] || `sg_${Date.now()}` };
+  }
+
+  async _sendEmailViaSES(_email, _subject, _message, _html, _attachments) {
+    // For AWS SES, you would use AWS SDK
+    // This is a placeholder implementation
+    throw new Error('AWS SES integration not yet implemented');
+  }
+
+  async _sendEmailViaMailgun(email, subject, message, html, _attachments) {
+    // For Mailgun API
+    const domain = process.env.MAILGUN_DOMAIN;
+    const response = await axios.post(
+      `https://api.mailgun.net/v3/${domain}/messages`,
+      new URLSearchParams({
+        from: `${this.emailConfig.fromName} <${this.emailConfig.fromEmail}>`,
+        to: email,
+        subject,
+        text: message,
+        ...(html && { html })
+      }),
+      {
+        auth: {
+          username: 'api',
+          password: this.emailConfig.apiKey
+        }
+      }
+    );
     
-    return {
-      success: true,
-      messageId: `sms_${Date.now()}`,
-      channel: 'sms',
-      recipient: phoneNumber
-    };
+    return { messageId: response.data.id };
+  }
+
+  async sendSMSNotification(phoneNumber, message, options = {}) {
+    try {
+      if (!this.smsConfig.accountSid || !this.smsConfig.authToken) {
+        console.log(`SMS credentials missing. Would send to ${phoneNumber}: ${message}`);
+        return {
+          success: true,
+          messageId: `sms_${Date.now()}`,
+          channel: 'sms',
+          recipient: phoneNumber,
+          status: 'simulated'
+        };
+      }
+
+      let result;
+      
+      switch (this.smsConfig.provider) {
+      case 'twilio':
+        result = await this._sendSMSViaTwilio(phoneNumber, message, options);
+        break;
+      case 'aws-sns':
+        result = await this._sendSMSViaSNS(phoneNumber, message, options);
+        break;
+      case 'vonage':
+        result = await this._sendSMSViaVonage(phoneNumber, message, options);
+        break;
+      default:
+        throw new Error(`Unsupported SMS provider: ${this.smsConfig.provider}`);
+      }
+
+      return {
+        success: true,
+        messageId: result.messageId,
+        channel: 'sms',
+        recipient: phoneNumber,
+        status: 'sent'
+      };
+
+    } catch (error) {
+      console.error('SMS sending failed:', error.message);
+      return {
+        success: false,
+        channel: 'sms',
+        recipient: phoneNumber,
+        error: error.message
+      };
+    }
+  }
+
+  async _sendSMSViaTwilio(phoneNumber, message, _options) {
+    const response = await axios.post(
+      `https://api.twilio.com/2010-04-01/Accounts/${this.smsConfig.accountSid}/Messages.json`,
+      new URLSearchParams({
+        From: this.smsConfig.fromNumber,
+        To: phoneNumber,
+        Body: message
+      }),
+      {
+        auth: {
+          username: this.smsConfig.accountSid,
+          password: this.smsConfig.authToken
+        }
+      }
+    );
+    
+    return { messageId: response.data.sid };
+  }
+
+  async _sendSMSViaSNS(_phoneNumber, _message, _options) {
+    // For AWS SNS, you would use AWS SDK
+    // This is a placeholder implementation
+    throw new Error('AWS SNS integration not yet implemented');
+  }
+
+  async _sendSMSViaVonage(phoneNumber, message, _options) {
+    // For Vonage (Nexmo) API
+    const response = await axios.post(
+      'https://rest.nexmo.com/sms/json',
+      {
+        from: this.smsConfig.fromNumber,
+        to: phoneNumber,
+        text: message,
+        api_key: process.env.VONAGE_API_KEY,
+        api_secret: process.env.VONAGE_API_SECRET
+      }
+    );
+    
+    return { messageId: response.data.messages[0]['message-id'] };
   }
 
   // OCR-specific notification methods
@@ -291,8 +530,25 @@ Please review your positions immediately.`;
     
     for (const channel of userPreferences.channels || ['telegram', 'email']) {
       try {
+        const result = await this.sendNotification(
+          channel,
+          userPreferences[channel] || userPreferences.email,
+          message
+        );
+        notifications.push(result);
+      } catch (error) {
+        console.error(`Failed to send ${channel} notification:`, error);
+        notifications.push({
+          success: false,
+          channel,
+          error: error.message
+        });
+      }
+    }
 
     return notifications;
   }
 }
+
+module.exports = NotificationService;
 

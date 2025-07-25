@@ -3,6 +3,10 @@ import ocrReducer from './slices/ocrSlice';
 import tradingReducer from './slices/tradingSlice';
 import riskReducer from './slices/riskSlice';
 import complianceReducer from './slices/complianceSlice';
+import marketReducer from './slices/marketSlice';
+import authReducer from './slices/authSlice';
+import notificationReducer from './slices/notificationSlice';
+import settingsReducer from './slices/settingsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +14,10 @@ export const store = configureStore({
     trading: tradingReducer,
     risk: riskReducer,
     compliance: complianceReducer,
+    market: marketReducer,
+    auth: authReducer,
+    notifications: notificationReducer,
+    settings: settingsReducer,
   },
 });
 

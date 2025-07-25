@@ -195,6 +195,7 @@ class OCRService {
     }
   }
 
+  async extractText(filePath, options = {}) {
     const { language = 'eng', extractFields = false, detectStamps = false, detectSignatures = false } = options;
     
     try {
@@ -237,20 +238,40 @@ class OCRService {
     }
   }
 
-  async _extractFields(_text) {
+  async _extractFields(text) {
     // Simple field extraction using regex patterns
     // In production, this would use ML models
     const fields = {};
-
+    
+    // Extract common contract fields
+    const fieldTypes = ['contract_number', 'trade_date', 'volume', 'price', 'commodity'];
+    
+    for (const fieldType of fieldTypes) {
+      const extracted = await this._extractByType(text, fieldType, fieldType);
+      if (extracted) {
+        fields[fieldType] = extracted;
+      }
+    }
+    
+    return fields;
   }
 
   async _detectStamps(text) {
     // Simple stamp detection based on text patterns
     const stampPatterns = [
+      /\b(?:APPROVED|RECEIVED|PROCESSED|REVIEWED|SIGNED|VERIFIED)\b/i,
+      /\b\d{2}\/\d{2}\/\d{4}\s+(?:APPROVED|RECEIVED|PROCESSED|REVIEWED|SIGNED|VERIFIED)\b/i
     ];
 
     const detectedStamps = [];
     for (const pattern of stampPatterns) {
+      const matches = text.match(pattern);
+      if (matches) {
+        detectedStamps.push({
+          type: 'stamp',
+          text: matches[0],
+          confidence: 85
+        });
       }
     }
 
