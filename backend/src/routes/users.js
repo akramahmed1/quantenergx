@@ -2,6 +2,9 @@ const express = require('express');
 const { body, query, validationResult } = require('express-validator');
 const UserManagementService = require('../services/userManagementService');
 const { authenticateToken } = require('../middleware/auth');
+const passwordUtils = require('../utils/passwordUtils');
+const captchaUtils = require('../utils/captchaUtils');
+const validationUtils = require('../utils/validationUtils');
 
 const router = express.Router();
 
@@ -33,15 +36,9 @@ router.get('/', (req, res) => {
 
 // Register new user
 router.post('/auth/register',
-  [
-    body('username').isLength({ min: 3 }).withMessage('Username must be at least 3 characters'),
-    body('email').isEmail().withMessage('Valid email is required'),
-    body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
-    body('firstName').notEmpty().withMessage('First name is required'),
-    body('lastName').notEmpty().withMessage('Last name is required'),
-    body('role').optional().isIn(['trader', 'risk_manager', 'compliance_officer', 'analyst', 'viewer'])
-      .withMessage('Invalid role')
-  ],
+  validationUtils.validateRegistration(),
+  validationUtils.handleValidationErrors(),
+  captchaUtils.middleware({ tokenField: 'hcaptcha_token' }),
   async (req, res) => {
     try {
       if (!userService) {
@@ -51,17 +48,27 @@ router.post('/auth/register',
         });
       }
 
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
+      // Validate password strength
+      const passwordValidation = passwordUtils.validatePasswordStrength(req.body.password);
+      if (!passwordValidation.valid) {
         return res.status(400).json({
           success: false,
-          errors: errors.array()
+          error: 'weak_password',
+          issues: passwordValidation.issues,
+          suggestions: passwordValidation.suggestions
         });
       }
 
+      // Hash password with Argon2
+      const hashedPassword = await passwordUtils.hashPassword(req.body.password);
+
       const userData = {
         ...req.body,
-        role: req.body.role || 'viewer' // Default to viewer role
+        password: hashedPassword,
+        role: req.body.role || 'viewer', // Default to viewer role
+        email: validationUtils.sanitizeString(req.body.email, { maxLength: 254 }),
+        firstName: validationUtils.sanitizeString(req.body.firstName, { maxLength: 50 }),
+        lastName: validationUtils.sanitizeString(req.body.lastName, { maxLength: 50 })
       };
 
       const user = await userService.createUser(userData);
@@ -69,7 +76,8 @@ router.post('/auth/register',
       res.status(201).json({
         success: true,
         message: 'User created successfully',
-        user
+        user,
+        captcha_verified: req.captchaVerification?.success || false
       });
 
     } catch (error) {
@@ -84,25 +92,15 @@ router.post('/auth/register',
 
 // Login user
 router.post('/auth/login',
-  [
-    body('username').notEmpty().withMessage('Username is required'),
-    body('password').notEmpty().withMessage('Password is required'),
-    body('mfaToken').optional().isLength({ min: 6, max: 6 }).withMessage('MFA token must be 6 digits')
-  ],
+  validationUtils.validateLogin(),
+  validationUtils.handleValidationErrors(),
+  captchaUtils.middleware({ tokenField: 'hcaptcha_token' }),
   async (req, res) => {
     try {
       if (!userService) {
         return res.status(503).json({
           success: false,
           error: 'User management service unavailable'
-        });
-      }
-
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({
-          success: false,
-          errors: errors.array()
         });
       }
 
@@ -113,6 +111,7 @@ router.post('/auth/login',
       res.json({
         success: true,
         message: 'Login successful',
+        captcha_verified: req.captchaVerification?.success || false,
         ...result
       });
 
@@ -130,6 +129,103 @@ router.post('/auth/login',
       res.status(401).json({
         success: false,
         error: error.message
+      });
+    }
+  }
+);
+
+// Password reset request
+router.post('/auth/password-reset-request',
+  validationUtils.validatePasswordReset(),
+  validationUtils.handleValidationErrors(),
+  captchaUtils.middleware({ tokenField: 'hcaptcha_token' }),
+  async (req, res) => {
+    try {
+      if (!userService) {
+        return res.status(503).json({
+          success: false,
+          error: 'User management service unavailable'
+        });
+      }
+
+      const { email } = req.body;
+      const sanitizedEmail = validationUtils.sanitizeString(email, { maxLength: 254 });
+
+      // Always return success to prevent email enumeration
+      res.json({
+        success: true,
+        message: 'If the email exists, a password reset link has been sent',
+        captcha_verified: req.captchaVerification?.success || false
+      });
+
+      // Asynchronously process password reset (don't wait for response)
+      if (userService.requestPasswordReset) {
+        userService.requestPasswordReset(sanitizedEmail).catch(error => {
+          console.error('Password reset request error:', error);
+        });
+      }
+
+    } catch (error) {
+      console.error('Password reset request error:', error);
+      // Don't reveal internal errors to prevent information disclosure
+      res.json({
+        success: true,
+        message: 'If the email exists, a password reset link has been sent'
+      });
+    }
+  }
+);
+
+// Password reset confirmation
+router.post('/auth/password-reset-confirm',
+  [
+    body('email').isEmail().withMessage('Valid email is required'),
+    body('token').isLength({ min: 32, max: 128 }).withMessage('Invalid reset token'),
+    body('newPassword').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
+    body('hcaptcha_token').notEmpty().withMessage('Captcha verification required')
+  ],
+  validationUtils.handleValidationErrors(),
+  captchaUtils.middleware({ tokenField: 'hcaptcha_token' }),
+  async (req, res) => {
+    try {
+      if (!userService) {
+        return res.status(503).json({
+          success: false,
+          error: 'User management service unavailable'
+        });
+      }
+
+      const { token, newPassword } = req.body;
+
+      // Validate new password strength
+      const passwordValidation = passwordUtils.validatePasswordStrength(newPassword);
+      if (!passwordValidation.valid) {
+        return res.status(400).json({
+          success: false,
+          error: 'weak_password',
+          issues: passwordValidation.issues,
+          suggestions: passwordValidation.suggestions
+        });
+      }
+
+      // Hash new password
+      const hashedPassword = await passwordUtils.hashPassword(newPassword);
+
+      if (userService.confirmPasswordReset) {
+        await userService.confirmPasswordReset(token, hashedPassword);
+      }
+
+      res.json({
+        success: true,
+        message: 'Password reset successfully',
+        captcha_verified: req.captchaVerification?.success || false
+      });
+
+    } catch (error) {
+      console.error('Password reset confirmation error:', error);
+      res.status(400).json({
+        success: false,
+        error: 'Invalid or expired reset token'
       });
     }
   }
