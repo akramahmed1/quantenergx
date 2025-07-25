@@ -347,7 +347,7 @@ class MarketDataService {
       try {
         const correlation = await this._calculateCommodityCorrelation(commodity, otherCommodity, period);
         correlations[otherCommodity] = correlation;
-      } catch (error) {
+      } catch (_error) {
         correlations[otherCommodity] = null;
       }
     }
