@@ -9,6 +9,7 @@ const complianceRoutes = require('./compliance');
 const riskRoutes = require('./risk');
 const notificationsRoutes = require('./notifications');
 const marketRoutes = require('./market');
+const usersRoutes = require('./users');
 
 // API Documentation route
 router.get('/', (req, res) => {
@@ -23,7 +24,8 @@ router.get('/', (req, res) => {
       compliance: '/api/v1/compliance',
       risk: '/api/v1/risk',
       notifications: '/api/v1/notifications',
-      market: '/api/v1/market'
+      market: '/api/v1/market',
+      users: '/api/v1/users'
     }
   });
 });
@@ -36,5 +38,6 @@ router.use('/compliance', complianceRoutes);
 router.use('/risk', riskRoutes);
 router.use('/notifications', notificationsRoutes);
 router.use('/market', marketRoutes);
+router.use('/users', usersRoutes);
 
 module.exports = router;

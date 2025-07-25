@@ -487,6 +487,213 @@ Please review and approve in QuantEnergx platform.`;
   }
 
   // Trading-specific notifications
+  async notifyTradeExecuted(trade, userPreferences) {
+    const message = this.formatTradeExecutedMessage(trade);
+    return await this.sendMultiChannelNotification(
+      userPreferences,
+      message,
+      { subject: 'Trade Executed' }
+    );
+  }
+
+  async notifyOrderPlaced(order, userPreferences) {
+    const message = this.formatOrderPlacedMessage(order);
+    return await this.sendMultiChannelNotification(
+      userPreferences,
+      message,
+      { subject: 'Order Placed' }
+    );
+  }
+
+  async notifyOrderCancelled(order, userPreferences) {
+    const message = this.formatOrderCancelledMessage(order);
+    return await this.sendMultiChannelNotification(
+      userPreferences,
+      message,
+      { subject: 'Order Cancelled' }
+    );
+  }
+
+  async notifyRiskLimitBreach(riskData, userPreferences) {
+    const message = this.formatRiskLimitBreachMessage(riskData);
+    return await this.sendMultiChannelNotification(
+      userPreferences,
+      message,
+      { subject: 'Risk Limit Breach - Immediate Action Required', priority: 'high' }
+    );
+  }
+
+  async notifyMarginCall(marginData, userPreferences) {
+    const message = this.formatMarginCallMessage(marginData);
+    return await this.sendMultiChannelNotification(
+      userPreferences,
+      message,
+      { subject: 'Margin Call - Urgent Action Required', priority: 'critical' }
+    );
+  }
+
+  async notifyComplianceAlert(complianceData, userPreferences) {
+    const message = this.formatComplianceAlertMessage(complianceData);
+    return await this.sendMultiChannelNotification(
+      userPreferences,
+      message,
+      { subject: 'Compliance Alert', priority: 'high' }
+    );
+  }
+
+  // Multi-channel notification helper
+  async sendMultiChannelNotification(userPreferences, message, options = {}) {
+    const notifications = [];
+    const channels = userPreferences.channels || ['email'];
+    
+    for (const channel of channels) {
+      try {
+        const recipient = this.getRecipientForChannel(channel, userPreferences);
+        if (recipient) {
+          const result = await this.sendNotification(channel, recipient, message, options);
+          notifications.push(result);
+        }
+      } catch (error) {
+        console.error(`Failed to send ${channel} notification:`, error);
+        notifications.push({
+          success: false,
+          channel,
+          error: error.message
+        });
+      }
+    }
+    
+    return notifications;
+  }
+
+  getRecipientForChannel(channel, userPreferences) {
+    switch (channel) {
+    case 'email':
+      return userPreferences.email;
+    case 'sms':
+      return userPreferences.phone;
+    case 'telegram':
+      return userPreferences.telegramChatId;
+    case 'whatsapp':
+      return userPreferences.whatsappPhone;
+    default:
+      return null;
+    }
+  }
+
+  // Message formatters for trading events
+  formatTradeExecutedMessage(trade) {
+    return `🎯 *Trade Executed*
+
+💼 Trade ID: \`${trade.id}\`
+📊 ${trade.side.toUpperCase()} ${trade.quantity} ${trade.commodity.toUpperCase()}
+💰 Price: $${trade.price.toFixed(2)}
+💵 Value: $${trade.value.toLocaleString()}
+⏰ Time: ${new Date(trade.timestamp).toLocaleString()}
+
+Your trade has been successfully executed.`;
+  }
+
+  formatOrderPlacedMessage(order) {
+    return `📝 *Order Placed*
+
+🆔 Order ID: \`${order.id}\`
+📊 ${order.side.toUpperCase()} ${order.quantity} ${order.commodity.toUpperCase()}
+💰 ${order.type === 'market' ? 'Market Order' : `Limit: $${order.price.toFixed(2)}`}
+⏰ Placed: ${new Date(order.createdAt).toLocaleString()}
+
+Your order is now active in the market.`;
+  }
+
+  formatOrderCancelledMessage(order) {
+    return `❌ *Order Cancelled*
+
+🆔 Order ID: \`${order.id}\`
+📊 ${order.side.toUpperCase()} ${order.quantity} ${order.commodity.toUpperCase()}
+⏰ Cancelled: ${new Date(order.updatedAt).toLocaleString()}
+
+Your order has been successfully cancelled.`;
+  }
+
+  formatRiskLimitBreachMessage(riskData) {
+    return `🚨 *RISK LIMIT BREACH*
+
+⚠️ Alert Type: ${riskData.alertType}
+📈 Current Value: $${riskData.currentValue.toLocaleString()}
+📊 Limit: $${riskData.limit.toLocaleString()}
+🔴 Breach: ${((riskData.currentValue / riskData.limit - 1) * 100).toFixed(1)}%
+
+🚨 IMMEDIATE ACTION REQUIRED
+Review your positions and consider reducing exposure.`;
+  }
+
+  formatMarginCallMessage(marginData) {
+    return `🔴 *MARGIN CALL - URGENT*
+
+💰 Required Margin: $${marginData.requiredMargin.toLocaleString()}
+💵 Available: $${marginData.availableMargin.toLocaleString()}
+📉 Shortfall: $${marginData.shortfall.toLocaleString()}
+⏰ Deadline: ${marginData.deadline}
+
+🚨 URGENT: Deposit funds or reduce positions immediately to avoid liquidation.`;
+  }
+
+  formatComplianceAlertMessage(complianceData) {
+    return `⚖️ *Compliance Alert*
+
+🚨 Issue: ${complianceData.issueType}
+📋 Regulation: ${complianceData.regulation}
+📄 Reference: ${complianceData.reference}
+⏰ Detected: ${new Date(complianceData.timestamp).toLocaleString()}
+
+Please review and address this compliance issue immediately.`;
+  }
+
+  formatPositionReportMessage(positions) {
+    let message = '📊 *Daily Position Report*\n\n';
+    
+    positions.forEach(pos => {
+      const pnlIcon = pos.unrealizedPnL >= 0 ? '📈' : '📉';
+      message += `${pnlIcon} ${pos.commodity.toUpperCase()}: ${pos.quantity > 0 ? 'LONG' : 'SHORT'} ${Math.abs(pos.quantity)}\n`;
+      message += `💰 P&L: $${pos.unrealizedPnL.toLocaleString()}\n\n`;
+    });
+    
+    const totalPnL = positions.reduce((sum, pos) => sum + pos.unrealizedPnL, 0);
+    message += `📈 Total P&L: $${totalPnL.toLocaleString()}`;
+    
+    return message;
+  }
+
+  // Scheduled notification methods
+  async sendDailyPositionReport(userId, positions, userPreferences) {
+    const message = this.formatPositionReportMessage(positions);
+    return await this.sendMultiChannelNotification(
+      userPreferences,
+      message,
+      { subject: 'Daily Position Report' }
+    );
+  }
+
+  async sendMarketOpeningAlert(marketData, userPreferences) {
+    const message = `🔔 *Market Opening*
+
+📊 ${new Date().toLocaleDateString()} Trading Session
+🕒 ${new Date().toLocaleTimeString()}
+
+Key Prices:
+🛢️ Crude Oil: $${marketData.crude_oil?.toFixed(2) || 'N/A'}
+⛽ Natural Gas: $${marketData.natural_gas?.toFixed(2) || 'N/A'}
+🔋 RECs: $${marketData.renewable_certificates?.toFixed(2) || 'N/A'}
+
+Ready to trade!`;
+
+    return await this.sendMultiChannelNotification(
+      userPreferences,
+      message,
+      { subject: 'Market Opening' }
+    );
+  }
+
   async notifyTradeProcessed(tradeData, userPreferences) {
     const message = `🔄 *Trade Processed from Document*
 

@@ -1,9 +1,18 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const notificationService = require('../services/notificationService');
+const NotificationService = require('../services/notificationService');
 const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
+
+// Initialize notification service
+let notificationService;
+try {
+  notificationService = new NotificationService();
+} catch (error) {
+  console.error('Failed to initialize NotificationService:', error);
+  notificationService = null;
+}
 
 // Notification service status
 router.get('/', (req, res) => {
@@ -14,8 +23,15 @@ router.get('/', (req, res) => {
       send: 'POST /notifications/send',
       subscribe: 'POST /notifications/subscribe',
       channels: 'GET /notifications/channels',
-      test: 'POST /notifications/test'
-    }
+      test: 'POST /notifications/test',
+      trading: {
+        trade_executed: 'POST /notifications/trading/trade-executed',
+        order_placed: 'POST /notifications/trading/order-placed',
+        risk_alert: 'POST /notifications/trading/risk-alert',
+        margin_call: 'POST /notifications/trading/margin-call'
+      }
+    },
+    serviceStatus: notificationService ? 'online' : 'offline'
   });
 });
 
@@ -33,6 +49,13 @@ router.post('/send',
   ],
   async (req, res) => {
     try {
+      if (!notificationService) {
+        return res.status(503).json({
+          success: false,
+          error: 'Notification service unavailable'
+        });
+      }
+
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
@@ -56,6 +79,7 @@ router.post('/send',
     } catch (error) {
       console.error('Notification send error:', error);
       res.status(500).json({ 
+        success: false,
         error: 'Failed to send notification',
         message: error.message 
       });
@@ -245,6 +269,242 @@ router.post('/ocr/review-required',
       console.error('Review notification error:', error);
       res.status(500).json({ 
         error: 'Failed to send review notification',
+        message: error.message 
+      });
+    }
+  }
+);
+
+// Trading notification endpoints
+router.post('/trading/trade-executed',
+  authenticateToken,
+  [
+    body('trade').isObject().withMessage('Trade data is required'),
+    body('userPreferences').isObject().withMessage('User preferences are required')
+  ],
+  async (req, res) => {
+    try {
+      if (!notificationService) {
+        return res.status(503).json({
+          success: false,
+          error: 'Notification service unavailable'
+        });
+      }
+
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+          success: false,
+          errors: errors.array() 
+        });
+      }
+
+      const { trade, userPreferences } = req.body;
+      
+      const notifications = await notificationService.notifyTradeExecuted(
+        trade,
+        userPreferences
+      );
+      
+      res.json({
+        success: true,
+        notifications_sent: notifications.length,
+        notifications
+      });
+
+    } catch (error) {
+      console.error('Trade notification error:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to send trade notification',
+        message: error.message 
+      });
+    }
+  }
+);
+
+router.post('/trading/order-placed',
+  authenticateToken,
+  [
+    body('order').isObject().withMessage('Order data is required'),
+    body('userPreferences').isObject().withMessage('User preferences are required')
+  ],
+  async (req, res) => {
+    try {
+      if (!notificationService) {
+        return res.status(503).json({
+          success: false,
+          error: 'Notification service unavailable'
+        });
+      }
+
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+          success: false,
+          errors: errors.array() 
+        });
+      }
+
+      const { order, userPreferences } = req.body;
+      
+      const notifications = await notificationService.notifyOrderPlaced(
+        order,
+        userPreferences
+      );
+      
+      res.json({
+        success: true,
+        notifications_sent: notifications.length,
+        notifications
+      });
+
+    } catch (error) {
+      console.error('Order notification error:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to send order notification',
+        message: error.message 
+      });
+    }
+  }
+);
+
+router.post('/trading/risk-alert',
+  authenticateToken,
+  [
+    body('riskData').isObject().withMessage('Risk data is required'),
+    body('userPreferences').isObject().withMessage('User preferences are required')
+  ],
+  async (req, res) => {
+    try {
+      if (!notificationService) {
+        return res.status(503).json({
+          success: false,
+          error: 'Notification service unavailable'
+        });
+      }
+
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+          success: false,
+          errors: errors.array() 
+        });
+      }
+
+      const { riskData, userPreferences } = req.body;
+      
+      const notifications = await notificationService.notifyRiskLimitBreach(
+        riskData,
+        userPreferences
+      );
+      
+      res.json({
+        success: true,
+        notifications_sent: notifications.length,
+        notifications
+      });
+
+    } catch (error) {
+      console.error('Risk alert notification error:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to send risk alert notification',
+        message: error.message 
+      });
+    }
+  }
+);
+
+router.post('/trading/margin-call',
+  authenticateToken,
+  [
+    body('marginData').isObject().withMessage('Margin data is required'),
+    body('userPreferences').isObject().withMessage('User preferences are required')
+  ],
+  async (req, res) => {
+    try {
+      if (!notificationService) {
+        return res.status(503).json({
+          success: false,
+          error: 'Notification service unavailable'
+        });
+      }
+
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+          success: false,
+          errors: errors.array() 
+        });
+      }
+
+      const { marginData, userPreferences } = req.body;
+      
+      const notifications = await notificationService.notifyMarginCall(
+        marginData,
+        userPreferences
+      );
+      
+      res.json({
+        success: true,
+        notifications_sent: notifications.length,
+        notifications
+      });
+
+    } catch (error) {
+      console.error('Margin call notification error:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to send margin call notification',
+        message: error.message 
+      });
+    }
+  }
+);
+
+router.post('/trading/compliance-alert',
+  authenticateToken,
+  [
+    body('complianceData').isObject().withMessage('Compliance data is required'),
+    body('userPreferences').isObject().withMessage('User preferences are required')
+  ],
+  async (req, res) => {
+    try {
+      if (!notificationService) {
+        return res.status(503).json({
+          success: false,
+          error: 'Notification service unavailable'
+        });
+      }
+
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+          success: false,
+          errors: errors.array() 
+        });
+      }
+
+      const { complianceData, userPreferences } = req.body;
+      
+      const notifications = await notificationService.notifyComplianceAlert(
+        complianceData,
+        userPreferences
+      );
+      
+      res.json({
+        success: true,
+        notifications_sent: notifications.length,
+        notifications
+      });
+
+    } catch (error) {
+      console.error('Compliance alert notification error:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to send compliance alert notification',
         message: error.message 
       });
     }
