@@ -179,7 +179,7 @@ class UserManagementService {
       });
 
       // Return user without password
-      const { password: _password, ...userWithoutPassword } = user;
+      const { password: _, ...userWithoutPassword } = user;
       return userWithoutPassword;
 
     } catch (error) {
@@ -189,134 +189,129 @@ class UserManagementService {
 
   // Authenticate user
   async authenticateUser(username, password, mfaToken = null) {
-    try {
-      // Find user
-      const user = Array.from(this.users.values())
-        .find(u => u.username === username || u.email === username);
+    // Find user
+    const user = Array.from(this.users.values())
+      .find(u => u.username === username || u.email === username);
 
-      if (!user) {
-        await this.logAuditEvent({
-          action: 'login_failed',
-          details: { username, reason: 'user_not_found' }
-        });
-        throw new Error('Invalid credentials');
-      }
-
-      // Check if account is locked
-      if (user.lockedUntil && new Date() < new Date(user.lockedUntil)) {
-        await this.logAuditEvent({
-          userId: user.id,
-          action: 'login_failed',
-          details: { username, reason: 'account_locked' }
-        });
-        throw new Error('Account temporarily locked due to multiple failed attempts');
-      }
-
-      // Check if account is active
-      if (!user.isActive) {
-        await this.logAuditEvent({
-          userId: user.id,
-          action: 'login_failed',
-          details: { username, reason: 'account_inactive' }
-        });
-        throw new Error('Account is inactive');
-      }
-
-      // Verify password
-      const passwordValid = await bcrypt.compare(password, user.password);
-      if (!passwordValid) {
-        // Increment login attempts
-        user.loginAttempts++;
-        if (user.loginAttempts >= this.config.maxLoginAttempts) {
-          user.lockedUntil = new Date(Date.now() + this.config.lockoutDuration).toISOString();
-        }
-        
-        await this.logAuditEvent({
-          userId: user.id,
-          action: 'login_failed',
-          details: { username, reason: 'invalid_password', attempts: user.loginAttempts }
-        });
-        
-        throw new Error('Invalid credentials');
-      }
-
-      // Check MFA if enabled
-      if (user.mfaEnabled) {
-        if (!mfaToken) {
-          // Generate and store MFA token for demo (in production, would use TOTP)
-          const token = crypto.randomInt(100000, 999999).toString();
-          this.mfaTokens.set(user.id, {
-            token,
-            expiresAt: Date.now() + this.config.mfaTokenExpiry
-          });
-          
-          await this.logAuditEvent({
-            userId: user.id,
-            action: 'mfa_token_generated',
-            details: { username }
-          });
-
-          throw new Error('MFA_REQUIRED'); // Special error to indicate MFA is needed
-        }
-
-        // Verify MFA token
-        const storedMfaData = this.mfaTokens.get(user.id);
-        if (!storedMfaData || Date.now() > storedMfaData.expiresAt || storedMfaData.token !== mfaToken) {
-          await this.logAuditEvent({
-            userId: user.id,
-            action: 'login_failed',
-            details: { username, reason: 'invalid_mfa_token' }
-          });
-          throw new Error('Invalid or expired MFA token');
-        }
-
-        // Remove used MFA token
-        this.mfaTokens.delete(user.id);
-      }
-
-      // Reset login attempts on successful login
-      user.loginAttempts = 0;
-      user.lockedUntil = null;
-      user.lastLogin = new Date().toISOString();
-
-      // Generate JWT token
-      const sessionId = uuidv4();
-      const token = jwt.sign(
-        { 
-          id: user.id, 
-          username: user.username, 
-          role: user.role,
-          sessionId 
-        },
-        this.config.jwtSecret,
-        { expiresIn: '24h' }
-      );
-
-      // Store session
-      this.sessions.set(sessionId, {
-        userId: user.id,
-        createdAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + this.config.sessionTimeout).toISOString(),
-        ipAddress: null, // Would be set by route handler
-        userAgent: null  // Would be set by route handler
+    if (!user) {
+      await this.logAuditEvent({
+        action: 'login_failed',
+        details: { username, reason: 'user_not_found' }
       });
+      throw new Error('Invalid credentials');
+    }
 
+    // Check if account is locked
+    if (user.lockedUntil && new Date() < new Date(user.lockedUntil)) {
       await this.logAuditEvent({
         userId: user.id,
-        action: 'login_successful',
-        details: { username, sessionId }
+        action: 'login_failed',
+        details: { username, reason: 'account_locked' }
       });
-
-      const { password: _password, ...userWithoutPassword } = user;
-      return {
-        user: userWithoutPassword,
-        token,
-        sessionId
-      };
-
-    } catch (error) {
-      throw error;
+      throw new Error('Account temporarily locked due to multiple failed attempts');
     }
+
+    // Check if account is active
+    if (!user.isActive) {
+      await this.logAuditEvent({
+        userId: user.id,
+        action: 'login_failed',
+        details: { username, reason: 'account_inactive' }
+      });
+      throw new Error('Account is inactive');
+    }
+
+    // Verify password
+    const passwordValid = await bcrypt.compare(password, user.password);
+    if (!passwordValid) {
+      // Increment login attempts
+      user.loginAttempts++;
+      if (user.loginAttempts >= this.config.maxLoginAttempts) {
+        user.lockedUntil = new Date(Date.now() + this.config.lockoutDuration).toISOString();
+      }
+      
+      await this.logAuditEvent({
+        userId: user.id,
+        action: 'login_failed',
+        details: { username, reason: 'invalid_password', attempts: user.loginAttempts }
+      });
+      
+      throw new Error('Invalid credentials');
+    }
+
+    // Check MFA if enabled
+    if (user.mfaEnabled) {
+      if (!mfaToken) {
+        // Generate and store MFA token for demo (in production, would use TOTP)
+        const token = crypto.randomInt(100000, 999999).toString();
+        this.mfaTokens.set(user.id, {
+          token,
+          expiresAt: Date.now() + this.config.mfaTokenExpiry
+        });
+        
+        await this.logAuditEvent({
+          userId: user.id,
+          action: 'mfa_token_generated',
+          details: { username }
+        });
+
+        throw new Error('MFA_REQUIRED'); // Special error to indicate MFA is needed
+      }
+
+      // Verify MFA token
+      const storedMfaData = this.mfaTokens.get(user.id);
+      if (!storedMfaData || Date.now() > storedMfaData.expiresAt || storedMfaData.token !== mfaToken) {
+        await this.logAuditEvent({
+          userId: user.id,
+          action: 'login_failed',
+          details: { username, reason: 'invalid_mfa_token' }
+        });
+        throw new Error('Invalid or expired MFA token');
+      }
+
+      // Remove used MFA token
+      this.mfaTokens.delete(user.id);
+    }
+
+    // Reset login attempts on successful login
+    user.loginAttempts = 0;
+    user.lockedUntil = null;
+    user.lastLogin = new Date().toISOString();
+
+    // Generate JWT token
+    const sessionId = uuidv4();
+    const token = jwt.sign(
+      { 
+        id: user.id, 
+        username: user.username, 
+        role: user.role,
+        sessionId 
+      },
+      this.config.jwtSecret,
+      { expiresIn: '24h' }
+    );
+
+    // Store session
+    this.sessions.set(sessionId, {
+      userId: user.id,
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + this.config.sessionTimeout).toISOString(),
+      ipAddress: null, // Would be set by route handler
+      userAgent: null  // Would be set by route handler
+    });
+
+    await this.logAuditEvent({
+      userId: user.id,
+      action: 'login_successful',
+      details: { username, sessionId }
+    });
+
+    const { password: _, ...userWithoutPassword } = user;
+    return {
+      user: userWithoutPassword,
+      token,
+      sessionId
+    };
   }
 
   // Logout user
@@ -351,7 +346,7 @@ class UserManagementService {
       }
 
       return decoded;
-    } catch (error) {
+    } catch {
       throw new Error('Invalid token');
     }
   }
@@ -373,7 +368,7 @@ class UserManagementService {
     const user = this.users.get(userId);
     if (!user) return null;
 
-    const { password: _password, ...userWithoutPassword } = user;
+    const { password: _, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
@@ -414,7 +409,7 @@ class UserManagementService {
         details: { updates: Object.keys(updates) }
       });
 
-      const { password: _password, ...userWithoutPassword } = user;
+      const { password: _, ...userWithoutPassword } = user;
       return userWithoutPassword;
 
     } catch (error) {
@@ -475,7 +470,7 @@ class UserManagementService {
     }
 
     // Remove passwords
-    return users.map(({ password: _password, ...user }) => user);
+    return users.map(({ password: _, ...user }) => user);
   }
 
   // Get user audit log
@@ -550,16 +545,16 @@ class UserManagementService {
   }
 
   // Validate password
-  validatePassword(password) {
+  validatePassword(password, _unused) {
     if (password.length < this.config.passwordMinLength) {
       throw new Error(`Password must be at least ${this.config.passwordMinLength} characters long`);
     }
 
     if (this.config.passwordRequireSpecialChars) {
-      const hasUpperCase = /[A-Z]/.test(password);
-      const hasLowerCase = /[a-z]/.test(password);
-      const hasNumbers = /\d/.test(password);
-      const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+      const hasUpperCase = /[A-Z]/.test(password, _unused);
+      const hasLowerCase = /[a-z]/.test(password, _unused);
+      const hasNumbers = /\d/.test(password, _unused);
+      const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password, _unused);
 
       if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
         throw new Error('Password must contain uppercase, lowercase, numbers, and special characters');
