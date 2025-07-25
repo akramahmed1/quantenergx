@@ -58,6 +58,7 @@ class NotificationService {
     };
   }
 
+  async sendWhatsAppMessage(phoneNumber, message, _options = {}) {
     // This is a placeholder for WhatsApp Business API integration
     // In production, you would integrate with services like:
     // - WhatsApp Business API
@@ -81,6 +82,8 @@ class NotificationService {
     // - AWS SES
     // - Mailgun
     
+    const { subject = 'QuantEnergx Notification' } = options;
+    
     console.log(`Email would be sent to ${email}:`);
     console.log(`Subject: ${subject}`);
     console.log(`Message: ${message}`);
@@ -93,6 +96,7 @@ class NotificationService {
     };
   }
 
+  async sendSMSNotification(phoneNumber, message, _options = {}) {
     // Placeholder for SMS service integration
     // In production, integrate with services like:
     // - Twilio
@@ -289,5 +293,25 @@ Please review your positions immediately.`;
     const notifications = [];
     for (const channel of userPreferences.channels || ['telegram', 'email']) {
       try {
-        const notification
-
+        const notification = await this.sendNotification(
+          channel, 
+          userPreferences[channel + '_address'], 
+          message, 
+          { subject: 'Risk Alert' }
+        );
+        notifications.push(notification);
+      } catch (error) {
+        console.error(`Failed to send ${channel} notification:`, error);
+        notifications.push({
+          success: false,
+          channel,
+          error: error.message
+        });
+      }
+    }
+
+    return notifications;
+  }
+}
+
+module.exports = new NotificationService();

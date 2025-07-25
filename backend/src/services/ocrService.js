@@ -136,16 +136,6 @@ class OCRService {
       throw new Error(`Failed to get batch status: ${error.message}`);
     }
   }
-    // This would typically query a database
-    // For now, return a placeholder structure
-    return {
-      page,
-      limit,
-      total: 0,
-      documents: [],
-      message: 'Database integration pending'
-    };
-  }
 
   async _preprocessFile(file) {
     const fileExtension = path.extname(file.originalname).toLowerCase();
@@ -205,6 +195,7 @@ class OCRService {
     }
   }
 
+  async _performOCR(filePath, options = {}) {
     const { language = 'eng', extractFields = false, detectStamps = false, detectSignatures = false } = options;
     
     try {
@@ -247,12 +238,27 @@ class OCRService {
     }
   }
 
-  async _extractFields(text) {
+  async _extractFields(_text) {
     // Simple field extraction using regex patterns
     // In production, this would use ML models
     const fields = {};
-
+    
+    return fields;
   }
+
+  async _detectStamps(text) {
+    // Simple stamp detection based on text patterns
+    const stampPatterns = [
+      /\b(stamp|seal|notary|official)\b/i,
+      /\b(certified|authorized|approved)\b/i
+    ];
+
+    const detectedStamps = [];
+    for (const pattern of stampPatterns) {
+      const match = text.match(pattern);
+      if (match) {
+        detectedStamps.push(match[0]);
+      }
     }
 
     return detectedStamps.length > 0 ? detectedStamps : null;

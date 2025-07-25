@@ -163,6 +163,10 @@ class DocumentProcessingService {
   _parseDate(dateString) {
     // Handle various date formats
     const formats = [
+      /(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})/, // MM/DD/YYYY or MM-DD-YYYY
+      /(\d{2,4})[-/](\d{1,2})[-/](\d{1,2})/, // YYYY/MM/DD or YYYY-MM-DD
+    ];
+    
     for (const format of formats) {
       const match = dateString.match(format);
       if (match) {
