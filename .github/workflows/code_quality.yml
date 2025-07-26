@@ -1,0 +1,63 @@
+name: Automated Code Quality, Security & E2E
+
+on: [push, pull_request]
+
+jobs:
+  lint-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node.js setup
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+
+      # JS/TS Lint & Format
+      - run: npm run lint -- --fix
+      - run: npm run prettier -- --write
+
+      # Python setup
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+
+      # Python Lint & Format
+      - run: black .
+      - run: flake8 .
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        with:
+          args: >
+            -Dsonar.projectKey=quantenergx
+            -Dsonar.organization=akramahmed1
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+      - name: Snyk Security Scan
+        uses: snyk/actions@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - name: Run Cypress E2E Tests
+        run: npx cypress run
+
+  summary:
+    needs: [lint-format, static-analysis, e2e]
+    runs-on: ubuntu-latest
+    steps:
+      - name: All checks passed
+        run: echo "All code quality standards, security, and E2E tests passed!"
