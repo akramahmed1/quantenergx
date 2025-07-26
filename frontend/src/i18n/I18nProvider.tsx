@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { translations } from './translations';
 
-type Language = 'en' | 'es' | 'fr';
+type SupportedLanguage = keyof typeof translations;
+type Language = SupportedLanguage;
 type TranslationKey = string;
 
 interface I18nContextType {
@@ -26,9 +27,11 @@ interface I18nProviderProps {
 }
 
 export const I18nProvider: React.FC<I18nProviderProps> = ({ children, defaultLanguage = 'en' }) => {
-  const [language, setLanguage] = useState<Language>(
-    (localStorage.getItem('language') as Language) || defaultLanguage
-  );
+  const [language, setLanguage] = useState<Language>(() => {
+    const storedLanguage = localStorage.getItem('language') as Language;
+    // Ensure the stored language is supported, fallback to default if not
+    return storedLanguage && storedLanguage in translations ? storedLanguage : defaultLanguage;
+  });
 
   const handleSetLanguage = (lang: Language) => {
     setLanguage(lang);
@@ -47,13 +50,20 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children, defaultLan
       return value;
     }
 
-    // Fallback to English
-    value = translations.en;
-    for (const k of keys) {
-      value = value?.[k];
+    // Fallback to English if current language doesn't have the key
+    if (language !== 'en') {
+      value = translations.en;
+      for (const k of keys) {
+        value = value?.[k];
+      }
+      
+      if (typeof value === 'string') {
+        return value;
+      }
     }
 
-    return typeof value === 'string' ? value : key;
+    // Return the key itself if no translation found
+    return key;
   };
 
   return (
