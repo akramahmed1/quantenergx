@@ -1,6 +1,236 @@
-# QuantEnergx Backend
+# QuantEnergx Backend - Manual Deployment Guide
 
-> Server-side components for the QuantEnergx energy trading platform
+This guide provides step-by-step instructions for manually deploying the QuantEnergx backend application on Windows and other platforms.
+
+## Prerequisites
+
+- **Node.js**: Version 18.x or higher ([Download](https://nodejs.org/))
+- **npm**: Comes with Node.js installation
+- **PostgreSQL**: Version 12 or higher ([Download](https://www.postgresql.org/download/windows/))
+- **Redis**: Version 6 or higher ([Download](https://github.com/tporadowski/redis/releases))
+- **Git**: For cloning the repository ([Download](https://git-scm.com/download/win))
+
+## Quick Start
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/akramahmed1/quantenergx.git
+cd quantenergx/backend
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Set Up Environment Variables
+
+Copy the example environment file and customize it:
+
+```bash
+# Windows Command Prompt
+copy .env.example .env
+
+# Windows PowerShell
+Copy-Item .env.example .env
+
+# Git Bash/WSL/Linux/macOS
+cp .env.example .env
+```
+
+### 4. Configure Environment Variables
+
+Edit the `.env` file with your specific configuration:
+
+```env
+NODE_ENV=production
+PORT=3001
+
+# Database Configuration
+DATABASE_URL=postgresql://username:password@localhost:5432/quantenergx
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=quantenergx
+DB_USER=your_db_user
+DB_PASSWORD=your_db_password
+
+# Redis Configuration
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# Security Keys (Generate secure keys for production)
+JWT_SECRET=your-super-secret-jwt-key-change-in-production-min-32-chars
+JWT_REFRESH_SECRET=your-super-secret-refresh-key-change-in-production-min-32-chars
+API_ENCRYPTION_KEY=your-32-char-encryption-key-here
+```
+
+### 5. Build the Application
+
+```bash
+npm run build
+```
+
+### 6. Start the Application
+
+```bash
+npm start
+```
+
+## Detailed Windows Setup Instructions
+
+### Setting Environment Variables on Windows
+
+#### Method 1: Using Command Prompt
+```cmd
+# Set temporary environment variables (session only)
+set NODE_ENV=production
+set PORT=3001
+set DATABASE_URL=postgresql://username:password@localhost:5432/quantenergx
+
+# Start the application
+npm start
+```
+
+#### Method 2: Using PowerShell
+```powershell
+# Set temporary environment variables (session only)
+$env:NODE_ENV="production"
+$env:PORT="3001"
+$env:DATABASE_URL="postgresql://username:password@localhost:5432/quantenergx"
+
+# Start the application
+npm start
+```
+
+#### Method 3: Using Windows System Properties (Permanent)
+1. Press `Win + R`, type `sysdm.cpl`, and press Enter
+2. Click "Environment Variables"
+3. Under "User variables" or "System variables", click "New"
+4. Add each environment variable name and value
+5. Click "OK" to save
+
+#### Method 4: Using .env file (Recommended)
+Create a `.env` file in the backend directory with all required variables.
+
+### Windows-Specific Notes
+
+1. **File Paths**: Use forward slashes (/) or double backslashes (\\\\) in paths
+2. **PowerShell Execution Policy**: If you encounter script execution issues:
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
+3. **Windows Defender**: Add the project folder to Windows Defender exclusions for better performance
+
+## Build Process
+
+### TypeScript Compilation
+
+The application uses TypeScript and requires compilation before running:
+
+```bash
+# Build the TypeScript code
+npm run build
+
+# This compiles src/ files to dist/ directory
+# The compiled JavaScript files are placed in dist/
+```
+
+### Build Output Structure
+
+```
+dist/
+├── index.js          # Main entry point
+├── index.d.ts        # TypeScript declarations
+├── index.js.map      # Source maps
+└── index.d.ts.map    # Declaration maps
+```
+
+## Available Scripts
+
+| Script | Command | Description |
+|--------|---------|-------------|
+| **build** | `npm run build` | Compile TypeScript to JavaScript |
+| **start** | `npm start` | Start production server (requires build) |
+| **start:dev** | `npm run start:dev` | Start development server with ts-node |
+| **dev** | `npm run dev` | Start development server with nodemon |
+| **test** | `npm test` | Run all tests |
+| **test:coverage** | `npm run test:coverage` | Run tests with coverage report |
+| **lint** | `npm run lint` | Run ESLint on source code |
+| **lint:fix** | `npm run lint:fix` | Auto-fix ESLint issues |
+
+## Health Check & API Verification
+
+### Health Check Endpoint
+
+```bash
+# Check if the application is running
+curl http://localhost:3001/health
+
+# Expected response:
+{
+  "status": "healthy",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "version": "1.0.0",
+  "services": {
+    "rest_api": "online",
+    "grpc_service": "online"
+  }
+}
+```
+
+### Windows Testing with PowerShell
+
+```powershell
+# Test health endpoint using PowerShell
+Invoke-RestMethod -Uri "http://localhost:3001/health" -Method Get
+
+# Or using curl if installed
+curl http://localhost:3001/health
+```
+
+## Security Audit & Dependency Management
+
+### Running Security Audit
+
+```bash
+# Check for vulnerabilities
+npm audit
+
+# Fix non-breaking vulnerabilities
+npm audit fix
+
+# Fix all vulnerabilities (may include breaking changes)
+npm audit fix --force
+```
+
+### Current Known Vulnerabilities
+
+The application currently has 6 vulnerabilities (4 moderate, 2 critical) primarily related to:
+- `form-data` package (critical)
+- `tough-cookie` package (moderate)
+- `node-telegram-bot-api` dependency chain
+
+**Resolution Steps:**
+1. Run `npm audit fix` for automatic fixes
+2. For critical issues requiring breaking changes, run `npm audit fix --force`
+3. Test the application thoroughly after updates
+
+## Deployment Checklist
+
+Before deploying to production:
+
+- [ ] All environment variables are set correctly
+- [ ] Database is set up and accessible
+- [ ] Redis is running and accessible
+- [ ] All dependencies are installed (`npm install`)
+- [ ] Application builds successfully (`npm run build`)
+- [ ] Tests pass (`npm test`)
+- [ ] Security audit is clean (`npm audit`)
+- [ ] Health check endpoint responds correctly
+
+---
 
 ## 🏗️ Architecture Overview
 
