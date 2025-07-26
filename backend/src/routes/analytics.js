@@ -459,10 +459,10 @@ async function generateTradingAnalytics(userId, period, commodity) {
       byCommodity: commodity
         ? [{ commodity, trades: 156, volume: 4500000000, pnl: 2350000 }]
         : [
-          { commodity: 'crude_oil', trades: 85, volume: 2500000000, pnl: 1200000 },
-          { commodity: 'natural_gas', trades: 45, volume: 1500000000, pnl: 850000 },
-          { commodity: 'renewable_certificates', trades: 26, volume: 500000000, pnl: 300000 },
-        ],
+            { commodity: 'crude_oil', trades: 85, volume: 2500000000, pnl: 1200000 },
+            { commodity: 'natural_gas', trades: 45, volume: 1500000000, pnl: 850000 },
+            { commodity: 'renewable_certificates', trades: 26, volume: 500000000, pnl: 300000 },
+          ],
       byDirection: [
         { direction: 'buy', trades: 78, volume: 2250000000, pnl: 1100000 },
         { direction: 'sell', trades: 78, volume: 2250000000, pnl: 1250000 },
@@ -760,21 +760,21 @@ function generateMockTimeSeries(type, period) {
 
     let value;
     switch (type) {
-    case 'daily_pnl':
-      value = (Math.random() - 0.45) * 50000;
-      break;
-    case 'cumulative_pnl':
-      value =
+      case 'daily_pnl':
+        value = (Math.random() - 0.45) * 50000;
+        break;
+      case 'cumulative_pnl':
+        value =
           i === days ? 0 : (data[data.length - 1]?.value || 0) + (Math.random() - 0.45) * 50000;
-      break;
-    case 'returns':
-      value = (Math.random() - 0.5) * 0.05;
-      break;
-    case 'volume':
-      value = Math.random() * 10000000 + 5000000;
-      break;
-    default:
-      value = Math.random() * 100;
+        break;
+      case 'returns':
+        value = (Math.random() - 0.5) * 0.05;
+        break;
+      case 'volume':
+        value = Math.random() * 10000000 + 5000000;
+        break;
+      default:
+        value = Math.random() * 100;
     }
 
     data.push({

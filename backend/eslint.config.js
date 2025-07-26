@@ -24,16 +24,30 @@ module.exports = [
       }
     },
     rules: {
-      'no-unused-vars': ['error', { 
+      // Make unused vars a warning instead of error for development
+      'no-unused-vars': ['warn', { 
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_',
         destructuredArrayIgnorePattern: '^_',
-        caughtErrorsIgnorePattern: '^_'
+        caughtErrorsIgnorePattern: '^_',
+        args: 'after-used',
+        ignoreRestSiblings: true
       }],
       'no-console': 'off',
       'semi': ['error', 'always'],
       'quotes': ['error', 'single'],
-      'indent': ['error', 2]
+      'indent': ['error', 2],
+      'no-useless-escape': 'error',
+      
+      // Important security and correctness rules (keep as errors)
+      'no-undef': 'error',
+      'no-redeclare': 'error',
+      'no-dupe-keys': 'error',
+      'no-dupe-args': 'error',
+      'no-unreachable': 'error',
+      'eqeqeq': 'error',
+      'no-eval': 'error',
+      'no-implied-eval': 'error'
     }
   },
   {

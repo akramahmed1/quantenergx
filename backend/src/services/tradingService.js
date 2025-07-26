@@ -161,20 +161,20 @@ class TradingService extends EventEmitter {
   // Process order based on type
   async processOrder(order) {
     switch (order.type) {
-    case 'market':
-      await this.processMarketOrder(order);
-      break;
-    case 'limit':
-      await this.processLimitOrder(order);
-      break;
-    case 'stop':
-      await this.processStopOrder(order);
-      break;
-    case 'stop_limit':
-      await this.processStopLimitOrder(order);
-      break;
-    default:
-      throw new Error(`Unsupported order type: ${order.type}`);
+      case 'market':
+        await this.processMarketOrder(order);
+        break;
+      case 'limit':
+        await this.processLimitOrder(order);
+        break;
+      case 'stop':
+        await this.processStopOrder(order);
+        break;
+      case 'stop_limit':
+        await this.processStopLimitOrder(order);
+        break;
+      default:
+        throw new Error(`Unsupported order type: ${order.type}`);
     }
   }
 
