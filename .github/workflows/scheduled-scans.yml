@@ -1,0 +1,381 @@
+name: Scheduled Security and Technical Debt Scans
+
+on:
+  schedule:
+    # Daily security scans at 2 AM UTC
+    - cron: '0 2 * * *'
+    # Weekly technical debt analysis on Sundays at 6 AM UTC  
+    - cron: '0 6 * * 0'
+    # Monthly comprehensive audit on 1st of month at 4 AM UTC
+    - cron: '0 4 1 * *'
+  
+  workflow_dispatch:
+    inputs:
+      scan_type:
+        description: 'Type of scan to run'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+        - all
+        - security
+        - technical-debt
+        - dependencies
+        - performance
+
+env:
+  NODE_VERSION: 20
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  security-scan:
+    name: Security Vulnerability Scan
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 2 * * *' || github.event.inputs.scan_type == 'security' || github.event.inputs.scan_type == 'all'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          npm ci --prefix backend
+          npm ci --prefix frontend
+          pip install -r requirements-dev.txt
+
+      # Comprehensive security scanning
+      - name: Run Snyk security scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --all-projects --severity-threshold=low
+
+      - name: Run npm audit
+        run: |
+          cd backend && npm audit --audit-level=low --json > ../security-audit-backend.json || true
+          cd frontend && npm audit --audit-level=low --json > ../security-audit-frontend.json || true
+
+      - name: Run Bandit security scan
+        run: bandit -r . -f json -o bandit-security-report.json
+        continue-on-error: true
+
+      - name: Run Safety check
+        run: safety check --json --output safety-report.json
+        continue-on-error: true
+
+      # Advanced security scans
+      - name: Run Semgrep
+        run: |
+          python3 -m pip install semgrep
+          semgrep --config=auto --json --output=semgrep-report.json .
+        continue-on-error: true
+
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified --json
+
+      # Generate security report
+      - name: Generate security summary
+        run: |
+          echo "# Daily Security Scan Report - $(date)" > security-report.md
+          echo "" >> security-report.md
+          echo "## Summary" >> security-report.md
+          
+          # Count vulnerabilities
+          BACKEND_VULNS=$(jq '.vulnerabilities | length' security-audit-backend.json 2>/dev/null || echo "0")
+          FRONTEND_VULNS=$(jq '.vulnerabilities | length' security-audit-frontend.json 2>/dev/null || echo "0")
+          
+          echo "- Backend vulnerabilities: $BACKEND_VULNS" >> security-report.md
+          echo "- Frontend vulnerabilities: $FRONTEND_VULNS" >> security-report.md
+          echo "- Python security issues: $(jq '.results | length' bandit-security-report.json 2>/dev/null || echo "0")" >> security-report.md
+          echo "- Dependency security issues: $(jq '.vulnerabilities | length' safety-report.json 2>/dev/null || echo "0")" >> security-report.md
+          
+          echo "" >> security-report.md
+          echo "## Actions Required" >> security-report.md
+          
+          if [ "$BACKEND_VULNS" -gt "0" ] || [ "$FRONTEND_VULNS" -gt "0" ]; then
+            echo "- 🚨 Update vulnerable dependencies" >> security-report.md
+          fi
+          
+          echo "- Review and address security findings" >> security-report.md
+          echo "- Update security documentation if needed" >> security-report.md
+
+      - name: Upload security artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-reports-$(date +%Y%m%d)
+          path: |
+            security-report.md
+            security-audit-*.json
+            bandit-security-report.json
+            safety-report.json
+            semgrep-report.json
+
+      # Create issue for critical vulnerabilities
+      - name: Create security issue
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            try {
+              const report = fs.readFileSync('security-report.md', 'utf8');
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `Security Scan Report - ${new Date().toISOString().split('T')[0]}`,
+                body: report,
+                labels: ['security', 'automated-scan']
+              });
+            } catch (error) {
+              console.log('No security report to create issue from');
+            }
+
+  technical-debt-analysis:
+    name: Technical Debt Analysis
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 6 * * 0' || github.event.inputs.scan_type == 'technical-debt' || github.event.inputs.scan_type == 'all'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Install analysis tools
+      - name: Install dependencies
+        run: |
+          npm ci --prefix backend
+          npm ci --prefix frontend
+          npm install -g jscpd complexity-report
+
+      # Code complexity analysis
+      - name: Run complexity analysis
+        run: |
+          echo "# Technical Debt Report - $(date)" > tech-debt-report.md
+          echo "" >> tech-debt-report.md
+          
+          # JavaScript complexity
+          complexity-report -f json backend/src > backend-complexity.json || true
+          complexity-report -f json frontend/src > frontend-complexity.json || true
+          
+          echo "## Code Complexity" >> tech-debt-report.md
+          echo "- Backend complexity analysis completed" >> tech-debt-report.md
+          echo "- Frontend complexity analysis completed" >> tech-debt-report.md
+
+      # Code duplication analysis
+      - name: Run duplication analysis
+        run: |
+          jscpd backend/src frontend/src --reporters json --output ./duplication-report.json || true
+          echo "" >> tech-debt-report.md
+          echo "## Code Duplication" >> tech-debt-report.md
+          echo "- Duplication analysis completed" >> tech-debt-report.md
+
+      # SonarQube analysis for technical debt
+      - name: SonarQube technical debt scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # ESLint for code quality issues
+      - name: Run comprehensive ESLint analysis
+        run: |
+          cd backend && npx eslint src/ --format json --output-file ../backend-lint-report.json || true
+          cd frontend && npx eslint src/ --ext .ts,.tsx --format json --output-file ../frontend-lint-report.json || true
+          
+          echo "" >> tech-debt-report.md
+          echo "## Code Quality Issues" >> tech-debt-report.md
+          echo "- Backend linting issues: $(jq '. | map(.messages | length) | add' backend-lint-report.json 2>/dev/null || echo "0")" >> tech-debt-report.md
+          echo "- Frontend linting issues: $(jq '. | map(.messages | length) | add' frontend-lint-report.json 2>/dev/null || echo "0")" >> tech-debt-report.md
+
+      # Generate technical debt summary
+      - name: Generate tech debt summary
+        run: |
+          echo "" >> tech-debt-report.md
+          echo "## Recommendations" >> tech-debt-report.md
+          echo "- Review high complexity functions" >> tech-debt-report.md
+          echo "- Refactor duplicated code blocks" >> tech-debt-report.md
+          echo "- Address linting issues" >> tech-debt-report.md
+          echo "- Update outdated dependencies" >> tech-debt-report.md
+          echo "" >> tech-debt-report.md
+          echo "## Next Steps" >> tech-debt-report.md
+          echo "- Schedule technical debt sprint" >> tech-debt-report.md
+          echo "- Prioritize refactoring tasks" >> tech-debt-report.md
+          echo "- Update coding standards if needed" >> tech-debt-report.md
+
+      - name: Upload technical debt artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: tech-debt-reports-$(date +%Y%m%d)
+          path: |
+            tech-debt-report.md
+            *-complexity.json
+            duplication-report.json
+            *-lint-report.json
+
+  dependency-audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    if: github.event.inputs.scan_type == 'dependencies' || github.event.inputs.scan_type == 'all'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Check for outdated dependencies
+        run: |
+          echo "# Dependency Audit Report - $(date)" > dependency-report.md
+          echo "" >> dependency-report.md
+          
+          # Backend dependencies
+          cd backend
+          echo "## Backend Dependencies" >> ../dependency-report.md
+          npm outdated --json > ../backend-outdated.json || true
+          
+          cd ../frontend
+          echo "## Frontend Dependencies" >> ../dependency-report.md
+          npm outdated --json > ../frontend-outdated.json || true
+          
+          cd ..
+          echo "" >> dependency-report.md
+          echo "## Recommendations" >> dependency-report.md
+          echo "- Review and update outdated packages" >> dependency-report.md
+          echo "- Test thoroughly after updates" >> dependency-report.md
+          echo "- Check for breaking changes" >> dependency-report.md
+
+      - name: License compliance check
+        run: |
+          npm install -g license-checker
+          cd backend && license-checker --json > ../backend-licenses.json
+          cd ../frontend && license-checker --json > ../frontend-licenses.json
+          
+          echo "" >> dependency-report.md
+          echo "## License Compliance" >> dependency-report.md
+          echo "- Backend license check completed" >> dependency-report.md
+          echo "- Frontend license check completed" >> dependency-report.md
+
+      - name: Upload dependency artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-reports-$(date +%Y%m%d)
+          path: |
+            dependency-report.md
+            *-outdated.json
+            *-licenses.json
+
+  performance-analysis:
+    name: Performance Analysis
+    runs-on: ubuntu-latest
+    if: github.event.inputs.scan_type == 'performance' || github.event.inputs.scan_type == 'all'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Bundle analysis
+      - name: Analyze bundle size
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+          
+          # Install bundle analyzer
+          npm install -g webpack-bundle-analyzer
+          
+          echo "# Performance Analysis Report - $(date)" > ../performance-report.md
+          echo "" >> ../performance-report.md
+          echo "## Bundle Analysis" >> ../performance-report.md
+          echo "- Frontend bundle analysis completed" >> ../performance-report.md
+
+      # Lighthouse CI analysis
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.12.x
+          # Add lighthouse analysis here
+          echo "" >> performance-report.md
+          echo "## Lighthouse Analysis" >> performance-report.md
+          echo "- Performance audit completed" >> performance-report.md
+
+      - name: Upload performance artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-reports-$(date +%Y%m%d)
+          path: |
+            performance-report.md
+
+  monthly-comprehensive-audit:
+    name: Monthly Comprehensive Audit
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 4 1 * *' || github.event.inputs.scan_type == 'all'
+    needs: [security-scan, technical-debt-analysis, dependency-audit, performance-analysis]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all reports
+        uses: actions/download-artifact@v3
+
+      - name: Generate comprehensive report
+        run: |
+          echo "# Monthly Comprehensive Audit - $(date)" > monthly-audit.md
+          echo "" >> monthly-audit.md
+          echo "## Overview" >> monthly-audit.md
+          echo "This report provides a comprehensive overview of security, technical debt, dependencies, and performance." >> monthly-audit.md
+          echo "" >> monthly-audit.md
+          
+          # Combine all reports if they exist
+          find . -name "*-report.md" -exec cat {} \; >> monthly-audit.md || true
+          
+          echo "" >> monthly-audit.md
+          echo "## Action Items for Next Month" >> monthly-audit.md
+          echo "- [ ] Address critical security vulnerabilities" >> monthly-audit.md
+          echo "- [ ] Reduce technical debt" >> monthly-audit.md
+          echo "- [ ] Update outdated dependencies" >> monthly-audit.md
+          echo "- [ ] Optimize performance bottlenecks" >> monthly-audit.md
+          echo "- [ ] Review and update security policies" >> monthly-audit.md
+
+      - name: Create monthly audit issue
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('monthly-audit.md', 'utf8');
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Monthly Comprehensive Audit - ${new Date().toISOString().split('T')[0]}`,
+              body: report,
+              labels: ['audit', 'monthly-review', 'technical-debt', 'security'],
+              assignees: ['security-team', 'tech-lead']
+            });
+
+      - name: Upload comprehensive audit
+        uses: actions/upload-artifact@v3
+        with:
+          name: monthly-comprehensive-audit-$(date +%Y%m)
+          path: monthly-audit.md

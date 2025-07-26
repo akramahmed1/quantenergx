@@ -68,22 +68,28 @@ export interface Analytics {
 export interface MarketState {
   marketData: Record<string, MarketData>;
   analytics: Record<string, Analytics>;
-  quotes: Record<string, {
-    symbol: string;
-    commodity: string;
-    price: number;
-    change: number;
-    changePercent: number;
-    volume: number;
-    timestamp: string;
-  }>;
-  supportedCommodities: Record<string, {
-    symbols: string[];
-    unit: string;
-    currency: string;
-    exchanges: string[];
-    contracts: string[];
-  }>;
+  quotes: Record<
+    string,
+    {
+      symbol: string;
+      commodity: string;
+      price: number;
+      change: number;
+      changePercent: number;
+      volume: number;
+      timestamp: string;
+    }
+  >;
+  supportedCommodities: Record<
+    string,
+    {
+      symbols: string[];
+      unit: string;
+      currency: string;
+      exchanges: string[];
+      contracts: string[];
+    }
+  >;
   loading: {
     marketData: boolean;
     analytics: boolean;
@@ -108,8 +114,18 @@ const initialState: MarketState = {
 // Async thunks
 export const fetchMarketData = createAsyncThunk(
   'market/fetchMarketData',
-  async ({ commodity, symbol, timeframe }: { commodity: string; symbol?: string; timeframe?: string }) => {
-    const response = await fetch(`/api/v1/market/prices/${commodity}?symbol=${symbol}&timeframe=${timeframe}`);
+  async ({
+    commodity,
+    symbol,
+    timeframe,
+  }: {
+    commodity: string;
+    symbol?: string;
+    timeframe?: string;
+  }) => {
+    const response = await fetch(
+      `/api/v1/market/prices/${commodity}?symbol=${symbol}&timeframe=${timeframe}`
+    );
     if (!response.ok) {
       throw new Error('Failed to fetch market data');
     }
@@ -130,17 +146,14 @@ export const fetchAnalytics = createAsyncThunk(
   }
 );
 
-export const fetchQuotes = createAsyncThunk(
-  'market/fetchQuotes',
-  async (symbols: string[]) => {
-    const response = await fetch(`/api/v1/market/quotes?symbols=${symbols.join(',')}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch quotes');
-    }
-    const data = await response.json();
-    return data.quotes;
+export const fetchQuotes = createAsyncThunk('market/fetchQuotes', async (symbols: string[]) => {
+  const response = await fetch(`/api/v1/market/quotes?symbols=${symbols.join(',')}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch quotes');
   }
-);
+  const data = await response.json();
+  return data.quotes;
+});
 
 export const fetchSupportedCommodities = createAsyncThunk(
   'market/fetchSupportedCommodities',
@@ -158,16 +171,19 @@ const marketSlice = createSlice({
   name: 'market',
   initialState,
   reducers: {
-    clearError: (state) => {
+    clearError: state => {
       state.error = null;
     },
-    updateQuote: (state, action: PayloadAction<{
-      symbol: string;
-      price: number;
-      change: number;
-      changePercent: number;
-      volume: number;
-    }>) => {
+    updateQuote: (
+      state,
+      action: PayloadAction<{
+        symbol: string;
+        price: number;
+        change: number;
+        changePercent: number;
+        volume: number;
+      }>
+    ) => {
       const { symbol, price, change, changePercent, volume } = action.payload;
       if (state.quotes[symbol]) {
         state.quotes[symbol] = {
@@ -181,10 +197,10 @@ const marketSlice = createSlice({
       }
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
       // Market data
-      .addCase(fetchMarketData.pending, (state) => {
+      .addCase(fetchMarketData.pending, state => {
         state.loading.marketData = true;
         state.error = null;
       })
@@ -199,7 +215,7 @@ const marketSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch market data';
       })
       // Analytics
-      .addCase(fetchAnalytics.pending, (state) => {
+      .addCase(fetchAnalytics.pending, state => {
         state.loading.analytics = true;
         state.error = null;
       })
@@ -213,7 +229,7 @@ const marketSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch analytics';
       })
       // Quotes
-      .addCase(fetchQuotes.pending, (state) => {
+      .addCase(fetchQuotes.pending, state => {
         state.loading.quotes = true;
         state.error = null;
       })

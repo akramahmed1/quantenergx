@@ -19,7 +19,8 @@ router.get('/', (req, res) => {
   res.json({
     name: 'QuantEnergx API',
     version: '2.0.0',
-    description: 'Industry-disrupting energy trading platform with advanced features across 13 major categories',
+    description:
+      'Industry-disrupting energy trading platform with advanced features across 13 major categories',
     endpoints: {
       ocr: '/api/v1/ocr',
       documents: '/api/v1/documents',
@@ -35,7 +36,7 @@ router.get('/', (req, res) => {
       exchanges: '/api/v1/exchanges',
       grid: '/api/v1/grid',
       'cloud-cost': '/api/v1/cloud-cost',
-      iot: '/api/v1/iot'
+      iot: '/api/v1/iot',
     },
     features: {
       streaming_engine: [
@@ -43,7 +44,7 @@ router.get('/', (req, res) => {
         'Real-time order execution',
         'WebSocket streaming',
         'Market data aggregation',
-        'Performance metrics'
+        'Performance metrics',
       ],
       risk_analytics: [
         'Value-at-Risk (VaR) calculation',
@@ -51,92 +52,92 @@ router.get('/', (req, res) => {
         'Multi-commodity risk analysis',
         'Weather-linked exposures',
         'Cyber risk assessment',
-        'Real-time risk dashboard'
+        'Real-time risk dashboard',
       ],
       multi_exchange: [
         'ICE, EEX, CME, APX, MEPEX integration',
         'Unified margin management',
         'Cross-market arbitrage detection',
         'Clearing and reconciliation',
-        'Regional exchange support (Guyana, MENA)'
+        'Regional exchange support (Guyana, MENA)',
       ],
       grid_integration: [
         'ERCOT, PJM, CAISO, MISO data ingestion',
         'Real-time congestion monitoring',
         'Transmission line status tracking',
         'Smart alert triggers',
-        'Project milestone monitoring'
+        'Project milestone monitoring',
       ],
       enhanced_compliance: [
         'Chat/email/voice logging',
         'Trade intent reconstruction',
         'Blockchain notarization',
         'REMIT II, FERC, SOC2, ISO27001, NERC CIP',
-        'Tamper-proof audit trails'
+        'Tamper-proof audit trails',
       ],
       cloud_cost_management: [
         'Spend anomaly detection',
         'Automated optimization',
         'Budget monitoring',
         'Security incident automation',
-        'Cost forecasting'
+        'Cost forecasting',
       ],
       iot_scada: [
         'IEC 61850, DNP3, Modbus, OpenADR',
         'Device onboarding automation',
         'Real-time data streaming',
         'Protocol-specific handlers',
-        'Industrial device monitoring'
+        'Industrial device monitoring',
       ],
       trading: [
         'Order Management (place, modify, cancel)',
         'Real-time Order Book',
         'Trade Execution Engine',
         'Portfolio Management',
-        'Position Tracking with P&L'
+        'Position Tracking with P&L',
       ],
       market_data: [
         'Real-time Price Feeds',
         'Historical Data',
         'Market Analytics',
         'Volatility Indicators',
-        'Commodity Correlations'
+        'Commodity Correlations',
       ],
       risk_management: [
         'Value-at-Risk (VaR)',
         'Exposure Monitoring',
         'Risk Limits',
         'Stress Testing',
-        'Real-time Alerts'
+        'Real-time Alerts',
       ],
       compliance: [
         'KYC/AML Workflows',
         'Regulatory Reporting',
         'Audit Trail',
         'Transaction Monitoring',
-        'Multi-jurisdiction Support'
+        'Multi-jurisdiction Support',
       ],
       notifications: [
         'Multi-channel Alerts (Email, SMS, WhatsApp, Telegram)',
         'Trade Confirmations',
         'Risk Breach Alerts',
         'Margin Call Notifications',
-        'Compliance Alerts'
+        'Compliance Alerts',
       ],
       user_management: [
         'Secure Authentication with JWT',
         'Multi-factor Authentication (MFA)',
         'Role-based Access Control',
         'Session Management',
-        'Activity Logging'
+        'Activity Logging',
       ],
       analytics: [
         'Trading Analytics',
         'Position Reports',
         'Risk Analytics',
         'Compliance Reports',
-        'Performance Dashboards'
-      ]
+        'Performance Dashboards',
+      ],
     },
     supported_commodities: [
       'Crude Oil (WTI, Brent)',
@@ -147,23 +148,23 @@ router.get('/', (req, res) => {
       'Renewable Energy Certificates (RECs)',
       'Carbon Credits',
       'Coal',
-      'Refined Products'
+      'Refined Products',
     ],
     supported_exchanges: [
       'ICE (Intercontinental Exchange)',
-      'EEX (European Energy Exchange)', 
+      'EEX (European Energy Exchange)',
       'CME (Chicago Mercantile Exchange)',
       'APX (Power Exchange)',
       'MEPEX (Middle East Power Exchange)',
       'Guyana Energy Exchange',
-      'Regional MENA Exchanges'
+      'Regional MENA Exchanges',
     ],
     supported_protocols: [
       'IEC 61850 (Power Utility Automation)',
       'DNP3 (Distributed Network Protocol)',
       'Modbus TCP/IP',
       'OpenADR (Automated Demand Response)',
-      'MQTT (IoT Messaging)'
+      'MQTT (IoT Messaging)',
     ],
     compliance_standards: [
       'REMIT II (EU Energy Market Integrity)',
@@ -172,9 +173,9 @@ router.get('/', (req, res) => {
       'ISO 27001',
       'NERC CIP (Critical Infrastructure)',
       'MENA Regional Regulations',
-      'Guyana Petroleum Act'
+      'Guyana Petroleum Act',
     ],
-    regions: ['US', 'EU', 'UK', 'Middle East', 'Guyana', 'Global']
+    regions: ['US', 'EU', 'UK', 'Middle East', 'Guyana', 'Global'],
   });
 });
 

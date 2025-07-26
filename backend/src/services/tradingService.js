@@ -4,14 +4,14 @@ const EventEmitter = require('events');
 class TradingService extends EventEmitter {
   constructor() {
     super();
-    
+
     // In-memory storage for demo (would use database in production)
     this.orders = new Map();
     this.trades = new Map();
     this.positions = new Map();
     this.portfolios = new Map();
     this.orderBook = new Map(); // commodity -> { bids: [], asks: [] }
-    
+
     // Trading configuration
     this.tradingConfig = {
       maxOrderSize: 10000000, // $10M max order size
@@ -22,8 +22,8 @@ class TradingService extends EventEmitter {
       tradingHours: {
         start: '09:00',
         end: '17:00',
-        timezone: 'UTC'
-      }
+        timezone: 'UTC',
+      },
     };
 
     // Initialize order books for supported commodities
@@ -32,14 +32,18 @@ class TradingService extends EventEmitter {
 
   initializeOrderBooks() {
     const commodities = [
-      'crude_oil', 'natural_gas', 'heating_oil', 'gasoline', 
-      'renewable_certificates', 'carbon_credits'
+      'crude_oil',
+      'natural_gas',
+      'heating_oil',
+      'gasoline',
+      'renewable_certificates',
+      'carbon_credits',
     ];
-    
+
     commodities.forEach(commodity => {
       this.orderBook.set(commodity, {
         bids: [], // buy orders (sorted by price descending)
-        asks: []  // sell orders (sorted by price ascending)
+        asks: [], // sell orders (sorted by price ascending)
       });
     });
   }
@@ -48,7 +52,7 @@ class TradingService extends EventEmitter {
   async placeOrder(orderRequest) {
     try {
       this.validateOrderRequest(orderRequest);
-      
+
       const order = {
         id: uuidv4(),
         ...orderRequest,
@@ -58,7 +62,7 @@ class TradingService extends EventEmitter {
         filledQuantity: 0,
         remainingQuantity: orderRequest.quantity,
         avgFillPrice: 0,
-        trades: []
+        trades: [],
       };
 
       // Store order
@@ -76,7 +80,6 @@ class TradingService extends EventEmitter {
       this.emit('orderPlaced', order);
 
       return order;
-
     } catch (error) {
       throw new Error(`Failed to place order: ${error.message}`);
     }
@@ -102,7 +105,7 @@ class TradingService extends EventEmitter {
       // Apply modifications
       const oldOrder = { ...order };
       Object.assign(order, modifications, {
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       });
 
       // Re-validate modified order
@@ -120,7 +123,6 @@ class TradingService extends EventEmitter {
       this.emit('orderModified', { oldOrder, newOrder: order });
 
       return order;
-
     } catch (error) {
       throw new Error(`Failed to modify order: ${error.message}`);
     }
@@ -151,7 +153,6 @@ class TradingService extends EventEmitter {
       this.emit('orderCancelled', order);
 
       return order;
-
     } catch (error) {
       throw new Error(`Failed to cancel order: ${error.message}`);
     }
@@ -185,7 +186,7 @@ class TradingService extends EventEmitter {
     }
 
     const contraOrders = order.side === 'buy' ? orderBook.asks : orderBook.bids;
-    
+
     if (contraOrders.length === 0) {
       // No liquidity available - use simulated market price
       const marketPrice = await this.getMarketPrice(order.commodity);
@@ -193,11 +194,11 @@ class TradingService extends EventEmitter {
     } else {
       // Execute against available orders
       let remainingQty = order.quantity;
-      
+
       while (remainingQty > 0 && contraOrders.length > 0) {
         const contraOrder = contraOrders[0];
         const fillQty = Math.min(remainingQty, contraOrder.remainingQuantity);
-        
+
         await this.executeTrade(order, fillQty, contraOrder.price, contraOrder);
         remainingQty -= fillQty;
       }
@@ -214,20 +215,19 @@ class TradingService extends EventEmitter {
   async processLimitOrder(order) {
     const orderBook = this.orderBook.get(order.commodity);
     const contraOrders = order.side === 'buy' ? orderBook.asks : orderBook.bids;
-    
+
     // Check for immediate matches
     let remainingQty = order.remainingQuantity;
-    
+
     while (remainingQty > 0 && contraOrders.length > 0) {
       const contraOrder = contraOrders[0];
-      
+
       // Check if prices cross
-      const canMatch = order.side === 'buy' ? 
-        order.price >= contraOrder.price : 
-        order.price <= contraOrder.price;
-        
+      const canMatch =
+        order.side === 'buy' ? order.price >= contraOrder.price : order.price <= contraOrder.price;
+
       if (!canMatch) break;
-      
+
       const fillQty = Math.min(remainingQty, contraOrder.remainingQuantity);
       await this.executeTrade(order, fillQty, contraOrder.price, contraOrder);
       remainingQty -= fillQty;
@@ -255,7 +255,7 @@ class TradingService extends EventEmitter {
       passiveOrderId: passiveOrder ? passiveOrder.id : null,
       aggressorUserId: aggressorOrder.userId,
       passiveUserId: passiveOrder ? passiveOrder.userId : 'market',
-      value: quantity * price
+      value: quantity * price,
     };
 
     // Store trade
@@ -308,7 +308,12 @@ class TradingService extends EventEmitter {
     // Update passive position if not market trade
     if (trade.passiveUserId !== 'market') {
       const passiveQuantity = -quantity; // opposite side
-      await this.updateUserPosition(trade.passiveUserId, trade.commodity, passiveQuantity, trade.price);
+      await this.updateUserPosition(
+        trade.passiveUserId,
+        trade.commodity,
+        passiveQuantity,
+        trade.price
+      );
     }
   }
 
@@ -325,17 +330,17 @@ class TradingService extends EventEmitter {
         avgPrice: 0,
         unrealizedPnL: 0,
         realizedPnL: 0,
-        lastUpdate: new Date().toISOString()
+        lastUpdate: new Date().toISOString(),
       };
     }
 
     // Calculate new average price and quantity
     const oldQuantity = position.quantity;
     const oldAvgPrice = position.avgPrice;
-    
+
     if ((oldQuantity >= 0 && quantity >= 0) || (oldQuantity <= 0 && quantity <= 0)) {
       // Same side - weighted average
-      const totalValue = (oldQuantity * oldAvgPrice) + (quantity * price);
+      const totalValue = oldQuantity * oldAvgPrice + quantity * price;
       position.quantity += quantity;
       position.avgPrice = position.quantity !== 0 ? totalValue / position.quantity : 0;
     } else {
@@ -343,7 +348,7 @@ class TradingService extends EventEmitter {
       const closedQuantity = Math.min(Math.abs(oldQuantity), Math.abs(quantity));
       position.realizedPnL += closedQuantity * (price - oldAvgPrice) * Math.sign(oldQuantity);
       position.quantity += quantity;
-      
+
       if (Math.sign(position.quantity) !== Math.sign(oldQuantity)) {
         // Position flipped sides
         position.avgPrice = price;
@@ -373,7 +378,7 @@ class TradingService extends EventEmitter {
     if (!orderBook) return;
 
     const orders = order.side === 'buy' ? orderBook.bids : orderBook.asks;
-    
+
     // Insert order in price-priority order
     const insertIndex = this.findInsertIndex(orders, order);
     orders.splice(insertIndex, 0, order);
@@ -386,7 +391,7 @@ class TradingService extends EventEmitter {
 
     const orders = order.side === 'buy' ? orderBook.bids : orderBook.asks;
     const index = orders.findIndex(o => o.id === order.id);
-    
+
     if (index !== -1) {
       orders.splice(index, 1);
     }
@@ -395,7 +400,7 @@ class TradingService extends EventEmitter {
   // Find insertion index for order book
   findInsertIndex(orders, newOrder) {
     const isAsk = newOrder.side === 'sell';
-    
+
     for (let i = 0; i < orders.length; i++) {
       if (isAsk) {
         // Ask side: ascending price order
@@ -405,14 +410,14 @@ class TradingService extends EventEmitter {
         if (newOrder.price > orders[i].price) return i;
       }
     }
-    
+
     return orders.length;
   }
 
   // Calculate average fill price for order
   calculateAvgFillPrice(order) {
     if (order.filledQuantity === 0) return 0;
-    
+
     let totalValue = 0;
     for (const tradeId of order.trades) {
       const trade = this.trades.get(tradeId);
@@ -420,7 +425,7 @@ class TradingService extends EventEmitter {
         totalValue += trade.quantity * trade.price;
       }
     }
-    
+
     return totalValue / order.filledQuantity;
   }
 
@@ -428,18 +433,18 @@ class TradingService extends EventEmitter {
   async getMarketPrice(commodity) {
     // In production, this would fetch from market data service
     const basePrices = {
-      crude_oil: 80.50,
-      natural_gas: 3.20,
+      crude_oil: 80.5,
+      natural_gas: 3.2,
       heating_oil: 2.45,
-      gasoline: 2.30,
-      renewable_certificates: 45.00,
-      carbon_credits: 85.00
+      gasoline: 2.3,
+      renewable_certificates: 45.0,
+      carbon_credits: 85.0,
     };
-    
-    const basePrice = basePrices[commodity] || 50.00;
+
+    const basePrice = basePrices[commodity] || 50.0;
     const volatility = 0.02; // 2% volatility
     const randomFactor = 1 + (Math.random() - 0.5) * volatility;
-    
+
     return basePrice * randomFactor;
   }
 
@@ -483,12 +488,18 @@ class TradingService extends EventEmitter {
     }
 
     // Validate price for limit orders
-    if ((order.type === 'limit' || order.type === 'stop_limit') && (!order.price || order.price <= 0)) {
+    if (
+      (order.type === 'limit' || order.type === 'stop_limit') &&
+      (!order.price || order.price <= 0)
+    ) {
       throw new Error('Limit orders require a positive price');
     }
 
     // Validate stop price for stop orders
-    if ((order.type === 'stop' || order.type === 'stop_limit') && (!order.stopPrice || order.stopPrice <= 0)) {
+    if (
+      (order.type === 'stop' || order.type === 'stop_limit') &&
+      (!order.stopPrice || order.stopPrice <= 0)
+    ) {
       throw new Error('Stop orders require a positive stop price');
     }
 
@@ -505,40 +516,38 @@ class TradingService extends EventEmitter {
 
   // Get orders for user
   getUserOrders(userId, status = null) {
-    const userOrders = Array.from(this.orders.values())
-      .filter(order => order.userId === userId);
-    
+    const userOrders = Array.from(this.orders.values()).filter(order => order.userId === userId);
+
     if (status) {
       return userOrders.filter(order => order.status === status);
     }
-    
+
     return userOrders;
   }
 
   // Get trade history
   getTradeHistory(userId = null, commodity = null, limit = 100) {
     let trades = Array.from(this.trades.values());
-    
+
     if (userId) {
-      trades = trades.filter(trade => 
-        trade.aggressorUserId === userId || trade.passiveUserId === userId
+      trades = trades.filter(
+        trade => trade.aggressorUserId === userId || trade.passiveUserId === userId
       );
     }
-    
+
     if (commodity) {
       trades = trades.filter(trade => trade.commodity === commodity);
     }
-    
+
     // Sort by timestamp descending
     trades.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-    
+
     return trades.slice(0, limit);
   }
 
   // Get user positions
   getUserPositions(userId) {
-    return Array.from(this.positions.values())
-      .filter(position => position.userId === userId);
+    return Array.from(this.positions.values()).filter(position => position.userId === userId);
   }
 
   // Get order book for commodity
@@ -554,13 +563,13 @@ class TradingService extends EventEmitter {
       bids: orderBook.bids.slice(0, depth).map(order => ({
         price: order.price,
         quantity: order.remainingQuantity,
-        orders: 1
+        orders: 1,
       })),
       asks: orderBook.asks.slice(0, depth).map(order => ({
         price: order.price,
         quantity: order.remainingQuantity,
-        orders: 1
-      }))
+        orders: 1,
+      })),
     };
   }
 
@@ -575,7 +584,10 @@ class TradingService extends EventEmitter {
       await this.updateUnrealizedPnL(position);
     }
 
-    const totalValue = positions.reduce((sum, pos) => sum + Math.abs(pos.quantity * pos.avgPrice), 0);
+    const totalValue = positions.reduce(
+      (sum, pos) => sum + Math.abs(pos.quantity * pos.avgPrice),
+      0
+    );
     const totalPnL = positions.reduce((sum, pos) => sum + pos.realizedPnL + pos.unrealizedPnL, 0);
 
     return {
@@ -587,7 +599,7 @@ class TradingService extends EventEmitter {
       totalValue,
       totalPnL,
       positions: positions,
-      recentTrades: trades.slice(0, 10)
+      recentTrades: trades.slice(0, 10),
     };
   }
 

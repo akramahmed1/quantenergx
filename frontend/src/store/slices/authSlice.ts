@@ -101,54 +101,48 @@ export const login = createAsyncThunk(
       },
       body: JSON.stringify({ email, password }),
     });
-    
+
     if (!response.ok) {
       throw new Error('Login failed');
     }
-    
+
     const data = await response.json();
     localStorage.setItem('token', data.token);
     localStorage.setItem('refreshToken', data.refreshToken);
-    
+
     return data;
   }
 );
 
-export const logout = createAsyncThunk(
-  'auth/logout',
-  async () => {
-    try {
-      await fetch('/api/v1/auth/logout', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-    } catch (error) {
-      // Continue with logout even if API call fails
-    }
-    
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
-  }
-);
-
-export const fetchUserProfile = createAsyncThunk(
-  'auth/fetchUserProfile',
-  async () => {
-    const response = await fetch('/api/v1/auth/profile', {
+export const logout = createAsyncThunk('auth/logout', async () => {
+  try {
+    await fetch('/api/v1/auth/logout', {
+      method: 'POST',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     });
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch user profile');
-    }
-    
-    return response.json();
+  } catch (error) {
+    // Continue with logout even if API call fails
   }
-);
+
+  localStorage.removeItem('token');
+  localStorage.removeItem('refreshToken');
+});
+
+export const fetchUserProfile = createAsyncThunk('auth/fetchUserProfile', async () => {
+  const response = await fetch('/api/v1/auth/profile', {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch user profile');
+  }
+
+  return response.json();
+});
 
 export const updateUserProfile = createAsyncThunk(
   'auth/updateUserProfile',
@@ -157,35 +151,32 @@ export const updateUserProfile = createAsyncThunk(
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify(updates),
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to update profile');
     }
-    
+
     return response.json();
   }
 );
 
-export const fetchUserPreferences = createAsyncThunk(
-  'auth/fetchUserPreferences',
-  async () => {
-    const response = await fetch('/api/v1/auth/preferences', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch preferences');
-    }
-    
-    return response.json();
+export const fetchUserPreferences = createAsyncThunk('auth/fetchUserPreferences', async () => {
+  const response = await fetch('/api/v1/auth/preferences', {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch preferences');
   }
-);
+
+  return response.json();
+});
 
 export const updateUserPreferences = createAsyncThunk(
   'auth/updateUserPreferences',
@@ -194,15 +185,15 @@ export const updateUserPreferences = createAsyncThunk(
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify(preferences),
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to update preferences');
     }
-    
+
     return response.json();
   }
 );
@@ -212,14 +203,14 @@ export const fetchAllUsers = createAsyncThunk(
   async ({ page = 1, limit = 50 }: { page?: number; limit?: number } = {}) => {
     const response = await fetch(`/api/v1/auth/users?page=${page}&limit=${limit}`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to fetch users');
     }
-    
+
     return response.json();
   }
 );
@@ -231,15 +222,15 @@ export const createUser = createAsyncThunk(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify(userData),
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to create user');
     }
-    
+
     return response.json();
   }
 );
@@ -251,15 +242,15 @@ export const updateUser = createAsyncThunk(
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify(updates),
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to update user');
     }
-    
+
     return response.json();
   }
 );
@@ -268,7 +259,7 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    clearError: (state) => {
+    clearError: state => {
       state.error = null;
     },
     setToken: (state, action: PayloadAction<string>) => {
@@ -276,7 +267,7 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       localStorage.setItem('token', action.payload);
     },
-    clearAuth: (state) => {
+    clearAuth: state => {
       state.isAuthenticated = false;
       state.token = null;
       state.refreshToken = null;
@@ -291,10 +282,10 @@ const authSlice = createSlice({
       }
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
       // Login
-      .addCase(login.pending, (state) => {
+      .addCase(login.pending, state => {
         state.loading.auth = true;
         state.error = null;
       })
@@ -310,7 +301,7 @@ const authSlice = createSlice({
         state.error = action.error.message || 'Login failed';
       })
       // Logout
-      .addCase(logout.fulfilled, (state) => {
+      .addCase(logout.fulfilled, state => {
         state.isAuthenticated = false;
         state.token = null;
         state.refreshToken = null;
@@ -326,14 +317,14 @@ const authSlice = createSlice({
         state.user = action.payload.user;
       })
       // Fetch preferences
-      .addCase(fetchUserPreferences.pending, (state) => {
+      .addCase(fetchUserPreferences.pending, state => {
         state.loading.preferences = true;
       })
       .addCase(fetchUserPreferences.fulfilled, (state, action) => {
         state.loading.preferences = false;
         state.preferences = action.payload.preferences || defaultPreferences;
       })
-      .addCase(fetchUserPreferences.rejected, (state) => {
+      .addCase(fetchUserPreferences.rejected, state => {
         state.loading.preferences = false;
         state.preferences = defaultPreferences;
       })
@@ -342,7 +333,7 @@ const authSlice = createSlice({
         state.preferences = action.payload.preferences;
       })
       // Fetch all users
-      .addCase(fetchAllUsers.pending, (state) => {
+      .addCase(fetchAllUsers.pending, state => {
         state.loading.users = true;
       })
       .addCase(fetchAllUsers.fulfilled, (state, action) => {

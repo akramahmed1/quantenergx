@@ -92,27 +92,31 @@ const initialState: NotificationState = {
 // Async thunks
 export const fetchNotifications = createAsyncThunk(
   'notifications/fetchNotifications',
-  async ({ page = 1, limit = 50, unreadOnly = false }: { 
-    page?: number; 
-    limit?: number; 
-    unreadOnly?: boolean; 
+  async ({
+    page = 1,
+    limit = 50,
+    unreadOnly = false,
+  }: {
+    page?: number;
+    limit?: number;
+    unreadOnly?: boolean;
   } = {}) => {
     const params = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
       ...(unreadOnly && { unread: 'true' }),
     });
-    
+
     const response = await fetch(`/api/v1/notifications?${params}`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to fetch notifications');
     }
-    
+
     return response.json();
   }
 );
@@ -121,20 +125,20 @@ export const markAsRead = createAsyncThunk(
   'notifications/markAsRead',
   async (notificationIds: string | string[]) => {
     const ids = Array.isArray(notificationIds) ? notificationIds : [notificationIds];
-    
+
     const response = await fetch('/api/v1/notifications/mark-read', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify({ notificationIds: ids }),
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to mark notifications as read');
     }
-    
+
     return { notificationIds: ids };
   }
 );
@@ -146,15 +150,15 @@ export const deleteNotifications = createAsyncThunk(
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify({ notificationIds }),
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to delete notifications');
     }
-    
+
     return { notificationIds };
   }
 );
@@ -176,7 +180,7 @@ export const sendNotification = createAsyncThunk(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify({
         channel,
@@ -185,11 +189,11 @@ export const sendNotification = createAsyncThunk(
         options,
       }),
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to send notification');
     }
-    
+
     return response.json();
   }
 );
@@ -199,14 +203,14 @@ export const fetchNotificationChannels = createAsyncThunk(
   async () => {
     const response = await fetch('/api/v1/notifications/channels', {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to fetch notification channels');
     }
-    
+
     return response.json();
   }
 );
@@ -218,15 +222,15 @@ export const updateNotificationPreferences = createAsyncThunk(
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify(preferences),
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to update notification preferences');
     }
-    
+
     return response.json();
   }
 );
@@ -238,7 +242,7 @@ export const testNotification = createAsyncThunk(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify({
         channel,
@@ -246,11 +250,11 @@ export const testNotification = createAsyncThunk(
         message: 'This is a test notification from QuantEnergx',
       }),
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to send test notification');
     }
-    
+
     return response.json();
   }
 );
@@ -259,7 +263,7 @@ const notificationSlice = createSlice({
   name: 'notifications',
   initialState,
   reducers: {
-    clearError: (state) => {
+    clearError: state => {
       state.error = null;
     },
     addNotification: (state, action: PayloadAction<Notification>) => {
@@ -278,7 +282,7 @@ const notificationSlice = createSlice({
         }
       });
     },
-    markAllAsReadLocal: (state) => {
+    markAllAsReadLocal: state => {
       state.notifications.forEach(notification => {
         notification.read = true;
       });
@@ -286,23 +290,21 @@ const notificationSlice = createSlice({
     },
     removeNotifications: (state, action: PayloadAction<string[]>) => {
       const idsToRemove = action.payload;
-      const removedUnreadCount = state.notifications
-        .filter(n => idsToRemove.includes(n.id) && !n.read)
-        .length;
-      
-      state.notifications = state.notifications.filter(
-        n => !idsToRemove.includes(n.id)
-      );
+      const removedUnreadCount = state.notifications.filter(
+        n => idsToRemove.includes(n.id) && !n.read
+      ).length;
+
+      state.notifications = state.notifications.filter(n => !idsToRemove.includes(n.id));
       state.unreadCount = Math.max(0, state.unreadCount - removedUnreadCount);
     },
     updatePreferencesLocal: (state, action: PayloadAction<Partial<NotificationPreferences>>) => {
       state.preferences = { ...state.preferences, ...action.payload };
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
       // Fetch notifications
-      .addCase(fetchNotifications.pending, (state) => {
+      .addCase(fetchNotifications.pending, state => {
         state.loading.notifications = true;
         state.error = null;
       })
@@ -329,21 +331,19 @@ const notificationSlice = createSlice({
       // Delete notifications
       .addCase(deleteNotifications.fulfilled, (state, action) => {
         const { notificationIds } = action.payload;
-        const removedUnreadCount = state.notifications
-          .filter(n => notificationIds.includes(n.id) && !n.read)
-          .length;
-        
-        state.notifications = state.notifications.filter(
-          n => !notificationIds.includes(n.id)
-        );
+        const removedUnreadCount = state.notifications.filter(
+          n => notificationIds.includes(n.id) && !n.read
+        ).length;
+
+        state.notifications = state.notifications.filter(n => !notificationIds.includes(n.id));
         state.unreadCount = Math.max(0, state.unreadCount - removedUnreadCount);
       })
       // Send notification
-      .addCase(sendNotification.pending, (state) => {
+      .addCase(sendNotification.pending, state => {
         state.loading.sending = true;
         state.error = null;
       })
-      .addCase(sendNotification.fulfilled, (state) => {
+      .addCase(sendNotification.fulfilled, state => {
         state.loading.sending = false;
       })
       .addCase(sendNotification.rejected, (state, action) => {
@@ -351,7 +351,7 @@ const notificationSlice = createSlice({
         state.error = action.error.message || 'Failed to send notification';
       })
       // Fetch channels
-      .addCase(fetchNotificationChannels.pending, (state) => {
+      .addCase(fetchNotificationChannels.pending, state => {
         state.loading.channels = true;
       })
       .addCase(fetchNotificationChannels.fulfilled, (state, action) => {
@@ -367,10 +367,10 @@ const notificationSlice = createSlice({
         state.preferences = action.payload.preferences;
       })
       // Test notification
-      .addCase(testNotification.pending, (state) => {
+      .addCase(testNotification.pending, state => {
         state.loading.sending = true;
       })
-      .addCase(testNotification.fulfilled, (state) => {
+      .addCase(testNotification.fulfilled, state => {
         state.loading.sending = false;
       })
       .addCase(testNotification.rejected, (state, action) => {

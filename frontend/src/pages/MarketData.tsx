@@ -29,17 +29,13 @@ import {
   Legend,
 } from 'chart.js';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { fetchMarketData, fetchAnalytics, fetchSupportedCommodities } from '../store/slices/marketSlice';
+import {
+  fetchMarketData,
+  fetchAnalytics,
+  fetchSupportedCommodities,
+} from '../store/slices/marketSlice';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -66,9 +62,9 @@ function TabPanel(props: TabPanelProps) {
 const MarketData: React.FC = () => {
   const dispatch = useAppDispatch();
   const { marketData, analytics, quotes, supportedCommodities, loading, error } = useAppSelector(
-    (state) => state.market
+    state => state.market
   );
-  
+
   const [tabValue, setTabValue] = useState(0);
   const [selectedCommodity, setSelectedCommodity] = useState('crude_oil');
   const [selectedTimeframe, setSelectedTimeframe] = useState('1D');
@@ -79,10 +75,12 @@ const MarketData: React.FC = () => {
 
   useEffect(() => {
     if (selectedCommodity) {
-      dispatch(fetchMarketData({ 
-        commodity: selectedCommodity, 
-        timeframe: selectedTimeframe 
-      }));
+      dispatch(
+        fetchMarketData({
+          commodity: selectedCommodity,
+          timeframe: selectedTimeframe,
+        })
+      );
       dispatch(fetchAnalytics({ commodity: selectedCommodity }));
     }
   }, [dispatch, selectedCommodity, selectedTimeframe]);
@@ -95,9 +93,7 @@ const MarketData: React.FC = () => {
     if (!data || !data.data) return null;
 
     return {
-      labels: data.data.map((point: any) => 
-        new Date(point.timestamp).toLocaleDateString()
-      ),
+      labels: data.data.map((point: any) => new Date(point.timestamp).toLocaleDateString()),
       datasets: [
         {
           label: 'Close Price',
@@ -110,7 +106,10 @@ const MarketData: React.FC = () => {
     };
   };
 
-  const currentData = marketData[`${selectedCommodity}_${supportedCommodities[selectedCommodity]?.symbols[0]}_${selectedTimeframe}`];
+  const currentData =
+    marketData[
+      `${selectedCommodity}_${supportedCommodities[selectedCommodity]?.symbols[0]}_${selectedTimeframe}`
+    ];
   const currentAnalytics = analytics[selectedCommodity];
   const chartData = formatChartData(currentData);
 
@@ -160,9 +159,9 @@ const MarketData: React.FC = () => {
                 <Select
                   value={selectedCommodity}
                   label="Commodity"
-                  onChange={(e) => setSelectedCommodity(e.target.value)}
+                  onChange={e => setSelectedCommodity(e.target.value)}
                 >
-                  {Object.keys(supportedCommodities).map((commodity) => (
+                  {Object.keys(supportedCommodities).map(commodity => (
                     <MenuItem key={commodity} value={commodity}>
                       {commodity.replace('_', ' ').toUpperCase()}
                     </MenuItem>
@@ -176,7 +175,7 @@ const MarketData: React.FC = () => {
                 <Select
                   value={selectedTimeframe}
                   label="Timeframe"
-                  onChange={(e) => setSelectedTimeframe(e.target.value)}
+                  onChange={e => setSelectedTimeframe(e.target.value)}
                 >
                   <MenuItem value="1H">1 Hour</MenuItem>
                   <MenuItem value="1D">1 Day</MenuItem>
@@ -196,20 +195,17 @@ const MarketData: React.FC = () => {
                 <CircularProgress />
               </Grid>
             )}
-            
+
             {Object.values(quotes).map((quote: any) => (
               <Grid item xs={12} md={6} lg={4} key={quote.symbol}>
                 <Card>
-                  <CardHeader
-                    title={quote.symbol}
-                    subheader={quote.commodity}
-                  />
+                  <CardHeader title={quote.symbol} subheader={quote.commodity} />
                   <CardContent>
                     <Typography variant="h4" color="primary">
                       ${quote.price.toFixed(2)}
                     </Typography>
-                    <Typography 
-                      variant="body1" 
+                    <Typography
+                      variant="body1"
                       color={quote.change >= 0 ? 'success.main' : 'error.main'}
                     >
                       {quote.change >= 0 ? '+' : ''}
@@ -234,7 +230,7 @@ const MarketData: React.FC = () => {
               <CircularProgress />
             </Box>
           )}
-          
+
           {currentAnalytics && (
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
@@ -248,7 +244,8 @@ const MarketData: React.FC = () => {
                       Average: ${currentAnalytics.analytics.price.average.toFixed(2)}
                     </Typography>
                     <Typography variant="body2">
-                      Range: ${currentAnalytics.analytics.price.min.toFixed(2)} - ${currentAnalytics.analytics.price.max.toFixed(2)}
+                      Range: ${currentAnalytics.analytics.price.min.toFixed(2)} - $
+                      {currentAnalytics.analytics.price.max.toFixed(2)}
                     </Typography>
                     <Typography variant="body2">
                       Change: {currentAnalytics.analytics.price.changePercent.toFixed(2)}%
@@ -256,7 +253,7 @@ const MarketData: React.FC = () => {
                   </CardContent>
                 </Card>
               </Grid>
-              
+
               <Grid item xs={12} md={6}>
                 <Card>
                   <CardHeader title="Market Trends" />
@@ -291,7 +288,8 @@ const MarketData: React.FC = () => {
                       Seasonal Bias: {currentAnalytics.seasonality.seasonalBias}
                     </Typography>
                     <Typography variant="body2">
-                      Historical Return: {currentAnalytics.seasonality.historicalSeasonalReturn.toFixed(2)}%
+                      Historical Return:{' '}
+                      {currentAnalytics.seasonality.historicalSeasonalReturn.toFixed(2)}%
                     </Typography>
                   </CardContent>
                 </Card>
@@ -306,7 +304,7 @@ const MarketData: React.FC = () => {
               <CircularProgress />
             </Box>
           )}
-          
+
           {chartData && (
             <Box sx={{ height: '400px' }}>
               <Line data={chartData} options={chartOptions} />
@@ -318,7 +316,7 @@ const MarketData: React.FC = () => {
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Card>
-                <CardHeader 
+                <CardHeader
                   title="Market Report"
                   action={
                     <Button variant="contained" color="primary">
@@ -331,8 +329,8 @@ const MarketData: React.FC = () => {
                     Market summary and analysis will be displayed here.
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    This feature allows you to generate comprehensive market reports
-                    including price movements, volume analysis, and market trends.
+                    This feature allows you to generate comprehensive market reports including price
+                    movements, volume analysis, and market trends.
                   </Typography>
                 </CardContent>
               </Card>

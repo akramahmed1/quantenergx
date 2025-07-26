@@ -22,10 +22,7 @@ import {
   ListItemText,
   IconButton,
 } from '@mui/material';
-import {
-  CloudUpload as UploadIcon,
-  Delete as DeleteIcon,
-} from '@mui/icons-material';
+import { CloudUpload as UploadIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useDropzone } from 'react-dropzone';
 import { AppDispatch, RootState } from '../../store/store';
 import { uploadDocument, uploadBatch } from '../../store/slices/ocrSlice';
@@ -33,7 +30,7 @@ import { uploadDocument, uploadBatch } from '../../store/slices/ocrSlice';
 export const OCRDocumentUpload: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { isProcessing, error } = useSelector((state: RootState) => state.ocr);
-  
+
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [language, setLanguage] = useState('eng');
   const [extractFields, setExtractFields] = useState(true);
@@ -91,7 +88,7 @@ export const OCRDocumentUpload: React.FC = () => {
       <Typography variant="h4" component="h1" gutterBottom>
         OCR Document Upload
       </Typography>
-      
+
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
@@ -105,7 +102,7 @@ export const OCRDocumentUpload: React.FC = () => {
             <Typography variant="h6" gutterBottom>
               Upload Documents
             </Typography>
-            
+
             <Box
               {...getRootProps()}
               sx={{
@@ -185,10 +182,10 @@ export const OCRDocumentUpload: React.FC = () => {
               <Select
                 value={language}
                 label="Language"
-                onChange={(e) => setLanguage(e.target.value)}
+                onChange={e => setLanguage(e.target.value)}
                 disabled={isProcessing}
               >
-                {languages.map((lang) => (
+                {languages.map(lang => (
                   <MenuItem key={lang.code} value={lang.code}>
                     {lang.name}
                   </MenuItem>
@@ -200,7 +197,7 @@ export const OCRDocumentUpload: React.FC = () => {
               control={
                 <Checkbox
                   checked={extractFields}
-                  onChange={(e) => setExtractFields(e.target.checked)}
+                  onChange={e => setExtractFields(e.target.checked)}
                   disabled={isProcessing}
                 />
               }
@@ -211,7 +208,7 @@ export const OCRDocumentUpload: React.FC = () => {
               control={
                 <Checkbox
                   checked={detectStamps}
-                  onChange={(e) => setDetectStamps(e.target.checked)}
+                  onChange={e => setDetectStamps(e.target.checked)}
                   disabled={isProcessing}
                 />
               }
@@ -222,7 +219,7 @@ export const OCRDocumentUpload: React.FC = () => {
               control={
                 <Checkbox
                   checked={detectSignatures}
-                  onChange={(e) => setDetectSignatures(e.target.checked)}
+                  onChange={e => setDetectSignatures(e.target.checked)}
                   disabled={isProcessing}
                 />
               }
@@ -233,7 +230,7 @@ export const OCRDocumentUpload: React.FC = () => {
               control={
                 <Checkbox
                   checked={isBatchMode}
-                  onChange={(e) => setIsBatchMode(e.target.checked)}
+                  onChange={e => setIsBatchMode(e.target.checked)}
                   disabled={isProcessing}
                 />
               }

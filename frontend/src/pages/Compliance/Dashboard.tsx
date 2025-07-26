@@ -8,8 +8,8 @@ export const ComplianceDashboard: React.FC = () => {
         Compliance Dashboard
       </Typography>
       <Alert severity="info">
-        Compliance dashboard implementation pending. This will include audit trails, 
-        regulatory reporting, violation monitoring, and compliance metrics.
+        Compliance dashboard implementation pending. This will include audit trails, regulatory
+        reporting, violation monitoring, and compliance metrics.
       </Alert>
     </Box>
   );

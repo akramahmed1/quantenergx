@@ -13,14 +13,14 @@ class SecurityLogger {
       failedLogins: 5, // per IP per 15 minutes
       suspiciousActivity: 10, // per IP per hour
       errorRate: 50, // 5xx errors per minute
-      trafficSpike: 1000 // requests per minute
+      trafficSpike: 1000, // requests per minute
     };
   }
 
   initializeLoggers() {
     // Ensure logs directory exists
     const logsDir = path.join(__dirname, '../../logs');
-    
+
     // Main application logger
     this.logger = winston.createLogger({
       level: process.env.LOG_LEVEL || 'info',
@@ -31,16 +31,16 @@ class SecurityLogger {
       ),
       defaultMeta: { service: 'quantenergx-backend' },
       transports: [
-        new winston.transports.File({ 
-          filename: path.join(logsDir, 'error.log'), 
+        new winston.transports.File({
+          filename: path.join(logsDir, 'error.log'),
           level: 'error',
           maxsize: 5242880, // 5MB
-          maxFiles: 5
+          maxFiles: 5,
         }),
-        new winston.transports.File({ 
+        new winston.transports.File({
           filename: path.join(logsDir, 'combined.log'),
           maxsize: 5242880, // 5MB
-          maxFiles: 5
+          maxFiles: 5,
         }),
       ],
     });
@@ -48,16 +48,13 @@ class SecurityLogger {
     // Security-specific logger
     this.securityLogger = winston.createLogger({
       level: 'info',
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.json()
-      ),
+      format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
       defaultMeta: { service: 'quantenergx-security' },
       transports: [
-        new winston.transports.File({ 
+        new winston.transports.File({
           filename: path.join(logsDir, 'security.log'),
           maxsize: 10485760, // 10MB
-          maxFiles: 10
+          maxFiles: 10,
         }),
       ],
     });
@@ -65,16 +62,13 @@ class SecurityLogger {
     // Audit logger for compliance
     this.auditLogger = winston.createLogger({
       level: 'info',
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.json()
-      ),
+      format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
       defaultMeta: { service: 'quantenergx-audit' },
       transports: [
-        new winston.transports.File({ 
+        new winston.transports.File({
           filename: path.join(logsDir, 'audit.log'),
           maxsize: 10485760, // 10MB
-          maxFiles: 20
+          maxFiles: 20,
         }),
       ],
     });
@@ -85,7 +79,7 @@ class SecurityLogger {
         winston.format.colorize(),
         winston.format.simple()
       );
-      
+
       this.logger.add(new winston.transports.Console({ format: consoleFormat }));
       this.securityLogger.add(new winston.transports.Console({ format: consoleFormat }));
     }
@@ -101,7 +95,7 @@ class SecurityLogger {
       ip,
       userAgent,
       reason,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     this.securityLogger.warn('Failed login attempt', event);
@@ -119,7 +113,7 @@ class SecurityLogger {
       ip,
       userAgent,
       mfaUsed,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     this.securityLogger.info('Successful login', event);
@@ -136,7 +130,7 @@ class SecurityLogger {
       email,
       ip,
       userAgent,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     this.securityLogger.info('Password reset activity', event);
@@ -153,7 +147,7 @@ class SecurityLogger {
       details,
       ip,
       userAgent,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     this.securityLogger.warn('Suspicious activity detected', event);
@@ -170,7 +164,7 @@ class SecurityLogger {
       endpoint,
       ip,
       success,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     this.auditLogger.info('API key usage', event);
@@ -184,7 +178,7 @@ class SecurityLogger {
       error: error.message,
       stack: error.stack,
       context,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -197,7 +191,7 @@ class SecurityLogger {
       userId,
       action, // 'order_placed', 'order_cancelled', 'trade_executed'
       details,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     this.auditLogger.info('Trading activity', event);
@@ -213,7 +207,7 @@ class SecurityLogger {
       dataType, // 'user_data', 'market_data', 'compliance_report'
       operation, // 'read', 'create', 'update', 'delete'
       recordId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     this.auditLogger.info('Data access', event);
@@ -225,19 +219,19 @@ class SecurityLogger {
   trackSecurityEvent(eventType, ip) {
     const now = Date.now();
     const key = `${eventType}:${ip}`;
-    
+
     if (!this.securityEvents.has(key)) {
       this.securityEvents.set(key, []);
     }
-    
+
     const events = this.securityEvents.get(key);
     events.push(now);
-    
+
     // Clean up old events (older than 1 hour)
-    const oneHourAgo = now - (60 * 60 * 1000);
+    const oneHourAgo = now - 60 * 60 * 1000;
     const recentEvents = events.filter(timestamp => timestamp > oneHourAgo);
     this.securityEvents.set(key, recentEvents);
-    
+
     // Check thresholds
     this.checkSecurityThresholds(eventType, ip, recentEvents.length);
   }
@@ -247,7 +241,7 @@ class SecurityLogger {
    */
   checkSecurityThresholds(eventType, ip, eventCount) {
     const threshold = this.alertThresholds[eventType];
-    
+
     if (threshold && eventCount >= threshold) {
       this.securityLogger.error('Security threshold exceeded', {
         event: 'threshold_exceeded',
@@ -255,11 +249,13 @@ class SecurityLogger {
         ip,
         eventCount,
         threshold,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
-      
+
       // In a real implementation, this would trigger alerts
-      console.warn(`SECURITY ALERT: ${eventType} threshold exceeded for IP ${ip}: ${eventCount}/${threshold}`);
+      console.warn(
+        `SECURITY ALERT: ${eventType} threshold exceeded for IP ${ip}: ${eventCount}/${threshold}`
+      );
     }
   }
 
@@ -269,7 +265,7 @@ class SecurityLogger {
   requestLogger() {
     return (req, res, next) => {
       const startTime = Date.now();
-      
+
       // Log request
       this.logger.info('HTTP Request', {
         method: req.method,
@@ -277,14 +273,14 @@ class SecurityLogger {
         ip: req.ip,
         userAgent: req.get('User-Agent'),
         userId: req.user?.id || null,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       // Override res.end to log response
       const originalEnd = res.end;
-      res.end = function(...args) {
+      res.end = function (...args) {
         const duration = Date.now() - startTime;
-        
+
         // Log response
         this.logger.info('HTTP Response', {
           method: req.method,
@@ -293,7 +289,7 @@ class SecurityLogger {
           duration,
           ip: req.ip,
           userId: req.user?.id || null,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
 
         // Check for 5xx errors
@@ -301,7 +297,7 @@ class SecurityLogger {
           this.logSystemError(new Error(`HTTP ${res.statusCode} error`), {
             method: req.method,
             url: req.url,
-            statusCode: res.statusCode
+            statusCode: res.statusCode,
           });
         }
 
@@ -317,22 +313,22 @@ class SecurityLogger {
    */
   getSecurityMetrics() {
     const now = Date.now();
-    const oneHourAgo = now - (60 * 60 * 1000);
-    
+    const oneHourAgo = now - 60 * 60 * 1000;
+
     const metrics = {
       failedLogins: 0,
       suspiciousActivity: 0,
       uniqueIPs: new Set(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     for (const [key, events] of this.securityEvents) {
       const [eventType, ip] = key.split(':');
       const recentEvents = events.filter(timestamp => timestamp > oneHourAgo);
-      
+
       if (recentEvents.length > 0) {
         metrics.uniqueIPs.add(ip);
-        
+
         if (eventType === 'failed_login') {
           metrics.failedLogins += recentEvents.length;
         } else if (eventType === 'suspicious_activity') {

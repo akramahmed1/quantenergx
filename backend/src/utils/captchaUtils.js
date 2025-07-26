@@ -23,7 +23,7 @@ class CaptchaUtils {
       return {
         success: true,
         bypass: true,
-        reason: process.env.NODE_ENV === 'test' ? 'test_environment' : 'disabled'
+        reason: process.env.NODE_ENV === 'test' ? 'test_environment' : 'disabled',
       };
     }
 
@@ -35,26 +35,26 @@ class CaptchaUtils {
       return {
         success: false,
         error: 'captcha_token_required',
-        message: 'Captcha verification required'
+        message: 'Captcha verification required',
       };
     }
 
     try {
       const verification = await hcaptcha.verify(this.secret, token, remoteip);
-      
+
       return {
         success: verification.success,
         timestamp: verification.challenge_ts,
         hostname: verification.hostname,
         error: verification['error-codes']?.[0] || null,
-        message: verification.success ? 'Captcha verified' : 'Captcha verification failed'
+        message: verification.success ? 'Captcha verified' : 'Captcha verification failed',
       };
     } catch (error) {
       console.error('Captcha verification error:', error);
       return {
         success: false,
         error: 'verification_failed',
-        message: 'Captcha verification service error'
+        message: 'Captcha verification service error',
       };
     }
   }
@@ -81,11 +81,7 @@ class CaptchaUtils {
    * @returns {Function} - Express middleware
    */
   middleware(options = {}) {
-    const { 
-      skipForMethods = ['GET'], 
-      tokenField = 'hcaptcha_token',
-      optional = false 
-    } = options;
+    const { skipForMethods = ['GET'], tokenField = 'hcaptcha_token', optional = false } = options;
 
     return async (req, res, next) => {
       // Skip verification for specified methods
@@ -108,13 +104,13 @@ class CaptchaUtils {
 
       try {
         const result = await this.verifyCaptcha(token, remoteip);
-        
+
         if (!result.success) {
           return res.status(400).json({
             success: false,
             error: 'captcha_verification_failed',
             message: result.message,
-            captcha_error: result.error
+            captcha_error: result.error,
           });
         }
 
@@ -126,7 +122,7 @@ class CaptchaUtils {
         res.status(500).json({
           success: false,
           error: 'captcha_service_error',
-          message: 'Captcha verification service unavailable'
+          message: 'Captcha verification service unavailable',
         });
       }
     };

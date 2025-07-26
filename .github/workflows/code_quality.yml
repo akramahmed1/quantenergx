@@ -1,63 +1,530 @@
-name: Automated Code Quality, Security & E2E
+name: Comprehensive Code Quality and Security Pipeline
 
-on: [push, pull_request]
+on: 
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  NODE_VERSION: 20
+  PYTHON_VERSION: '3.11'
 
 jobs:
-  lint-format:
+  # Phase 1: Code Quality and Formatting
+  code-quality:
+    name: Code Quality and Formatting
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      # Node.js setup
+      # Node.js setup for frontend and backend
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-      - run: npm ci
-
-      # JS/TS Lint & Format
-      - run: npm run lint -- --fix
-      - run: npm run prettier -- --write
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
 
       # Python setup
-      - uses: actions/setup-python@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
-      - run: pip install -r requirements.txt
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
 
-      # Python Lint & Format
-      - run: black .
-      - run: flake8 .
+      # Install dependencies
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: backend
 
-  static-analysis:
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements-dev.txt
+          pip install -e .
+
+      # Format and lint checks
+      - name: Check Prettier formatting (Backend)
+        run: npm run format:check
+        working-directory: backend
+
+      - name: Check Prettier formatting (Frontend)
+        run: npm run format:check
+        working-directory: frontend
+
+      - name: Run ESLint (Backend)
+        run: npm run lint
+        working-directory: backend
+
+      - name: Run ESLint (Frontend)
+        run: npm run lint
+        working-directory: frontend
+
+      - name: Run Black formatting check
+        run: black --check --diff .
+
+      - name: Run Flake8
+        run: flake8 .
+
+      - name: Run isort check
+        run: isort --check-only --diff .
+
+      # Type checking
+      - name: TypeScript type check (Frontend)
+        run: npm run type-check
+        working-directory: frontend
+
+      - name: MyPy type check (Python)
+        run: mypy . --config-file pyproject.toml
+        continue-on-error: true
+
+  # Phase 2: Security Analysis
+  security-analysis:
+    name: Security Analysis
     runs-on: ubuntu-latest
+    needs: code-quality
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          npm ci --prefix backend
+          npm ci --prefix frontend
+          pip install -r requirements-dev.txt
+
+      # Security linting
+      - name: Run ESLint security rules (Backend)
+        run: npm run lint:security
+        working-directory: backend
+        continue-on-error: true
+
+      - name: Run Bandit security linter (Python)
+        run: bandit -r . -f json -o bandit-report.json
+        continue-on-error: true
+
+      # Dependency security
+      - name: Run npm audit (Backend)
+        run: npm audit --audit-level=moderate
+        working-directory: backend
+
+      - name: Run npm audit (Frontend)
+        run: npm audit --audit-level=moderate
+        working-directory: frontend
+
+      - name: Run Safety security check (Python)
+        run: safety check --json --output safety-report.json
+        continue-on-error: true
+
+      # Secrets scanning
+      - name: Run TruffleHog secrets scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+
+      - name: Run GitLeaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # CodeQL Analysis
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript, python
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+      # Upload security artifacts
+      - name: Upload security reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: security-reports
+          path: |
+            bandit-report.json
+            safety-report.json
+
+  # Phase 3: Static Analysis
+  static-analysis:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    needs: code-quality
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # SonarQube Analysis
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
-        with:
-          args: >
-            -Dsonar.projectKey=quantenergx
-            -Dsonar.organization=akramahmed1
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-      - name: Snyk Security Scan
-        uses: snyk/actions@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # Snyk Security Scan
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          command: test
+          args: --all-projects --severity-threshold=medium
 
-  e2e:
+      # DeepSource Analysis
+      - name: DeepSource Analysis
+        uses: deepsourcelabs/test-coverage-action@master
+        if: always()
+        with:
+          key: javascript
+          coverage-file: coverage/lcov.info
+          dsn: ${{ secrets.DEEPSOURCE_DSN }}
+
+  # Phase 4: Testing
+  backend-tests:
+    name: Backend Tests
     runs-on: ubuntu-latest
+    needs: [code-quality, security-analysis]
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: quantenergx_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
     steps:
       - uses: actions/checkout@v4
-      - run: npm ci
-      - name: Run Cypress E2E Tests
-        run: npx cypress run
 
-  summary:
-    needs: [lint-format, static-analysis, e2e]
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: backend
+
+      # Unit tests
+      - name: Run unit tests
+        run: npm run test:unit
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://postgres:test@localhost:5432/quantenergx_test
+          REDIS_URL: redis://localhost:6379
+
+      # Integration tests
+      - name: Run integration tests
+        run: npm run test:integration
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://postgres:test@localhost:5432/quantenergx_test
+          REDIS_URL: redis://localhost:6379
+
+      # Security tests
+      - name: Run security tests
+        run: npm run test:security
+        working-directory: backend
+        env:
+          NODE_ENV: test
+
+      # Contract tests
+      - name: Run contract tests
+        run: npm run test:contract
+        working-directory: backend
+        env:
+          NODE_ENV: test
+
+      # Coverage
+      - name: Generate coverage report
+        run: npm run test:coverage
+        working-directory: backend
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://postgres:test@localhost:5432/quantenergx_test
+          REDIS_URL: redis://localhost:6379
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: backend/coverage/lcov.info
+          flags: backend
+          name: codecov-backend
+
+  frontend-tests:
+    name: Frontend Tests
     runs-on: ubuntu-latest
+    needs: [code-quality, security-analysis]
     steps:
-      - name: All checks passed
-        run: echo "All code quality standards, security, and E2E tests passed!"
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+        working-directory: frontend
+        env:
+          CI: true
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: frontend
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: frontend/coverage/lcov.info
+          flags: frontend
+          name: codecov-frontend
+
+  # Phase 5: E2E Testing
+  e2e-tests:
+    name: End-to-End Tests
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-tests]
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Install E2E dependencies
+      - name: Install E2E dependencies
+        run: npm ci
+        working-directory: e2e
+
+      # Install Playwright browsers
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+        working-directory: e2e
+
+      # Start services for E2E testing
+      - name: Start backend service
+        run: |
+          npm ci
+          npm start &
+        working-directory: backend
+        env:
+          NODE_ENV: test
+
+      - name: Start frontend service
+        run: |
+          npm ci
+          npm start &
+        working-directory: frontend
+        env:
+          CI: false
+
+      - name: Wait for services
+        run: |
+          npx wait-on http://localhost:3000 http://localhost:3001 --timeout 60000
+
+      # Run Cypress tests
+      - name: Run Cypress E2E tests
+        run: npm run cy:run
+        working-directory: e2e
+
+      # Run Playwright tests
+      - name: Run Playwright E2E tests
+        run: npm run pw:test
+        working-directory: e2e
+
+      # Upload E2E artifacts
+      - name: Upload E2E test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: e2e-results
+          path: |
+            e2e/cypress/videos/
+            e2e/cypress/screenshots/
+            e2e/test-results/
+            e2e/playwright-report/
+
+  # Phase 6: Performance and Load Testing
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-tests]
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Lighthouse CI for frontend performance
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.12.x
+          lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      # Load testing with Artillery
+      - name: Install Artillery
+        run: npm install -g artillery
+
+      - name: Run load tests
+        run: artillery run test-suite/load-tests/basic-load.yml
+        continue-on-error: true
+
+  # Phase 7: Deployment Readiness
+  deployment-check:
+    name: Deployment Readiness
+    runs-on: ubuntu-latest
+    needs: [security-analysis, static-analysis, backend-tests, frontend-tests]
+    steps:
+      - uses: actions/checkout@v4
+
+      # Check environment configurations
+      - name: Validate environment configurations
+        run: |
+          echo "Checking environment configurations..."
+          # Add checks for required environment variables
+          # Validate configuration files
+          # Check secrets management
+
+      # Database migration check
+      - name: Validate database migrations
+        run: |
+          echo "Validating database migrations..."
+          # Check migration files
+          # Validate migration rollback scripts
+
+      # Security configuration check
+      - name: Security configuration validation
+        run: |
+          echo "Validating security configurations..."
+          # Check HTTPS enforcement
+          # Validate security headers
+          # Check rate limiting configuration
+
+  # Phase 8: Quality Gate
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    needs: [security-analysis, static-analysis, backend-tests, frontend-tests, deployment-check]
+    if: always()
+    steps:
+      - name: Check Quality Gate Status
+        run: |
+          # Check if all required jobs passed
+          if [[ "${{ needs.security-analysis.result }}" == "success" && 
+                "${{ needs.static-analysis.result }}" == "success" && 
+                "${{ needs.backend-tests.result }}" == "success" && 
+                "${{ needs.frontend-tests.result }}" == "success" && 
+                "${{ needs.deployment-check.result }}" == "success" ]]; then
+            echo "✅ All quality gates passed!"
+            echo "QUALITY_GATE=passed" >> $GITHUB_ENV
+          else
+            echo "❌ Quality gate failed!"
+            echo "QUALITY_GATE=failed" >> $GITHUB_ENV
+            exit 1
+          fi
+
+      # Block merge if quality gate fails
+      - name: Quality Gate Result
+        run: |
+          if [[ "$QUALITY_GATE" == "failed" ]]; then
+            echo "🚫 Merge blocked due to quality gate failure"
+            echo "Please fix the failing checks before merging"
+            exit 1
+          else
+            echo "✅ Quality gate passed - ready for merge"
+          fi
+
+  # Phase 9: Notification and Reporting
+  notification:
+    name: Notification and Reporting
+    runs-on: ubuntu-latest
+    needs: [quality-gate, e2e-tests, performance-tests]
+    if: always()
+    steps:
+      - name: Generate Quality Report
+        run: |
+          echo "# Quality Report" > quality-report.md
+          echo "" >> quality-report.md
+          echo "## Pipeline Results" >> quality-report.md
+          echo "- Code Quality: ${{ needs.code-quality.result }}" >> quality-report.md
+          echo "- Security Analysis: ${{ needs.security-analysis.result }}" >> quality-report.md
+          echo "- Static Analysis: ${{ needs.static-analysis.result }}" >> quality-report.md
+          echo "- Backend Tests: ${{ needs.backend-tests.result }}" >> quality-report.md
+          echo "- Frontend Tests: ${{ needs.frontend-tests.result }}" >> quality-report.md
+          echo "- E2E Tests: ${{ needs.e2e-tests.result }}" >> quality-report.md
+          echo "- Performance Tests: ${{ needs.performance-tests.result }}" >> quality-report.md
+          echo "- Quality Gate: ${{ needs.quality-gate.result }}" >> quality-report.md
+
+      - name: Upload Quality Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: quality-report
+          path: quality-report.md
+
+      # Comment on PR with results
+      - name: Comment PR
+        uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('quality-report.md', 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: report
+            });

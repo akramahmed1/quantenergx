@@ -14,18 +14,18 @@ class DatabaseManager {
       connectionTimeoutMillis: 2000,
     });
 
-    this.pool.on('error', (err) => {
+    this.pool.on('error', err => {
       console.error('Unexpected error on idle client', err);
     });
 
     this.roleMapping = {
-      'admin': 'admin_users',
-      'risk_manager': 'risk_managers',
-      'compliance_officer': 'compliance_officers',
-      'trader': 'authenticated_users',
-      'analyst': 'authenticated_users',
-      'viewer': 'authenticated_users',
-      'service': 'service_accounts'
+      admin: 'admin_users',
+      risk_manager: 'risk_managers',
+      compliance_officer: 'compliance_officers',
+      trader: 'authenticated_users',
+      analyst: 'authenticated_users',
+      viewer: 'authenticated_users',
+      service: 'service_accounts',
     };
   }
 
@@ -37,12 +37,12 @@ class DatabaseManager {
    */
   async getClientWithContext(userId, userRole = 'viewer') {
     const client = await this.pool.connect();
-    
+
     try {
       // Set user context for RLS
       await client.query('SELECT set_current_user_id($1)', [userId]);
       await client.query('SELECT set_current_user_role($1)', [userRole]);
-      
+
       return {
         client,
         query: client.query.bind(client),
@@ -51,7 +51,7 @@ class DatabaseManager {
           client.query('SELECT reset_user_context()').finally(() => {
             client.release();
           });
-        }
+        },
       };
     } catch (error) {
       client.release();
@@ -69,7 +69,7 @@ class DatabaseManager {
    */
   async queryWithContext(query, params = [], userId, userRole = 'viewer') {
     const { client, release } = await this.getClientWithContext(userId, userRole);
-    
+
     try {
       return await client.query(query, params);
     } finally {
@@ -86,7 +86,7 @@ class DatabaseManager {
    */
   async transactionWithContext(callback, userId, userRole = 'viewer') {
     const { client, release } = await this.getClientWithContext(userId, userRole);
-    
+
     try {
       await client.query('BEGIN');
       const result = await callback(client);
@@ -126,13 +126,10 @@ class DatabaseManager {
   async initializeRLS() {
     const fs = require('fs');
     const path = require('path');
-    
+
     try {
       // Read RLS setup script
-      const rlsScript = fs.readFileSync(
-        path.join(__dirname, '../database/setup_rls.sql'),
-        'utf8'
-      );
+      const rlsScript = fs.readFileSync(path.join(__dirname, '../database/setup_rls.sql'), 'utf8');
 
       // Execute setup script with admin privileges
       await this.adminQuery(rlsScript);
@@ -149,11 +146,10 @@ class DatabaseManager {
    * @returns {boolean} - True if RLS is enabled
    */
   async isRLSEnabled(tableName) {
-    const result = await this.adminQuery(
-      'SELECT relrowsecurity FROM pg_class WHERE relname = $1',
-      [tableName]
-    );
-    
+    const result = await this.adminQuery('SELECT relrowsecurity FROM pg_class WHERE relname = $1', [
+      tableName,
+    ]);
+
     return result.rows.length > 0 && result.rows[0].relrowsecurity;
   }
 
@@ -163,7 +159,8 @@ class DatabaseManager {
    * @returns {Array} - List of policies
    */
   async getRLSPolicies(tableName) {
-    const result = await this.adminQuery(`
+    const result = await this.adminQuery(
+      `
       SELECT 
         pol.polname as policy_name,
         pol.polcmd as command,
@@ -173,8 +170,10 @@ class DatabaseManager {
       FROM pg_policy pol
       JOIN pg_class pc ON pol.polrelid = pc.oid
       WHERE pc.relname = $1
-    `, [tableName]);
-    
+    `,
+      [tableName]
+    );
+
     return result.rows;
   }
 
@@ -203,7 +202,7 @@ class DatabaseManager {
         locked_until TIMESTAMP WITH TIME ZONE,
         
         CONSTRAINT valid_role CHECK (role IN ('admin', 'trader', 'risk_manager', 'compliance_officer', 'analyst', 'viewer')),
-        CONSTRAINT valid_email CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
+        CONSTRAINT valid_email CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')
       );
 
       CREATE TABLE IF NOT EXISTS user_sessions (
@@ -339,12 +338,12 @@ class DatabaseManager {
         timestamp: result.rows[0].now,
         poolSize: this.pool.totalCount,
         idleCount: this.pool.idleCount,
-        waitingCount: this.pool.waitingCount
+        waitingCount: this.pool.waitingCount,
       };
     } catch (error) {
       return {
         healthy: false,
-        error: error.message
+        error: error.message,
       };
     }
   }

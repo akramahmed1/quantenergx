@@ -55,7 +55,7 @@ export const Sidebar: React.FC = () => {
     >
       <Box sx={{ overflow: 'auto' }}>
         <List>
-          {menuItems.map((item) => (
+          {menuItems.map(item => (
             <ListItem key={item.text} disablePadding>
               <ListItemButton
                 selected={location.pathname === item.path}
@@ -67,17 +67,17 @@ export const Sidebar: React.FC = () => {
             </ListItem>
           ))}
         </List>
-        
+
         <Divider />
-        
+
         <Box sx={{ p: 2 }}>
           <Typography variant="subtitle2" color="text.secondary">
             OCR & Documents
           </Typography>
         </Box>
-        
+
         <List>
-          {ocrItems.map((item) => (
+          {ocrItems.map(item => (
             <ListItem key={item.text} disablePadding>
               <ListItemButton
                 selected={location.pathname === item.path}

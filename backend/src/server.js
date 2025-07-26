@@ -30,9 +30,11 @@ const logger = winston.createLogger({
 });
 
 if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.simple()
-  }));
+  logger.add(
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    })
+  );
 }
 
 // Initialize gRPC service
@@ -50,26 +52,28 @@ app.use((req, res, next) => {
 });
 
 // Enhanced security headers
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https:"],
-      scriptSrc: ["'self'"],
-      connectSrc: ["'self'"],
-      frameSrc: ["'none'"],
-      objectSrc: ["'none'"],
-      upgradeInsecureRequests: [],
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ['\'self\''],
+        styleSrc: ['\'self\'', '\'unsafe-inline\'', 'https://fonts.googleapis.com'],
+        fontSrc: ['\'self\'', 'https://fonts.gstatic.com'],
+        imgSrc: ['\'self\'', 'data:', 'https:'],
+        scriptSrc: ['\'self\''],
+        connectSrc: ['\'self\''],
+        frameSrc: ['\'none\''],
+        objectSrc: ['\'none\''],
+        upgradeInsecureRequests: [],
+      },
     },
-  },
-  hsts: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true
-  }
-}));
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+  })
+);
 
 // Global rate limiting
 const globalLimiter = rateLimit({
@@ -77,7 +81,7 @@ const globalLimiter = rateLimit({
   max: 1000, // Limit each IP to 1000 requests per windowMs
   message: {
     error: 'Too many requests from this IP, please try again later.',
-    retryAfter: '15 minutes'
+    retryAfter: '15 minutes',
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -85,20 +89,20 @@ const globalLimiter = rateLimit({
     logger.warn(`Rate limit exceeded for IP: ${req.ip}`, {
       ip: req.ip,
       userAgent: req.get('User-Agent'),
-      path: req.path
+      path: req.path,
     });
     res.status(429).json({
       error: 'Too many requests from this IP, please try again later.',
-      retryAfter: '15 minutes'
+      retryAfter: '15 minutes',
     });
-  }
+  },
 });
 
 // Speed limiting for sustained traffic
 const speedLimiter = slowDown({
   windowMs: 15 * 60 * 1000, // 15 minutes
   delayAfter: 100, // Allow 100 requests per windowMs without delay
-  delayMs: (hits) => hits * 100, // Add 100ms delay per request after delayAfter
+  delayMs: hits => hits * 100, // Add 100ms delay per request after delayAfter
   maxDelayMs: 20000, // Maximum delay of 20 seconds
 });
 
@@ -108,7 +112,7 @@ const authLimiter = rateLimit({
   max: 5, // Limit each IP to 5 auth requests per windowMs
   message: {
     error: 'Too many authentication attempts, please try again later.',
-    retryAfter: '15 minutes'
+    retryAfter: '15 minutes',
   },
   skipSuccessfulRequests: true,
   standardHeaders: true,
@@ -117,13 +121,13 @@ const authLimiter = rateLimit({
     logger.warn(`Auth rate limit exceeded for IP: ${req.ip}`, {
       ip: req.ip,
       userAgent: req.get('User-Agent'),
-      path: req.path
+      path: req.path,
     });
     res.status(429).json({
       error: 'Too many authentication attempts, please try again later.',
-      retryAfter: '15 minutes'
+      retryAfter: '15 minutes',
     });
-  }
+  },
 });
 
 // Apply rate limiting
@@ -135,10 +139,12 @@ app.use('/api/v1/users/auth', authLimiter);
 app.use(cors());
 
 // JSON parsing with error handling
-app.use(express.json({ 
-  limit: '50mb',
-  type: 'application/json'
-}));
+app.use(
+  express.json({
+    limit: '50mb',
+    type: 'application/json',
+  })
+);
 
 // Handle JSON parsing errors
 app.use((err, req, res, _next) => {
@@ -152,14 +158,14 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'healthy', 
+  res.status(200).json({
+    status: 'healthy',
     timestamp: new Date().toISOString(),
     version: process.env.npm_package_version || '1.0.0',
     services: {
       rest_api: 'online',
-      grpc_service: 'online'
-    }
+      grpc_service: 'online',
+    },
   });
 });
 
@@ -174,9 +180,9 @@ app.use('/api/v1/*', (req, res) => {
 // Error handling middleware
 app.use((err, req, res, _next) => {
   logger.error(err.stack);
-  res.status(500).json({ 
+  res.status(500).json({
     error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong',
   });
 });
 
@@ -195,7 +201,6 @@ if (process.env.NODE_ENV !== 'test') {
   // Start gRPC service
   grpcService.start(GRPC_PORT);
   logger.info(`QuantEnergx gRPC Service running on port ${GRPC_PORT}`);
-
 
   process.on('SIGINT', () => {
     logger.info('SIGINT received, shutting down gracefully');

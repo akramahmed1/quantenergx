@@ -260,11 +260,14 @@ const settingsSlice = createSlice({
       state.notifications = { ...state.notifications, ...action.payload };
       state.hasUnsavedChanges = true;
     },
-    updateWidgetPosition: (state, action: PayloadAction<{
-      widgetId: string;
-      position: { x: number; y: number };
-      size?: { width: number; height: number };
-    }>) => {
+    updateWidgetPosition: (
+      state,
+      action: PayloadAction<{
+        widgetId: string;
+        position: { x: number; y: number };
+        size?: { width: number; height: number };
+      }>
+    ) => {
       const { widgetId, position, size } = action.payload;
       const widget = state.dashboard.widgets.find(w => w.id === widgetId);
       if (widget) {
@@ -282,12 +285,15 @@ const settingsSlice = createSlice({
         state.hasUnsavedChanges = true;
       }
     },
-    addWidget: (state, action: PayloadAction<{
-      type: string;
-      position: { x: number; y: number };
-      size: { width: number; height: number };
-      config?: Record<string, any>;
-    }>) => {
+    addWidget: (
+      state,
+      action: PayloadAction<{
+        type: string;
+        position: { x: number; y: number };
+        size: { width: number; height: number };
+        config?: Record<string, any>;
+      }>
+    ) => {
       const { type, position, size, config = {} } = action.payload;
       const newWidget = {
         id: `${type}-${Date.now()}`,
@@ -301,15 +307,16 @@ const settingsSlice = createSlice({
       state.hasUnsavedChanges = true;
     },
     removeWidget: (state, action: PayloadAction<string>) => {
-      state.dashboard.widgets = state.dashboard.widgets.filter(
-        w => w.id !== action.payload
-      );
+      state.dashboard.widgets = state.dashboard.widgets.filter(w => w.id !== action.payload);
       state.hasUnsavedChanges = true;
     },
-    updateWidgetConfig: (state, action: PayloadAction<{
-      widgetId: string;
-      config: Record<string, any>;
-    }>) => {
+    updateWidgetConfig: (
+      state,
+      action: PayloadAction<{
+        widgetId: string;
+        config: Record<string, any>;
+      }>
+    ) => {
       const { widgetId, config } = action.payload;
       const widget = state.dashboard.widgets.find(w => w.id === widgetId);
       if (widget) {
@@ -320,24 +327,24 @@ const settingsSlice = createSlice({
     resetToDefaults: (state, action: PayloadAction<keyof SettingsState>) => {
       const section = action.payload;
       switch (section) {
-      case 'app':
-        state.app = defaultAppSettings;
-        break;
-      case 'dashboard':
-        state.dashboard = defaultDashboardSettings;
-        break;
-      case 'trading':
-        state.trading = defaultTradingSettings;
-        break;
-      case 'risk':
-        state.risk = defaultRiskSettings;
-        break;
-      case 'compliance':
-        state.compliance = defaultComplianceSettings;
-        break;
-      case 'notifications':
-        state.notifications = defaultNotificationSettings;
-        break;
+        case 'app':
+          state.app = defaultAppSettings;
+          break;
+        case 'dashboard':
+          state.dashboard = defaultDashboardSettings;
+          break;
+        case 'trading':
+          state.trading = defaultTradingSettings;
+          break;
+        case 'risk':
+          state.risk = defaultRiskSettings;
+          break;
+        case 'compliance':
+          state.compliance = defaultComplianceSettings;
+          break;
+        case 'notifications':
+          state.notifications = defaultNotificationSettings;
+          break;
       }
       state.hasUnsavedChanges = true;
     },
@@ -351,7 +358,7 @@ const settingsSlice = createSlice({
       if (settings.notifications) state.notifications = settings.notifications;
       state.hasUnsavedChanges = false;
     },
-    markSettingsSaved: (state) => {
+    markSettingsSaved: state => {
       state.hasUnsavedChanges = false;
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
@@ -360,7 +367,7 @@ const settingsSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
-    clearError: (state) => {
+    clearError: state => {
       state.error = null;
     },
   },

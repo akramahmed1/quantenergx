@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  Button,
-} from '@mui/material';
+import { Box, Typography, Grid, Card, CardContent, Button } from '@mui/material';
 import {
   TrendingUp as TrendingIcon,
   DocumentScanner as OCRIcon,
@@ -54,19 +47,20 @@ export const Dashboard: React.FC = () => {
       <Typography variant="h4" component="h1" gutterBottom>
         QuantEnergx Dashboard
       </Typography>
-      
+
       <Typography variant="body1" color="text.secondary" paragraph>
-        Welcome to the QuantEnergx energy trading platform with advanced OCR and document processing capabilities.
+        Welcome to the QuantEnergx energy trading platform with advanced OCR and document processing
+        capabilities.
       </Typography>
 
       <Grid container spacing={3}>
         {quickActions.map((action, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>
-            <Card 
-              sx={{ 
+            <Card
+              sx={{
                 height: '100%',
                 cursor: 'pointer',
-                '&:hover': { 
+                '&:hover': {
                   boxShadow: 4,
                   transform: 'translateY(-2px)',
                 },
@@ -75,9 +69,7 @@ export const Dashboard: React.FC = () => {
               onClick={action.action}
             >
               <CardContent sx={{ textAlign: 'center', p: 3 }}>
-                <Box sx={{ color: action.color, mb: 2 }}>
-                  {action.icon}
-                </Box>
+                <Box sx={{ color: action.color, mb: 2 }}>{action.icon}</Box>
                 <Typography variant="h6" component="h2" gutterBottom>
                   {action.title}
                 </Typography>
@@ -99,11 +91,7 @@ export const Dashboard: React.FC = () => {
             <Typography variant="body1" color="text.secondary">
               No recent activity. Upload your first document to get started.
             </Typography>
-            <Button 
-              variant="contained" 
-              sx={{ mt: 2 }}
-              onClick={() => navigate('/ocr/upload')}
-            >
+            <Button variant="contained" sx={{ mt: 2 }} onClick={() => navigate('/ocr/upload')}>
               Upload Document
             </Button>
           </CardContent>

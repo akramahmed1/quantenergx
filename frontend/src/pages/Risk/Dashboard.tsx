@@ -8,8 +8,8 @@ export const RiskDashboard: React.FC = () => {
         Risk Dashboard
       </Typography>
       <Alert severity="info">
-        Risk dashboard implementation pending. This will include VaR calculations, 
-        position limits, stress testing, and risk metrics visualization.
+        Risk dashboard implementation pending. This will include VaR calculations, position limits,
+        stress testing, and risk metrics visualization.
       </Alert>
     </Box>
   );

@@ -1,5 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
-import marketReducer, { fetchMarketData, clearError, updateQuote } from '../store/slices/marketSlice';
+import marketReducer, {
+  fetchMarketData,
+  clearError,
+  updateQuote,
+} from '../store/slices/marketSlice';
 
 // Create a test store
 const createTestStore = () => {
@@ -48,20 +52,22 @@ describe('marketSlice', () => {
     // First add a quote to state
     store.dispatch({
       type: 'market/fetchQuotes/fulfilled',
-      payload: [{
-        symbol: 'CL',
-        commodity: 'crude_oil',
-        price: 79.3,
-        change: 0,
-        changePercent: 0,
-        volume: 50000,
-        timestamp: new Date().toISOString(),
-      }],
+      payload: [
+        {
+          symbol: 'CL',
+          commodity: 'crude_oil',
+          price: 79.3,
+          change: 0,
+          changePercent: 0,
+          volume: 50000,
+          timestamp: new Date().toISOString(),
+        },
+      ],
     });
 
     // Then update it
     store.dispatch(updateQuote(quote));
-    
+
     const state = store.getState().market;
     expect(state.quotes.CL.price).toBe(80.5);
     expect(state.quotes.CL.change).toBe(1.2);
@@ -71,7 +77,7 @@ describe('marketSlice', () => {
 
   it('should handle fetchMarketData pending', () => {
     store.dispatch({ type: fetchMarketData.pending.type });
-    
+
     const state = store.getState().market;
     expect(state.loading.marketData).toBe(true);
     expect(state.error).toBe(null);
@@ -104,20 +110,22 @@ describe('marketSlice', () => {
       type: fetchMarketData.fulfilled.type,
       payload: marketData,
     });
-    
+
     const state = store.getState().market;
     expect(state.loading.marketData).toBe(false);
-    expect(state.marketData[`${marketData.commodity}_${marketData.symbol}_${marketData.timeframe}`]).toEqual(marketData);
+    expect(
+      state.marketData[`${marketData.commodity}_${marketData.symbol}_${marketData.timeframe}`]
+    ).toEqual(marketData);
   });
 
   it('should handle fetchMarketData rejected', () => {
     const errorMessage = 'Failed to fetch market data';
-    
+
     store.dispatch({
       type: fetchMarketData.rejected.type,
       error: { message: errorMessage },
     });
-    
+
     const state = store.getState().market;
     expect(state.loading.marketData).toBe(false);
     expect(state.error).toBe(errorMessage);

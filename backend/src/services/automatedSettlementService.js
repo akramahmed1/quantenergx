@@ -12,7 +12,7 @@ class AutomatedSettlementService {
     this.paymentInstructions = new Map();
     this.collateralManagement = new Map();
     this.settlementNetworks = new Map();
-    
+
     this.initializeSettlementNetworks();
     this.initializeSettlementRules();
     this.initializeCollateralTypes();
@@ -33,13 +33,13 @@ class AutomatedSettlementService {
         margin_requirements: {
           initial_margin: 'SIMM',
           variation_margin: 'daily',
-          currency: 'multi_currency'
+          currency: 'multi_currency',
         },
         connectivity: {
           protocol: 'FIX',
           encryption: 'TLS_1.3',
-          authentication: 'mutual_TLS'
-        }
+          authentication: 'mutual_TLS',
+        },
       },
       {
         id: 'eurex_clearing',
@@ -51,13 +51,13 @@ class AutomatedSettlementService {
         margin_requirements: {
           initial_margin: 'EUREX_PRISMA',
           variation_margin: 'intraday',
-          currency: 'EUR'
+          currency: 'EUR',
         },
         connectivity: {
           protocol: 'T7_Enhanced',
           encryption: 'AES_256',
-          authentication: 'PKI'
-        }
+          authentication: 'PKI',
+        },
       },
       {
         id: 'cme_clearing',
@@ -69,13 +69,13 @@ class AutomatedSettlementService {
         margin_requirements: {
           initial_margin: 'SPAN',
           variation_margin: 'twice_daily',
-          currency: 'USD'
+          currency: 'USD',
         },
         connectivity: {
           protocol: 'FIX',
           encryption: 'TLS_1.3',
-          authentication: 'certificate_based'
-        }
+          authentication: 'certificate_based',
+        },
       },
       {
         id: 'swift_network',
@@ -88,8 +88,8 @@ class AutomatedSettlementService {
         connectivity: {
           protocol: 'SWIFTNet',
           encryption: 'PKI',
-          authentication: 'RMA'
-        }
+          authentication: 'RMA',
+        },
       },
       {
         id: 'fedwire',
@@ -102,8 +102,8 @@ class AutomatedSettlementService {
         connectivity: {
           protocol: 'FedLine',
           encryption: 'end_to_end',
-          authentication: 'dual_control'
-        }
+          authentication: 'dual_control',
+        },
       },
       {
         id: 'target2',
@@ -116,9 +116,9 @@ class AutomatedSettlementService {
         connectivity: {
           protocol: 'TARGET2_Network',
           encryption: 'ECB_standards',
-          authentication: 'PKI'
-        }
-      }
+          authentication: 'PKI',
+        },
+      },
     ];
 
     networks.forEach(network => {
@@ -128,7 +128,7 @@ class AutomatedSettlementService {
         last_heartbeat: new Date().toISOString(),
         connection_quality: 'excellent',
         daily_volume: 0,
-        daily_transactions: 0
+        daily_transactions: 0,
       });
     });
   }
@@ -147,19 +147,19 @@ class AutomatedSettlementService {
           trade_date: 'T',
           notification_deadline: 'T+2_16:00',
           delivery_start: 'delivery_month',
-          payment_due: 'T+3'
+          payment_due: 'T+3',
         },
         margin_requirements: {
           initial_margin_rate: 0.05,
           maintenance_margin_rate: 0.03,
           margin_call_threshold: 0.8,
-          margin_currency: 'USD'
+          margin_currency: 'USD',
         },
         settlement_instructions: {
           delivery_location: 'specified_hub',
           quality_specifications: 'contract_grade',
-          documentation_required: ['delivery_notice', 'pipeline_confirmation']
-        }
+          documentation_required: ['delivery_notice', 'pipeline_confirmation'],
+        },
       },
       {
         id: 'carbon_credits_settlement',
@@ -170,18 +170,18 @@ class AutomatedSettlementService {
           trade_date: 'T',
           registry_notification: 'T+1',
           transfer_completion: 'T+2',
-          payment_due: 'T+2'
+          payment_due: 'T+2',
         },
         margin_requirements: {
-          initial_margin_rate: 0.10,
+          initial_margin_rate: 0.1,
           maintenance_margin_rate: 0.06,
-          margin_call_threshold: 0.75
+          margin_call_threshold: 0.75,
         },
         settlement_instructions: {
           registry_accounts: ['EU_ETS', 'CORSIA', 'California_CARB'],
           verification_required: true,
-          compliance_period_check: true
-        }
+          compliance_period_check: true,
+        },
       },
       {
         id: 'electricity_spot_settlement',
@@ -192,18 +192,18 @@ class AutomatedSettlementService {
           trade_date: 'T',
           delivery_start: 'next_hour',
           metering_confirmation: 'T+1',
-          payment_due: 'T+7'
+          payment_due: 'T+7',
         },
         margin_requirements: {
-          initial_margin_rate: 0.20,
+          initial_margin_rate: 0.2,
           maintenance_margin_rate: 0.15,
-          margin_call_threshold: 0.70
+          margin_call_threshold: 0.7,
         },
         settlement_instructions: {
           metering_data_source: 'ISO_system',
           imbalance_pricing: 'locational_marginal_pricing',
-          congestion_adjustments: true
-        }
+          congestion_adjustments: true,
+        },
       },
       {
         id: 'fx_energy_settlement',
@@ -214,19 +214,19 @@ class AutomatedSettlementService {
           trade_date: 'T',
           fixing_date: 'T+2_11:00_London',
           settlement_date: 'T+2_17:00',
-          payment_due: 'T+2'
+          payment_due: 'T+2',
         },
         margin_requirements: {
           initial_margin_rate: 0.02,
           maintenance_margin_rate: 0.01,
-          margin_call_threshold: 0.90
+          margin_call_threshold: 0.9,
         },
         settlement_instructions: {
           fixing_source: 'WM_Reuters',
           currency_pairs: ['USD/EUR', 'USD/GBP', 'EUR/GBP'],
-          netting_eligible: true
-        }
-      }
+          netting_eligible: true,
+        },
+      },
     ];
 
     rules.forEach(rule => {
@@ -245,7 +245,7 @@ class AutomatedSettlementService {
         haircut: 0.0,
         eligibility: 'tier_1',
         liquidity_score: 1.0,
-        concentration_limit: 1.0
+        concentration_limit: 1.0,
       },
       {
         type: 'cash_eur',
@@ -253,7 +253,7 @@ class AutomatedSettlementService {
         haircut: 0.0,
         eligibility: 'tier_1',
         liquidity_score: 1.0,
-        concentration_limit: 1.0
+        concentration_limit: 1.0,
       },
       {
         type: 'us_treasury_bills',
@@ -261,7 +261,7 @@ class AutomatedSettlementService {
         haircut: 0.005,
         eligibility: 'tier_1',
         liquidity_score: 0.98,
-        concentration_limit: 0.8
+        concentration_limit: 0.8,
       },
       {
         type: 'german_bunds',
@@ -269,24 +269,24 @@ class AutomatedSettlementService {
         haircut: 0.01,
         eligibility: 'tier_1',
         liquidity_score: 0.95,
-        concentration_limit: 0.7
+        concentration_limit: 0.7,
       },
       {
         type: 'corporate_bonds_aaa',
         name: 'AAA Corporate Bonds',
         haircut: 0.08,
         eligibility: 'tier_2',
-        liquidity_score: 0.80,
-        concentration_limit: 0.3
+        liquidity_score: 0.8,
+        concentration_limit: 0.3,
       },
       {
         type: 'equity_etf',
         name: 'Equity ETFs',
         haircut: 0.15,
         eligibility: 'tier_3',
-        liquidity_score: 0.70,
-        concentration_limit: 0.2
-      }
+        liquidity_score: 0.7,
+        concentration_limit: 0.2,
+      },
     ];
   }
 
@@ -300,16 +300,19 @@ class AutomatedSettlementService {
     try {
       // Determine settlement rule
       const settlementRule = await this.determineSettlementRule(tradeData);
-      
+
       // Calculate settlement obligations
       const obligations = await this.calculateSettlementObligations(tradeData, settlementRule);
-      
+
       // Check margin requirements
       const marginStatus = await this.checkMarginRequirements(tradeData, settlementRule);
-      
+
       // Generate clearing instructions
-      const clearingInstructions = await this.generateClearingInstructions(tradeData, settlementRule);
-      
+      const clearingInstructions = await this.generateClearingInstructions(
+        tradeData,
+        settlementRule
+      );
+
       // Create settlement record
       const settlement = {
         settlement_id: settlementId,
@@ -323,7 +326,7 @@ class AutomatedSettlementService {
         settlement_network: await this.selectSettlementNetwork(tradeData, settlementRule),
         workflow_steps: this.createSettlementWorkflow(settlementRule),
         risk_assessment: await this.assessSettlementRisk(tradeData, obligations),
-        compliance_checks: await this.performComplianceChecks(tradeData, settlementRule)
+        compliance_checks: await this.performComplianceChecks(tradeData, settlementRule),
       };
 
       this.settlements.set(settlementId, settlement);
@@ -337,9 +340,8 @@ class AutomatedSettlementService {
         expected_completion: this.calculateSettlementDate(settlementRule),
         next_milestone: settlement.workflow_steps[0],
         estimated_fees: obligations.fees,
-        timestamp
+        timestamp,
       };
-
     } catch (error) {
       throw new Error(`Settlement processing failed: ${error.message}`);
     }
@@ -364,7 +366,7 @@ class AutomatedSettlementService {
       current_positions: await this.getCurrentPositions(accountId),
       suggested_actions: await this.generateMarginCallActions(marginDeficit),
       auto_liquidation_threshold: marginDeficit.amount * 1.2,
-      status: 'issued'
+      status: 'issued',
     };
 
     // Store margin call
@@ -386,7 +388,7 @@ class AutomatedSettlementService {
       due_time: marginCall.due_time,
       deficit_amount: marginCall.deficit_amount,
       acceptable_collateral: marginCall.acceptable_collateral,
-      timestamp
+      timestamp,
     };
   }
 
@@ -408,27 +410,27 @@ class AutomatedSettlementService {
       const positionReconciliation = await this.reconcilePositions([
         internalData.positions,
         clearingHouseData.positions,
-        custodianData.positions
+        custodianData.positions,
       ]);
 
       // Compare cash balances
       const cashReconciliation = await this.reconcileCashBalances([
         internalData.cash,
         clearingHouseData.cash,
-        custodianData.cash
+        custodianData.cash,
       ]);
 
       // Compare margin requirements
       const marginReconciliation = await this.reconcileMarginRequirements([
         internalData.margin,
-        clearingHouseData.margin
+        clearingHouseData.margin,
       ]);
 
       // Identify breaks and discrepancies
       const breaks = await this.identifyReconciliationBreaks({
         positions: positionReconciliation,
         cash: cashReconciliation,
-        margin: marginReconciliation
+        margin: marginReconciliation,
       });
 
       // Generate reconciliation report
@@ -441,13 +443,13 @@ class AutomatedSettlementService {
         reconciliation_results: {
           positions: positionReconciliation,
           cash: cashReconciliation,
-          margin: marginReconciliation
+          margin: marginReconciliation,
         },
         breaks_identified: breaks,
         break_resolution: await this.generateBreakResolution(breaks),
         sign_off_required: breaks.length > 0,
         auto_resolved: await this.attemptAutoResolution(breaks),
-        next_reconciliation: this.scheduleNextReconciliation(reconciliationType)
+        next_reconciliation: this.scheduleNextReconciliation(reconciliationType),
       };
 
       this.reconciliationRecords.set(reconciliationId, reconciliation);
@@ -458,7 +460,6 @@ class AutomatedSettlementService {
       }
 
       return reconciliation;
-
     } catch (error) {
       throw new Error(`Reconciliation failed: ${error.message}`);
     }
@@ -477,7 +478,7 @@ class AutomatedSettlementService {
       risk_metrics: await this.getRiskMetrics(),
       operational_metrics: await this.getOperationalMetrics(),
       alerts_and_exceptions: await this.getAlertsAndExceptions(),
-      upcoming_settlements: await this.getUpcomingSettlements()
+      upcoming_settlements: await this.getUpcomingSettlements(),
     };
 
     return dashboard;
@@ -494,7 +495,7 @@ class AutomatedSettlementService {
       instructions: [],
       netting_opportunities: [],
       cross_currency_exposures: [],
-      funding_requirements: {}
+      funding_requirements: {},
     };
 
     // Group trades by settlement rules and networks
@@ -527,28 +528,30 @@ class AutomatedSettlementService {
   async determineSettlementRule(tradeData) {
     // Find applicable settlement rule based on trade characteristics
     const rules = Array.from(this.settlementRules.values());
-    
+
     for (const rule of rules) {
       if (this.isRuleApplicable(rule, tradeData)) {
         return rule;
       }
     }
-    
+
     // Default rule if none found
     return rules[0];
   }
 
   isRuleApplicable(rule, tradeData) {
     // Simplified rule matching
-    return rule.asset_class === tradeData.asset_class ||
-           rule.asset_class === 'generic' ||
-           tradeData.instrument_type?.includes(rule.asset_class);
+    return (
+      rule.asset_class === tradeData.asset_class ||
+      rule.asset_class === 'generic' ||
+      tradeData.instrument_type?.includes(rule.asset_class)
+    );
   }
 
   async calculateSettlementObligations(tradeData, settlementRule) {
     const notionalAmount = tradeData.quantity * tradeData.price;
     const baseFee = notionalAmount * 0.0001; // 0.01% fee
-    
+
     return {
       notional_amount: notionalAmount,
       currency: tradeData.currency || 'USD',
@@ -556,28 +559,32 @@ class AutomatedSettlementService {
       fees: {
         clearing_fee: baseFee * 0.5,
         settlement_fee: baseFee * 0.3,
-        regulatory_fee: baseFee * 0.2
+        regulatory_fee: baseFee * 0.2,
       },
       margin_requirements: {
         initial_margin: notionalAmount * settlementRule.margin_requirements.initial_margin_rate,
-        maintenance_margin: notionalAmount * settlementRule.margin_requirements.maintenance_margin_rate
+        maintenance_margin:
+          notionalAmount * settlementRule.margin_requirements.maintenance_margin_rate,
       },
-      collateral_requirements: await this.calculateCollateralRequirements(tradeData, settlementRule)
+      collateral_requirements: await this.calculateCollateralRequirements(
+        tradeData,
+        settlementRule
+      ),
     };
   }
 
   async checkMarginRequirements(tradeData, settlementRule) {
-    const requiredMargin = tradeData.quantity * tradeData.price * 
-                          settlementRule.margin_requirements.initial_margin_rate;
-    
+    const requiredMargin =
+      tradeData.quantity * tradeData.price * settlementRule.margin_requirements.initial_margin_rate;
+
     const availableMargin = await this.getAvailableMargin(tradeData.account_id);
-    
+
     return {
       required_margin: requiredMargin,
       available_margin: availableMargin,
       margin_surplus: availableMargin - requiredMargin,
       margin_sufficient: availableMargin >= requiredMargin,
-      margin_utilization: availableMargin > 0 ? requiredMargin / availableMargin : 1.0
+      margin_utilization: availableMargin > 0 ? requiredMargin / availableMargin : 1.0,
     };
   }
 
@@ -589,21 +596,23 @@ class AutomatedSettlementService {
       settlement_date: this.calculateSettlementDate(settlementRule),
       delivery_instructions: settlementRule.settlement_instructions,
       payment_instructions: await this.generatePaymentInstructions(tradeData, settlementRule),
-      documentation_required: settlementRule.settlement_instructions.documentation_required || []
+      documentation_required: settlementRule.settlement_instructions.documentation_required || [],
     };
   }
 
   async selectSettlementNetwork(tradeData, settlementRule) {
     // Select appropriate settlement network based on asset class and geography
     const networks = Array.from(this.settlementNetworks.values());
-    
+
     for (const network of networks) {
-      if (network.asset_classes.includes(settlementRule.asset_class) &&
-          network.settlement_currency.includes(tradeData.currency || 'USD')) {
+      if (
+        network.asset_classes.includes(settlementRule.asset_class) &&
+        network.settlement_currency.includes(tradeData.currency || 'USD')
+      ) {
         return network.id;
       }
     }
-    
+
     return 'swift_network'; // Default fallback
   }
 
@@ -614,14 +623,16 @@ class AutomatedSettlementService {
       { step: 'clearing_instruction_generation', status: 'pending', estimated_time: 120 },
       { step: 'counterparty_confirmation', status: 'pending', estimated_time: 3600 },
       { step: 'settlement_instruction_submission', status: 'pending', estimated_time: 300 },
-      { step: 'settlement_completion', status: 'pending', estimated_time: 0 }
+      { step: 'settlement_completion', status: 'pending', estimated_time: 0 },
     ];
 
     // Add asset-specific steps
     if (settlementRule.asset_class === 'energy_derivatives') {
-      baseWorkflow.splice(4, 0, 
-        { step: 'delivery_notice_generation', status: 'pending', estimated_time: 1800 }
-      );
+      baseWorkflow.splice(4, 0, {
+        step: 'delivery_notice_generation',
+        status: 'pending',
+        estimated_time: 1800,
+      });
     }
 
     return baseWorkflow;
@@ -655,7 +666,7 @@ class AutomatedSettlementService {
       risk_score: riskScore,
       risk_level: riskScore > 50 ? 'high' : riskScore > 25 ? 'medium' : 'low',
       risk_factors: riskFactors,
-      mitigation_required: riskScore > 40
+      mitigation_required: riskScore > 40,
     };
   }
 
@@ -666,27 +677,27 @@ class AutomatedSettlementService {
     checks.push({
       check: 'regulatory_reporting',
       status: 'passed',
-      details: 'Trade meets reporting requirements'
+      details: 'Trade meets reporting requirements',
     });
 
     // Settlement cycle compliance
     checks.push({
       check: 'settlement_cycle',
       status: 'passed',
-      details: `Complies with ${settlementRule.timeline.settlement_date} cycle`
+      details: `Complies with ${settlementRule.timeline.settlement_date} cycle`,
     });
 
     // Documentation completeness
     checks.push({
       check: 'documentation',
       status: 'pending',
-      details: 'Awaiting trade confirmation documents'
+      details: 'Awaiting trade confirmation documents',
     });
 
     return {
       overall_status: 'compliant',
       checks: checks,
-      issues: checks.filter(check => check.status !== 'passed')
+      issues: checks.filter(check => check.status !== 'passed'),
     };
   }
 
@@ -735,8 +746,9 @@ class AutomatedSettlementService {
 
   calculateSettlementDate(settlementRule) {
     const tradeDate = new Date();
-    const settlementCycle = settlementRule.timeline?.settlement_date || settlementRule.settlement_cycle || 'T+2';
-    
+    const settlementCycle =
+      settlementRule.timeline?.settlement_date || settlementRule.settlement_cycle || 'T+2';
+
     const cycleDays = this.parseSettlementCycle(settlementCycle);
     const settlementDate = new Date(tradeDate);
     settlementDate.setDate(settlementDate.getDate() + cycleDays);
@@ -747,7 +759,7 @@ class AutomatedSettlementService {
   parseSettlementCycle(cycle) {
     if (cycle === 'same_day') return 0;
     if (cycle === 'real_time') return 0;
-    
+
     const match = cycle.match(/T\+(\d+)/);
     return match ? parseInt(match[1]) : 2;
   }
@@ -755,7 +767,7 @@ class AutomatedSettlementService {
   calculateMarginCallDueTime(marginDeficit) {
     const now = new Date();
     const dueTime = new Date(now);
-    
+
     if (marginDeficit.amount > 1000000) {
       // Immediate call - 2 hours
       dueTime.setHours(dueTime.getHours() + 2);
@@ -766,7 +778,7 @@ class AutomatedSettlementService {
         dueTime.setDate(dueTime.getDate() + 1);
       }
     }
-    
+
     return dueTime.toISOString();
   }
 
@@ -792,24 +804,46 @@ class AutomatedSettlementService {
   }
 
   // Stub methods for complex operations
-  async getCounterpartyRating(counterpartyId) { return 8; }
-  async getMarketVolatility(instrument) { return 0.2; }
-  async getAvailableMargin(accountId) { return 5000000; }
-  async calculateCollateralRequirements(tradeData, rule) { return { amount: 100000, currency: 'USD' }; }
-  async generatePaymentInstructions(tradeData, rule) { return { method: 'wire_transfer', account: 'settlement_account' }; }
-  selectClearingHouse(tradeData, rule) { return 'ice_clear_credit'; }
-  async getAcceptableCollateral(accountId) { return this.collateralTypes; }
-  async getCurrentPositions(accountId) { return []; }
-  async generateMarginCallActions(deficit) { return ['post_additional_collateral', 'reduce_positions']; }
-  async sendMarginCallNotifications(marginCall) { console.log(`Margin call notification sent: ${marginCall.margin_call_id}`); }
-  async scheduleAutoLiquidation(marginCall) { console.log(`Auto-liquidation scheduled: ${marginCall.margin_call_id}`); }
+  async getCounterpartyRating(counterpartyId) {
+    return 8;
+  }
+  async getMarketVolatility(instrument) {
+    return 0.2;
+  }
+  async getAvailableMargin(accountId) {
+    return 5000000;
+  }
+  async calculateCollateralRequirements(tradeData, rule) {
+    return { amount: 100000, currency: 'USD' };
+  }
+  async generatePaymentInstructions(tradeData, rule) {
+    return { method: 'wire_transfer', account: 'settlement_account' };
+  }
+  selectClearingHouse(tradeData, rule) {
+    return 'ice_clear_credit';
+  }
+  async getAcceptableCollateral(accountId) {
+    return this.collateralTypes;
+  }
+  async getCurrentPositions(accountId) {
+    return [];
+  }
+  async generateMarginCallActions(deficit) {
+    return ['post_additional_collateral', 'reduce_positions'];
+  }
+  async sendMarginCallNotifications(marginCall) {
+    console.log(`Margin call notification sent: ${marginCall.margin_call_id}`);
+  }
+  async scheduleAutoLiquidation(marginCall) {
+    console.log(`Auto-liquidation scheduled: ${marginCall.margin_call_id}`);
+  }
 
   // Data retrieval methods (simplified)
   async getInternalPositionData(accountId) {
     return {
       positions: [{ symbol: 'CRUDE_OIL', quantity: 1000 }],
       cash: { USD: 1000000 },
-      margin: { required: 50000, posted: 60000 }
+      margin: { required: 50000, posted: 60000 },
     };
   }
 
@@ -817,21 +851,21 @@ class AutomatedSettlementService {
     return {
       positions: [{ symbol: 'CRUDE_OIL', quantity: 1000 }],
       cash: { USD: 1000000 },
-      margin: { required: 50000, posted: 60000 }
+      margin: { required: 50000, posted: 60000 },
     };
   }
 
   async getCustodianData(accountId) {
     return {
       positions: [{ symbol: 'CRUDE_OIL', quantity: 1000 }],
-      cash: { USD: 1000000 }
+      cash: { USD: 1000000 },
     };
   }
 
   async getCounterpartyData(accountId) {
     return {
       confirmations: ['confirmed'],
-      settlements: ['pending']
+      settlements: ['pending'],
     };
   }
 
@@ -842,7 +876,7 @@ class AutomatedSettlementService {
       total_positions: 10,
       matched_positions: 9,
       breaks: 1,
-      match_rate: 0.9
+      match_rate: 0.9,
     };
   }
 
@@ -851,7 +885,7 @@ class AutomatedSettlementService {
       total_balances: 5,
       matched_balances: 5,
       breaks: 0,
-      match_rate: 1.0
+      match_rate: 1.0,
     };
   }
 
@@ -860,22 +894,22 @@ class AutomatedSettlementService {
       total_requirements: 3,
       matched_requirements: 2,
       breaks: 1,
-      match_rate: 0.67
+      match_rate: 0.67,
     };
   }
 
   async identifyReconciliationBreaks(reconciliationResults) {
     const breaks = [];
-    
+
     if (reconciliationResults.positions.breaks > 0) {
       breaks.push({
         type: 'position_break',
         severity: 'medium',
         count: reconciliationResults.positions.breaks,
-        description: 'Position quantity mismatch detected'
+        description: 'Position quantity mismatch detected',
       });
     }
-    
+
     return breaks;
   }
 
@@ -884,33 +918,33 @@ class AutomatedSettlementService {
       break_id: breakItem.type,
       resolution_actions: ['investigate_discrepancy', 'contact_counterparty', 'adjust_positions'],
       priority: breakItem.severity,
-      estimated_resolution_time: '2_hours'
+      estimated_resolution_time: '2_hours',
     }));
   }
 
   async attemptAutoResolution(breaks) {
     // Attempt to automatically resolve minor breaks
-    const autoResolved = breaks.filter(breakItem => 
-      breakItem.severity === 'low' && breakItem.count === 1
+    const autoResolved = breaks.filter(
+      breakItem => breakItem.severity === 'low' && breakItem.count === 1
     );
-    
+
     return {
       auto_resolved_count: autoResolved.length,
-      manual_resolution_required: breaks.length - autoResolved.length
+      manual_resolution_required: breaks.length - autoResolved.length,
     };
   }
 
   scheduleNextReconciliation(type) {
     const schedules = {
-      'daily': 24,
-      'weekly': 168,
-      'monthly': 720
+      daily: 24,
+      weekly: 168,
+      monthly: 720,
     };
-    
+
     const hours = schedules[type] || 24;
     const nextRun = new Date();
     nextRun.setHours(nextRun.getHours() + hours);
-    
+
     return nextRun.toISOString();
   }
 
@@ -925,7 +959,7 @@ class AutomatedSettlementService {
       pending_settlements: 23,
       failed_settlements: 2,
       total_value: 45000000,
-      average_settlement_time: '4.2_hours'
+      average_settlement_time: '4.2_hours',
     };
   }
 
@@ -934,7 +968,7 @@ class AutomatedSettlementService {
       total_margin_posted: 125000000,
       active_margin_calls: 3,
       margin_utilization: 0.78,
-      excess_margin: 27500000
+      excess_margin: 27500000,
     };
   }
 
@@ -944,7 +978,7 @@ class AutomatedSettlementService {
       weekly_reconciliation: 'in_progress',
       monthly_reconciliation: 'scheduled',
       outstanding_breaks: 5,
-      auto_resolution_rate: 0.85
+      auto_resolution_rate: 0.85,
     };
   }
 
@@ -955,7 +989,7 @@ class AutomatedSettlementService {
         status: network.status,
         uptime: '99.9%',
         last_heartbeat: network.last_heartbeat,
-        daily_volume: network.daily_volume
+        daily_volume: network.daily_volume,
       };
     }
     return networkStatuses;
@@ -966,7 +1000,7 @@ class AutomatedSettlementService {
       settlement_risk_score: 25,
       counterparty_risk_score: 30,
       operational_risk_score: 15,
-      overall_risk_level: 'medium'
+      overall_risk_level: 'medium',
     };
   }
 
@@ -975,7 +1009,7 @@ class AutomatedSettlementService {
       stp_rate: 0.94, // Straight-through processing
       exception_rate: 0.06,
       average_processing_time: 280, // seconds
-      peak_throughput: 1500 // trades per hour
+      peak_throughput: 1500, // trades per hour
     };
   }
 
@@ -985,14 +1019,14 @@ class AutomatedSettlementService {
         type: 'margin_call',
         severity: 'high',
         count: 2,
-        message: '2 accounts require immediate margin posting'
+        message: '2 accounts require immediate margin posting',
       },
       {
         type: 'settlement_delay',
         severity: 'medium',
         count: 1,
-        message: '1 settlement delayed due to network issues'
-      }
+        message: '1 settlement delayed due to network issues',
+      },
     ];
   }
 
@@ -1004,15 +1038,15 @@ class AutomatedSettlementService {
         settlement_date: new Date(Date.now() + 86400000).toISOString(),
         amount: 2500000,
         currency: 'USD',
-        status: 'pending_confirmation'
-      }
+        status: 'pending_confirmation',
+      },
     ];
   }
 
   // Multi-market instruction methods
   groupTradesBySettlement(trades) {
     const grouped = new Map();
-    
+
     trades.forEach(trade => {
       const ruleId = this.determineSettlementRuleId(trade);
       if (!grouped.has(ruleId)) {
@@ -1020,7 +1054,7 @@ class AutomatedSettlementService {
       }
       grouped.get(ruleId).push(trade);
     });
-    
+
     return grouped;
   }
 
@@ -1034,12 +1068,15 @@ class AutomatedSettlementService {
 
   async processTradeBatch(trades, ruleId) {
     const instructions = [];
-    
+
     for (const trade of trades) {
-      const instruction = await this.generateClearingInstructions(trade, this.settlementRules.get(ruleId));
+      const instruction = await this.generateClearingInstructions(
+        trade,
+        this.settlementRules.get(ruleId)
+      );
       instructions.push(instruction);
     }
-    
+
     return instructions;
   }
 
@@ -1047,7 +1084,7 @@ class AutomatedSettlementService {
     // Simplified netting identification
     const opportunities = [];
     const groupedByCurrency = this.groupInstructionsByCurrency(instructions);
-    
+
     for (const [currency, currencyInstructions] of groupedByCurrency) {
       if (currencyInstructions.length > 1) {
         const netAmount = this.calculateNetAmount(currencyInstructions);
@@ -1056,17 +1093,17 @@ class AutomatedSettlementService {
           gross_amount: this.calculateGrossAmount(currencyInstructions),
           net_amount: netAmount,
           savings: this.calculateNettingSavings(currencyInstructions, netAmount),
-          instruction_count: currencyInstructions.length
+          instruction_count: currencyInstructions.length,
         });
       }
     }
-    
+
     return opportunities;
   }
 
   groupInstructionsByCurrency(instructions) {
     const grouped = new Map();
-    
+
     instructions.forEach(instruction => {
       const currency = instruction.payment_instructions?.currency || 'USD';
       if (!grouped.has(currency)) {
@@ -1074,7 +1111,7 @@ class AutomatedSettlementService {
       }
       grouped.get(currency).push(instruction);
     });
-    
+
     return grouped;
   }
 
@@ -1097,28 +1134,28 @@ class AutomatedSettlementService {
 
   async calculateFundingRequirements(instructions) {
     const requirements = {};
-    
+
     instructions.forEach(instruction => {
       const currency = instruction.payment_instructions?.currency || 'USD';
       const amount = instruction.settlement_amount || 0;
-      
+
       requirements[currency] = (requirements[currency] || 0) + amount;
     });
-    
+
     return requirements;
   }
 
   async optimizeSettlementFlows(instructionBatch) {
     // Apply netting where possible
     const optimizedInstructions = [...instructionBatch.instructions];
-    
+
     // Add optimization metadata
     return {
       ...instructionBatch,
       optimized: true,
       optimization_applied: ['currency_netting', 'settlement_consolidation'],
       cost_savings: this.calculateOptimizationSavings(instructionBatch),
-      instructions: optimizedInstructions
+      instructions: optimizedInstructions,
     };
   }
 
@@ -1127,7 +1164,7 @@ class AutomatedSettlementService {
       netting_savings: 25000,
       consolidation_savings: 5000,
       total_savings: 30000,
-      percentage_savings: 0.03
+      percentage_savings: 0.03,
     };
   }
 }

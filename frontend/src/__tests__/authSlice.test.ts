@@ -49,9 +49,9 @@ describe('authSlice', () => {
 
   it('should handle setToken action', () => {
     const token = 'test-token';
-    
+
     store.dispatch(setToken(token));
-    
+
     const state = store.getState().auth;
     expect(state.token).toBe(token);
     expect(state.isAuthenticated).toBe(true);
@@ -60,7 +60,7 @@ describe('authSlice', () => {
 
   it('should handle login pending', () => {
     store.dispatch({ type: login.pending.type });
-    
+
     const state = store.getState().auth;
     expect(state.loading.auth).toBe(true);
     expect(state.error).toBe(null);
@@ -89,7 +89,7 @@ describe('authSlice', () => {
       type: login.fulfilled.type,
       payload: loginData,
     });
-    
+
     const state = store.getState().auth;
     expect(state.loading.auth).toBe(false);
     expect(state.isAuthenticated).toBe(true);
@@ -100,12 +100,12 @@ describe('authSlice', () => {
 
   it('should handle login rejected', () => {
     const errorMessage = 'Invalid credentials';
-    
+
     store.dispatch({
       type: login.rejected.type,
       error: { message: errorMessage },
     });
-    
+
     const state = store.getState().auth;
     expect(state.loading.auth).toBe(false);
     expect(state.error).toBe(errorMessage);
@@ -119,7 +119,7 @@ describe('authSlice', () => {
 
     // Then logout
     store.dispatch({ type: logout.fulfilled.type });
-    
+
     const state = store.getState().auth;
     expect(state.isAuthenticated).toBe(false);
     expect(state.token).toBe(null);
@@ -147,7 +147,7 @@ describe('authSlice', () => {
       type: 'auth/fetchUserProfile/fulfilled',
       payload: { user },
     });
-    
+
     const state = store.getState().auth;
     expect(state.user).toEqual(user);
   });
