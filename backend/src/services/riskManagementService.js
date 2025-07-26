@@ -6,30 +6,30 @@ class RiskManagementService {
       position: {
         max_single_position: 10000000,
         max_portfolio_exposure: 50000000,
-        max_commodity_concentration: 0.3 // 30%
+        max_commodity_concentration: 0.3, // 30%
       },
       credit: {
         max_counterparty_exposure: 5000000,
         max_unsecured_exposure: 1000000,
-        min_credit_rating: 'BBB'
+        min_credit_rating: 'BBB',
       },
       market: {
         var_limit_daily: 1000000, // Value at Risk daily limit
         var_limit_monthly: 5000000,
         max_leverage: 5.0,
-        stress_test_threshold: 0.95
+        stress_test_threshold: 0.95,
       },
       operational: {
         max_trade_size: 20000000,
         max_daily_volume: 100000000,
-        settlement_risk_limit: 10000000
-      }
+        settlement_risk_limit: 10000000,
+      },
     };
 
     this.volatilityModels = {
       crude_oil: { base_volatility: 0.25, stress_multiplier: 2.5 },
       natural_gas: { base_volatility: 0.35, stress_multiplier: 3.0 },
-      renewable: { base_volatility: 0.15, stress_multiplier: 1.8 }
+      renewable: { base_volatility: 0.15, stress_multiplier: 1.8 },
     };
   }
 
@@ -44,7 +44,7 @@ class RiskManagementService {
         this._evaluateCreditRisk(portfolioData),
         this._analyzeMarketRisk(portfolioData),
         this._checkLiquidityRisk(portfolioData),
-        this._assessOperationalRisk(portfolioData)
+        this._assessOperationalRisk(portfolioData),
       ]);
 
       const overallRiskScore = this._calculateOverallRiskScore(riskMetrics);
@@ -59,9 +59,8 @@ class RiskManagementService {
         riskLevel,
         riskMetrics,
         alerts,
-        recommendations: this._generateRiskRecommendations(riskMetrics, riskLevel)
+        recommendations: this._generateRiskRecommendations(riskMetrics, riskLevel),
       };
-
     } catch (error) {
       console.error('Risk assessment failed:', error);
       throw new Error(`Risk assessment failed: ${error.message}`);
@@ -71,7 +70,7 @@ class RiskManagementService {
   async _calculateVaR(portfolioData) {
     // Value at Risk calculation using Monte Carlo simulation
     const { positions, confidenceLevel = 0.95 } = portfolioData;
-    
+
     let portfolioValue = 0;
     let portfolioVolatility = 0;
 
@@ -79,18 +78,19 @@ class RiskManagementService {
     positions.forEach(position => {
       const value = position.quantity * position.currentPrice;
       portfolioValue += value;
-      
-      const volatility = this.volatilityModels[position.commodity]?.base_volatility || 0.20;
+
+      const volatility = this.volatilityModels[position.commodity]?.base_volatility || 0.2;
       portfolioVolatility += (value / portfolioValue) * volatility;
     });
 
     // Simple VaR calculation (in production, use more sophisticated models)
     const zScore = this._getZScore(confidenceLevel);
-    const dailyVaR = portfolioValue * portfolioVolatility * zScore / Math.sqrt(252); // Annualized to daily
+    const dailyVaR = (portfolioValue * portfolioVolatility * zScore) / Math.sqrt(252); // Annualized to daily
     const monthlyVaR = dailyVaR * Math.sqrt(21); // Monthly
 
-    const withinLimits = dailyVaR <= this.riskLimits.market.var_limit_daily &&
-                        monthlyVaR <= this.riskLimits.market.var_limit_monthly;
+    const withinLimits =
+      dailyVaR <= this.riskLimits.market.var_limit_daily &&
+      monthlyVaR <= this.riskLimits.market.var_limit_monthly;
 
     return {
       metric: 'value_at_risk',
@@ -102,13 +102,13 @@ class RiskManagementService {
       withinLimits,
       utilizationDaily: (dailyVaR / this.riskLimits.market.var_limit_daily) * 100,
       utilizationMonthly: (monthlyVaR / this.riskLimits.market.var_limit_monthly) * 100,
-      severity: withinLimits ? 'low' : 'high'
+      severity: withinLimits ? 'low' : 'high',
     };
   }
 
   async _assessConcentrationRisk(portfolioData) {
     const { positions } = portfolioData;
-    
+
     // Calculate concentration by commodity
     const commodityExposure = {};
     let totalValue = 0;
@@ -116,7 +116,7 @@ class RiskManagementService {
     positions.forEach(position => {
       const value = position.quantity * position.currentPrice;
       totalValue += value;
-      
+
       if (!commodityExposure[position.commodity]) {
         commodityExposure[position.commodity] = 0;
       }
@@ -135,26 +135,29 @@ class RiskManagementService {
       }
     });
 
-    const withinLimits = maxCommodityConcentration <= this.riskLimits.position.max_commodity_concentration;
+    const withinLimits =
+      maxCommodityConcentration <= this.riskLimits.position.max_commodity_concentration;
 
     return {
       metric: 'concentration_risk',
       maxCommodityConcentration,
       mostConcentratedCommodity,
       commodityBreakdown: Object.fromEntries(
-        Object.entries(commodityExposure).map(([commodity, exposure]) => 
-          [commodity, { exposure, percentage: (exposure / totalValue) * 100 }]
-        )
+        Object.entries(commodityExposure).map(([commodity, exposure]) => [
+          commodity,
+          { exposure, percentage: (exposure / totalValue) * 100 },
+        ])
       ),
       withinLimits,
-      utilizationPercentage: (maxCommodityConcentration / this.riskLimits.position.max_commodity_concentration) * 100,
-      severity: withinLimits ? 'low' : 'medium'
+      utilizationPercentage:
+        (maxCommodityConcentration / this.riskLimits.position.max_commodity_concentration) * 100,
+      severity: withinLimits ? 'low' : 'medium',
     };
   }
 
   async _evaluateCreditRisk(portfolioData) {
     const { counterparties, trades } = portfolioData;
-    
+
     // Calculate exposure by counterparty
     const counterpartyExposure = {};
     let totalCreditExposure = 0;
@@ -162,18 +165,18 @@ class RiskManagementService {
     trades.forEach(trade => {
       const exposure = trade.notionalValue;
       totalCreditExposure += exposure;
-      
+
       if (!counterpartyExposure[trade.counterpartyId]) {
         counterpartyExposure[trade.counterpartyId] = {
           exposure: 0,
           creditRating: counterparties[trade.counterpartyId]?.creditRating || 'NR',
           secured: 0,
-          unsecured: 0
+          unsecured: 0,
         };
       }
-      
+
       counterpartyExposure[trade.counterpartyId].exposure += exposure;
-      
+
       if (trade.collateralized) {
         counterpartyExposure[trade.counterpartyId].secured += exposure;
       } else {
@@ -195,7 +198,7 @@ class RiskManagementService {
           type: 'counterparty_limit_exceeded',
           counterpartyId,
           exposure: data.exposure,
-          limit: this.riskLimits.credit.max_counterparty_exposure
+          limit: this.riskLimits.credit.max_counterparty_exposure,
         });
       }
 
@@ -204,7 +207,7 @@ class RiskManagementService {
           type: 'unsecured_limit_exceeded',
           counterpartyId,
           unsecuredExposure: data.unsecured,
-          limit: this.riskLimits.credit.max_unsecured_exposure
+          limit: this.riskLimits.credit.max_unsecured_exposure,
         });
       }
     });
@@ -217,23 +220,23 @@ class RiskManagementService {
       violations,
       withinLimits: violations.length === 0,
       creditScore: this._calculateCreditScore(counterpartyExposure),
-      severity: violations.length === 0 ? 'low' : 'high'
+      severity: violations.length === 0 ? 'low' : 'high',
     };
   }
 
   async _analyzeMarketRisk(portfolioData) {
     const { positions, marketData } = portfolioData;
-    
+
     // Calculate beta and correlation risks
     let portfolioBeta = 0;
     let totalValue = 0;
-    
+
     const correlationMatrix = this._buildCorrelationMatrix(positions);
-    
+
     positions.forEach(position => {
       const value = position.quantity * position.currentPrice;
       totalValue += value;
-      
+
       // Simplified beta calculation
       const positionBeta = marketData[position.commodity]?.beta || 1.0;
       portfolioBeta += (value / totalValue) * positionBeta;
@@ -241,10 +244,10 @@ class RiskManagementService {
 
     // Stress testing
     const stressScenarios = [
-      { name: 'oil_price_crash', impact: -0.30 },
-      { name: 'gas_supply_shock', impact: 0.40 },
+      { name: 'oil_price_crash', impact: -0.3 },
+      { name: 'gas_supply_shock', impact: 0.4 },
       { name: 'renewable_policy_change', impact: -0.15 },
-      { name: 'general_market_crash', impact: -0.25 }
+      { name: 'general_market_crash', impact: -0.25 },
     ];
 
     const stressTestResults = stressScenarios.map(scenario => {
@@ -253,11 +256,11 @@ class RiskManagementService {
         scenario: scenario.name,
         impact: scenario.impact,
         potentialLoss,
-        percentageOfPortfolio: Math.abs(scenario.impact) * 100
+        percentageOfPortfolio: Math.abs(scenario.impact) * 100,
       };
     });
 
-    const worstCaseScenario = stressTestResults.reduce((worst, current) => 
+    const worstCaseScenario = stressTestResults.reduce((worst, current) =>
       current.potentialLoss > worst.potentialLoss ? current : worst
     );
 
@@ -269,13 +272,13 @@ class RiskManagementService {
       worstCaseScenario,
       leverageRatio: this._calculateLeverage(portfolioData),
       withinLimits: portfolioBeta <= 2.0, // Arbitrary threshold
-      severity: portfolioBeta > 2.0 ? 'medium' : 'low'
+      severity: portfolioBeta > 2.0 ? 'medium' : 'low',
     };
   }
 
   async _checkLiquidityRisk(portfolioData) {
     const { positions, marketData } = portfolioData;
-    
+
     let illiquidValue = 0;
     let totalValue = 0;
     const liquidityBreakdown = {};
@@ -283,16 +286,16 @@ class RiskManagementService {
     positions.forEach(position => {
       const value = position.quantity * position.currentPrice;
       totalValue += value;
-      
+
       const liquidityScore = marketData[position.commodity]?.liquidity || 0.5;
       const timeToLiquidate = this._estimateLiquidationTime(position, liquidityScore);
-      
+
       liquidityBreakdown[position.id] = {
         commodity: position.commodity,
         value,
         liquidityScore,
         timeToLiquidate,
-        liquidityRisk: liquidityScore < 0.5 ? 'high' : liquidityScore < 0.8 ? 'medium' : 'low'
+        liquidityRisk: liquidityScore < 0.5 ? 'high' : liquidityScore < 0.8 ? 'medium' : 'low',
       };
 
       if (liquidityScore < 0.5) {
@@ -310,30 +313,30 @@ class RiskManagementService {
       liquidityBreakdown,
       averageLiquidationTime: this._calculateAverageLiquidationTime(liquidityBreakdown),
       withinLimits: illiquidPercentage <= 20, // 20% threshold
-      severity: illiquidPercentage > 30 ? 'high' : illiquidPercentage > 20 ? 'medium' : 'low'
+      severity: illiquidPercentage > 30 ? 'high' : illiquidPercentage > 20 ? 'medium' : 'low',
     };
   }
 
   async _assessOperationalRisk(portfolioData) {
     const { trades, systems } = portfolioData;
-    
+
     // Assess operational risk factors
     const riskFactors = {
       systemDowntime: systems?.downtime || 0,
       failedTrades: trades.filter(t => t.status === 'failed').length,
       settlementDelays: trades.filter(t => t.settlementStatus === 'delayed').length,
       dataQualityIssues: 0, // Would be calculated from data validation
-      staffingLevels: systems?.staffing || 1.0
+      staffingLevels: systems?.staffing || 1.0,
     };
 
     const operationalScore = this._calculateOperationalScore(riskFactors);
-    
+
     return {
       metric: 'operational_risk',
       riskFactors,
       operationalScore,
       withinLimits: operationalScore >= 0.8, // 80% threshold
-      severity: operationalScore < 0.6 ? 'high' : operationalScore < 0.8 ? 'medium' : 'low'
+      severity: operationalScore < 0.6 ? 'high' : operationalScore < 0.8 ? 'medium' : 'low',
     };
   }
 
@@ -343,7 +346,7 @@ class RiskManagementService {
       concentration_risk: 0.2,
       credit_risk: 0.25,
       market_risk: 0.15,
-      liquidity_risk: 0.1
+      liquidity_risk: 0.1,
     };
 
     let score = 0;
@@ -358,10 +361,14 @@ class RiskManagementService {
 
   _getMetricScore(metric) {
     switch (metric.severity) {
-    case 'low': return 0.9;
-    case 'medium': return 0.6;
-    case 'high': return 0.3;
-    default: return 0.5;
+      case 'low':
+        return 0.9;
+      case 'medium':
+        return 0.6;
+      case 'high':
+        return 0.3;
+      default:
+        return 0.5;
     }
   }
 
@@ -374,7 +381,7 @@ class RiskManagementService {
 
   _generateRiskAlerts(riskMetrics) {
     const alerts = [];
-    
+
     riskMetrics.forEach(metric => {
       if (metric.severity === 'high' || !metric.withinLimits) {
         alerts.push({
@@ -383,7 +390,7 @@ class RiskManagementService {
           severity: metric.severity,
           message: this._getAlertMessage(metric),
           timestamp: new Date().toISOString(),
-          requiredAction: this._getRequiredAction(metric)
+          requiredAction: this._getRequiredAction(metric),
         });
       }
     });
@@ -393,41 +400,41 @@ class RiskManagementService {
 
   _getAlertMessage(metric) {
     switch (metric.metric) {
-    case 'value_at_risk':
-      return `VaR limits exceeded. Daily VaR: $${metric.dailyVaR.toLocaleString()}`;
-    case 'concentration_risk':
-      return `Concentration risk in ${metric.mostConcentratedCommodity}: ${(metric.maxCommodityConcentration * 100).toFixed(1)}%`;
-    case 'credit_risk':
-      return `Credit limit violations detected for ${metric.violations.length} counterparties`;
-    case 'market_risk':
-      return `Portfolio beta elevated at ${metric.portfolioBeta.toFixed(2)}`;
-    case 'liquidity_risk':
-      return `Illiquid positions represent ${metric.illiquidPercentage.toFixed(1)}% of portfolio`;
-    default:
-      return `Risk threshold exceeded for ${metric.metric}`;
+      case 'value_at_risk':
+        return `VaR limits exceeded. Daily VaR: $${metric.dailyVaR.toLocaleString()}`;
+      case 'concentration_risk':
+        return `Concentration risk in ${metric.mostConcentratedCommodity}: ${(metric.maxCommodityConcentration * 100).toFixed(1)}%`;
+      case 'credit_risk':
+        return `Credit limit violations detected for ${metric.violations.length} counterparties`;
+      case 'market_risk':
+        return `Portfolio beta elevated at ${metric.portfolioBeta.toFixed(2)}`;
+      case 'liquidity_risk':
+        return `Illiquid positions represent ${metric.illiquidPercentage.toFixed(1)}% of portfolio`;
+      default:
+        return `Risk threshold exceeded for ${metric.metric}`;
     }
   }
 
   _getRequiredAction(metric) {
     switch (metric.metric) {
-    case 'value_at_risk':
-      return 'Reduce position sizes or hedge exposure';
-    case 'concentration_risk':
-      return 'Diversify commodity exposure';
-    case 'credit_risk':
-      return 'Reduce counterparty exposure or increase collateral';
-    case 'market_risk':
-      return 'Consider hedging strategies';
-    case 'liquidity_risk':
-      return 'Increase liquid asset allocation';
-    default:
-      return 'Review and mitigate risk exposure';
+      case 'value_at_risk':
+        return 'Reduce position sizes or hedge exposure';
+      case 'concentration_risk':
+        return 'Diversify commodity exposure';
+      case 'credit_risk':
+        return 'Reduce counterparty exposure or increase collateral';
+      case 'market_risk':
+        return 'Consider hedging strategies';
+      case 'liquidity_risk':
+        return 'Increase liquid asset allocation';
+      default:
+        return 'Review and mitigate risk exposure';
     }
   }
 
   _generateRiskRecommendations(riskMetrics, riskLevel) {
     const recommendations = [];
-    
+
     if (riskLevel === 'high' || riskLevel === 'critical') {
       recommendations.push('Immediate risk review required');
       recommendations.push('Consider halting new positions until risk is reduced');
@@ -442,7 +449,7 @@ class RiskManagementService {
     // General recommendations
     recommendations.push('Regular stress testing recommended');
     recommendations.push('Update risk models with latest market data');
-    
+
     return [...new Set(recommendations)]; // Remove duplicates
   }
 
@@ -450,9 +457,9 @@ class RiskManagementService {
   _getZScore(confidenceLevel) {
     // Z-scores for common confidence levels
     const zScores = {
-      0.90: 1.282,
+      0.9: 1.282,
       0.95: 1.645,
-      0.99: 2.326
+      0.99: 2.326,
     };
     return zScores[confidenceLevel] || 1.645;
   }
@@ -476,7 +483,7 @@ class RiskManagementService {
     const baseDays = 1;
     const sizeFactor = Math.log(position.quantity / 1000) || 1;
     const liquidityFactor = 1 / liquidityScore;
-    
+
     return Math.max(baseDays * sizeFactor * liquidityFactor, 0.1);
   }
 
@@ -488,24 +495,24 @@ class RiskManagementService {
   _calculateCreditScore(counterpartyExposure) {
     // Simplified credit score calculation
     let score = 100;
-    
+
     Object.values(counterpartyExposure).forEach(data => {
       if (data.creditRating === 'BB' || data.creditRating === 'B') score -= 10;
       if (data.creditRating === 'CCC' || data.creditRating === 'CC') score -= 20;
       if (data.unsecured > 0) score -= 5;
     });
-    
+
     return Math.max(score, 0);
   }
 
   _calculateOperationalScore(riskFactors) {
     let score = 1.0;
-    
+
     score -= riskFactors.systemDowntime * 0.1;
     score -= (riskFactors.failedTrades / 100) * 0.2;
     score -= (riskFactors.settlementDelays / 50) * 0.1;
     score *= riskFactors.staffingLevels;
-    
+
     return Math.max(score, 0);
   }
 
@@ -513,7 +520,7 @@ class RiskManagementService {
     // Generate comprehensive risk report
     const reportId = uuidv4();
     const timestamp = new Date().toISOString();
-    
+
     // This would pull actual portfolio data
     const mockPortfolioData = {
       portfolioId,
@@ -521,11 +528,11 @@ class RiskManagementService {
       trades: [],
       counterparties: {},
       marketData: {},
-      systems: {}
+      systems: {},
     };
-    
+
     const riskAssessment = await this.assessPortfolioRisk(mockPortfolioData);
-    
+
     return {
       reportId,
       timestamp,
@@ -534,7 +541,7 @@ class RiskManagementService {
       riskAssessment,
       historicalTrends: [], // Would include historical risk metrics
       recommendations: riskAssessment.recommendations,
-      executiveSummary: this._generateExecutiveSummary(riskAssessment)
+      executiveSummary: this._generateExecutiveSummary(riskAssessment),
     };
   }
 
@@ -543,7 +550,7 @@ class RiskManagementService {
       overallRiskLevel: riskAssessment.riskLevel,
       keyRisks: riskAssessment.alerts.map(alert => alert.type),
       recommendedActions: riskAssessment.recommendations.slice(0, 3),
-      riskTrend: 'stable' // Would calculate from historical data
+      riskTrend: 'stable', // Would calculate from historical data
     };
   }
 }

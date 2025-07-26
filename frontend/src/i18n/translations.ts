@@ -13,7 +13,7 @@ export const translations = {
       filter: 'Filter',
       export: 'Export',
       import: 'Import',
-      refresh: 'Refresh'
+      refresh: 'Refresh',
     },
     navigation: {
       dashboard: 'Dashboard',
@@ -24,7 +24,7 @@ export const translations = {
       ocr: 'Document Processing',
       notifications: 'Notifications',
       settings: 'Settings',
-      logout: 'Logout'
+      logout: 'Logout',
     },
     trading: {
       title: 'Trading',
@@ -41,7 +41,7 @@ export const translations = {
       sell: 'Sell',
       market: 'Market',
       limit: 'Limit',
-      stop: 'Stop'
+      stop: 'Stop',
     },
     market: {
       title: 'Market Data',
@@ -54,8 +54,8 @@ export const translations = {
       timeframe: 'Timeframe',
       volatility: 'Volatility',
       trends: 'Trends',
-      correlations: 'Correlations'
-    }
+      correlations: 'Correlations',
+    },
   },
   es: {
     common: {
@@ -63,17 +63,17 @@ export const translations = {
       error: 'Error',
       success: 'Éxito',
       cancel: 'Cancelar',
-      save: 'Guardar'
+      save: 'Guardar',
     },
     navigation: {
       dashboard: 'Panel de Control',
       trading: 'Comercio',
-      market: 'Datos de Mercado'
+      market: 'Datos de Mercado',
     },
     trading: {
       title: 'Comercio',
       orders: 'Órdenes',
-      positions: 'Posiciones'
-    }
-  }
+      positions: 'Posiciones',
+    },
+  },
 };

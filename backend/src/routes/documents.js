@@ -9,8 +9,8 @@ router.get('/', (req, res) => {
       upload: 'POST /documents/upload',
       list: 'GET /documents',
       get: 'GET /documents/:id',
-      delete: 'DELETE /documents/:id'
-    }
+      delete: 'DELETE /documents/:id',
+    },
   });
 });
 
@@ -18,7 +18,7 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   res.json({
     message: 'Get document endpoint - implementation pending',
-    document_id: req.params.id
+    document_id: req.params.id,
   });
 });
 
@@ -26,7 +26,7 @@ router.get('/:id', (req, res) => {
 router.get('/', (req, res) => {
   res.json({
     message: 'List documents endpoint - implementation pending',
-    documents: []
+    documents: [],
   });
 });
 

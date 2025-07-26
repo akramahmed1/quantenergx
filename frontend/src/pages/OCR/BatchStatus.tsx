@@ -38,10 +38,14 @@ export const OCRBatchStatus: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'success';
-      case 'processing': return 'warning';
-      case 'failed': return 'error';
-      default: return 'default';
+      case 'completed':
+        return 'success';
+      case 'processing':
+        return 'warning';
+      case 'failed':
+        return 'error';
+      default:
+        return 'default';
     }
   };
 
@@ -50,16 +54,21 @@ export const OCRBatchStatus: React.FC = () => {
       <Typography variant="h4" component="h1" gutterBottom>
         Batch Processing Status
       </Typography>
-      
+
       <Paper sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom>
           Batch ID: {batchId}
         </Typography>
-        
+
         <Box sx={{ mb: 2 }}>
-          <LinearProgress variant="determinate" value={progress} sx={{ height: 10, borderRadius: 5 }} />
+          <LinearProgress
+            variant="determinate"
+            value={progress}
+            sx={{ height: 10, borderRadius: 5 }}
+          />
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            {batchData.completed} of {batchData.total_documents} documents processed ({progress.toFixed(0)}%)
+            {batchData.completed} of {batchData.total_documents} documents processed (
+            {progress.toFixed(0)}%)
           </Typography>
         </Box>
 
@@ -83,20 +92,18 @@ export const OCRBatchStatus: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {batchData.results.map((result) => (
+              {batchData.results.map(result => (
                 <TableRow key={result.document_id}>
                   <TableCell>{result.document_id}</TableCell>
                   <TableCell>{result.filename}</TableCell>
                   <TableCell>
-                    <Chip 
-                      label={result.status} 
+                    <Chip
+                      label={result.status}
                       color={getStatusColor(result.status) as any}
                       size="small"
                     />
                   </TableCell>
-                  <TableCell>
-                    {result.confidence > 0 ? `${result.confidence}%` : '-'}
-                  </TableCell>
+                  <TableCell>{result.confidence > 0 ? `${result.confidence}%` : '-'}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

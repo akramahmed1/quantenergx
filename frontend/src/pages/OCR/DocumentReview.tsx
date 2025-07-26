@@ -1,15 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import {
-  Box,
-  Typography,
-  Paper,
-  Grid,
-  TextField,
-  Button,
-  Divider,
-  Alert,
-} from '@mui/material';
+import { Box, Typography, Paper, Grid, TextField, Button, Divider, Alert } from '@mui/material';
 
 export const OCRDocumentReview: React.FC = () => {
   const { documentId } = useParams<{ documentId: string }>();
@@ -19,10 +10,10 @@ export const OCRDocumentReview: React.FC = () => {
       <Typography variant="h4" component="h1" gutterBottom>
         Document Review
       </Typography>
-      
+
       <Alert severity="info" sx={{ mb: 3 }}>
-        Document ID: {documentId} - This is a placeholder for the document review interface.
-        Full implementation would include extracted text display, field editing, and approval workflow.
+        Document ID: {documentId} - This is a placeholder for the document review interface. Full
+        implementation would include extracted text display, field editing, and approval workflow.
       </Alert>
 
       <Grid container spacing={3}>
@@ -61,9 +52,9 @@ export const OCRDocumentReview: React.FC = () => {
                 <TextField fullWidth label="Counterparty" />
               </Grid>
             </Grid>
-            
+
             <Divider sx={{ my: 2 }} />
-            
+
             <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
               <Button variant="contained" color="success">
                 Approve

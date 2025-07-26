@@ -19,18 +19,19 @@ router.get('/', (req, res) => {
         trading: 'GET /analytics/reports/trading',
         positions: 'GET /analytics/reports/positions',
         risk: 'GET /analytics/reports/risk',
-        compliance: 'GET /analytics/reports/compliance'
-      }
-    }
+        compliance: 'GET /analytics/reports/compliance',
+      },
+    },
   });
 });
 
 // Get comprehensive dashboard analytics
-router.get('/dashboard',
+router.get(
+  '/dashboard',
   authenticateToken,
   [
     query('period').optional().isIn(['1D', '7D', '30D', '90D', '1Y']).withMessage('Invalid period'),
-    query('portfolioId').optional().isString().withMessage('Portfolio ID must be string')
+    query('portfolioId').optional().isString().withMessage('Portfolio ID must be string'),
   ],
   async (req, res) => {
     try {
@@ -38,7 +39,7 @@ router.get('/dashboard',
       if (!errors.isEmpty()) {
         return res.status(400).json({
           success: false,
-          errors: errors.array()
+          errors: errors.array(),
         });
       }
 
@@ -52,25 +53,25 @@ router.get('/dashboard',
         success: true,
         dashboard,
         period,
-        generatedAt: new Date().toISOString()
+        generatedAt: new Date().toISOString(),
       });
-
     } catch (error) {
       console.error('Dashboard analytics error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
 );
 
 // Get trading analytics
-router.get('/trading',
+router.get(
+  '/trading',
   authenticateToken,
   [
     query('period').optional().isIn(['1D', '7D', '30D', '90D', '1Y']).withMessage('Invalid period'),
-    query('commodity').optional().isString().withMessage('Commodity must be string')
+    query('commodity').optional().isString().withMessage('Commodity must be string'),
   ],
   async (req, res) => {
     try {
@@ -78,7 +79,7 @@ router.get('/trading',
       if (!errors.isEmpty()) {
         return res.status(400).json({
           success: false,
-          errors: errors.array()
+          errors: errors.array(),
         });
       }
 
@@ -91,25 +92,31 @@ router.get('/trading',
         success: true,
         analytics,
         period,
-        commodity: commodity || 'all'
+        commodity: commodity || 'all',
       });
-
     } catch (error) {
       console.error('Trading analytics error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
 );
 
 // Get position analytics
-router.get('/positions',
+router.get(
+  '/positions',
   authenticateToken,
   [
-    query('groupBy').optional().isIn(['commodity', 'date', 'region']).withMessage('Invalid groupBy'),
-    query('includeHistorical').optional().isBoolean().withMessage('includeHistorical must be boolean')
+    query('groupBy')
+      .optional()
+      .isIn(['commodity', 'date', 'region'])
+      .withMessage('Invalid groupBy'),
+    query('includeHistorical')
+      .optional()
+      .isBoolean()
+      .withMessage('includeHistorical must be boolean'),
   ],
   async (req, res) => {
     try {
@@ -117,7 +124,7 @@ router.get('/positions',
       if (!errors.isEmpty()) {
         return res.status(400).json({
           success: false,
-          errors: errors.array()
+          errors: errors.array(),
         });
       }
 
@@ -130,26 +137,31 @@ router.get('/positions',
         success: true,
         analytics,
         groupBy,
-        includeHistorical
+        includeHistorical,
       });
-
     } catch (error) {
       console.error('Position analytics error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
 );
 
 // Get risk analytics
-router.get('/risk',
+router.get(
+  '/risk',
   authenticateToken,
   [
-    query('riskType').optional().isIn(['var', 'exposure', 'concentration', 'correlation'])
+    query('riskType')
+      .optional()
+      .isIn(['var', 'exposure', 'concentration', 'correlation'])
       .withMessage('Invalid risk type'),
-    query('confidence').optional().isFloat({ min: 0.8, max: 0.99 }).withMessage('Confidence must be between 0.8 and 0.99')
+    query('confidence')
+      .optional()
+      .isFloat({ min: 0.8, max: 0.99 })
+      .withMessage('Confidence must be between 0.8 and 0.99'),
   ],
   async (req, res) => {
     try {
@@ -157,7 +169,7 @@ router.get('/risk',
       if (!errors.isEmpty()) {
         return res.status(400).json({
           success: false,
-          errors: errors.array()
+          errors: errors.array(),
         });
       }
 
@@ -170,25 +182,25 @@ router.get('/risk',
         success: true,
         analytics,
         riskType,
-        confidence: parseFloat(confidence)
+        confidence: parseFloat(confidence),
       });
-
     } catch (error) {
       console.error('Risk analytics error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
 );
 
 // Get compliance analytics
-router.get('/compliance',
+router.get(
+  '/compliance',
   authenticateToken,
   [
     query('region').optional().isIn(['US', 'EU', 'UK', 'ME']).withMessage('Invalid region'),
-    query('regulation').optional().isString().withMessage('Regulation must be string')
+    query('regulation').optional().isString().withMessage('Regulation must be string'),
   ],
   async (req, res) => {
     try {
@@ -196,7 +208,7 @@ router.get('/compliance',
       if (!errors.isEmpty()) {
         return res.status(400).json({
           success: false,
-          errors: errors.array()
+          errors: errors.array(),
         });
       }
 
@@ -209,24 +221,27 @@ router.get('/compliance',
         success: true,
         analytics,
         region: region || 'all',
-        regulation: regulation || 'all'
+        regulation: regulation || 'all',
       });
-
     } catch (error) {
       console.error('Compliance analytics error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
 );
 
 // Get market analytics
-router.get('/market',
+router.get(
+  '/market',
   [
-    query('commodities').optional().isString().withMessage('Commodities must be comma-separated string'),
-    query('timeframe').optional().isIn(['1H', '1D', '1W', '1M']).withMessage('Invalid timeframe')
+    query('commodities')
+      .optional()
+      .isString()
+      .withMessage('Commodities must be comma-separated string'),
+    query('timeframe').optional().isIn(['1H', '1D', '1W', '1M']).withMessage('Invalid timeframe'),
   ],
   async (req, res) => {
     try {
@@ -234,7 +249,7 @@ router.get('/market',
       if (!errors.isEmpty()) {
         return res.status(400).json({
           success: false,
-          errors: errors.array()
+          errors: errors.array(),
         });
       }
 
@@ -247,26 +262,26 @@ router.get('/market',
         success: true,
         analytics,
         commodities: commodityList,
-        timeframe
+        timeframe,
       });
-
     } catch (error) {
       console.error('Market analytics error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
 );
 
 // Generate trading report
-router.get('/reports/trading',
+router.get(
+  '/reports/trading',
   authenticateToken,
   [
     query('format').optional().isIn(['json', 'csv', 'pdf']).withMessage('Invalid format'),
     query('startDate').optional().isISO8601().withMessage('Invalid start date'),
-    query('endDate').optional().isISO8601().withMessage('Invalid end date')
+    query('endDate').optional().isISO8601().withMessage('Invalid end date'),
   ],
   async (req, res) => {
     try {
@@ -274,7 +289,7 @@ router.get('/reports/trading',
       if (!errors.isEmpty()) {
         return res.status(400).json({
           success: false,
-          errors: errors.array()
+          errors: errors.array(),
         });
       }
 
@@ -283,7 +298,7 @@ router.get('/reports/trading',
 
       const dateRange = {
         start: startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-        end: endDate || new Date().toISOString()
+        end: endDate || new Date().toISOString(),
       };
 
       const report = await generateTradingReport(userId, dateRange, format);
@@ -293,31 +308,34 @@ router.get('/reports/trading',
           success: true,
           report,
           dateRange,
-          format
+          format,
         });
       } else {
         // For CSV/PDF, set appropriate headers and send file
-        res.setHeader('Content-Disposition', `attachment; filename=trading-report-${Date.now()}.${format}`);
+        res.setHeader(
+          'Content-Disposition',
+          `attachment; filename=trading-report-${Date.now()}.${format}`
+        );
         res.setHeader('Content-Type', getMimeType(format));
         res.send(report);
       }
-
     } catch (error) {
       console.error('Trading report error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
 );
 
 // Generate positions report
-router.get('/reports/positions',
+router.get(
+  '/reports/positions',
   authenticateToken,
   [
     query('format').optional().isIn(['json', 'csv', 'pdf']).withMessage('Invalid format'),
-    query('asOfDate').optional().isISO8601().withMessage('Invalid as of date')
+    query('asOfDate').optional().isISO8601().withMessage('Invalid as of date'),
   ],
   async (req, res) => {
     try {
@@ -325,7 +343,7 @@ router.get('/reports/positions',
       if (!errors.isEmpty()) {
         return res.status(400).json({
           success: false,
-          errors: errors.array()
+          errors: errors.array(),
         });
       }
 
@@ -340,19 +358,21 @@ router.get('/reports/positions',
           success: true,
           report,
           asOfDate: reportDate,
-          format
+          format,
         });
       } else {
-        res.setHeader('Content-Disposition', `attachment; filename=positions-report-${Date.now()}.${format}`);
+        res.setHeader(
+          'Content-Disposition',
+          `attachment; filename=positions-report-${Date.now()}.${format}`
+        );
         res.setHeader('Content-Type', getMimeType(format));
         res.send(report);
       }
-
     } catch (error) {
       console.error('Positions report error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -368,23 +388,23 @@ async function generateDashboardAnalytics(userId, portfolioId, period) {
       totalPnLPercent: 5.26,
       activePositions: 8,
       todaysTrades: 12,
-      riskUtilization: 0.65
+      riskUtilization: 0.65,
     },
     performance: {
       dailyPnL: generateMockTimeSeries('daily_pnl', period),
       cumulativePnL: generateMockTimeSeries('cumulative_pnl', period),
-      returns: generateMockTimeSeries('returns', period)
+      returns: generateMockTimeSeries('returns', period),
     },
     positions: {
       byCommodity: [
         { commodity: 'crude_oil', value: 1200000, pnl: 85000, weight: 0.48 },
         { commodity: 'natural_gas', value: 800000, pnl: 25000, weight: 0.32 },
-        { commodity: 'renewable_certificates', value: 500000, pnl: 15000, weight: 0.20 }
+        { commodity: 'renewable_certificates', value: 500000, pnl: 15000, weight: 0.2 },
       ],
       topPositions: [
         { symbol: 'CL_NOV23', commodity: 'crude_oil', quantity: 1000, value: 850000, pnl: 42000 },
-        { symbol: 'NG_DEC23', commodity: 'natural_gas', quantity: 5000, value: 400000, pnl: 15000 }
-      ]
+        { symbol: 'NG_DEC23', commodity: 'natural_gas', quantity: 5000, value: 400000, pnl: 15000 },
+      ],
     },
     risk: {
       var95: 125000,
@@ -394,28 +414,28 @@ async function generateDashboardAnalytics(userId, portfolioId, period) {
       riskLimits: {
         utilizationPercent: 65,
         breachCount: 0,
-        lastBreach: null
-      }
+        lastBreach: null,
+      },
     },
     trading: {
       volume: {
         today: 15000000,
         month: 450000000,
-        avgDaily: 18500000
+        avgDaily: 18500000,
       },
       activity: {
         ordersPlaced: 45,
         tradesExecuted: 38,
         avgTradeSize: 125000,
-        successRate: 0.84
-      }
+        successRate: 0.84,
+      },
     },
     compliance: {
       status: 'compliant',
       alerts: 0,
       lastCheck: new Date().toISOString(),
-      reguiredActions: []
-    }
+      reguiredActions: [],
+    },
   };
 }
 
@@ -428,29 +448,29 @@ async function generateTradingAnalytics(userId, period, commodity) {
       successfulTrades: 128,
       successRate: 0.82,
       totalPnL: 2350000,
-      avgPnL: 15064
+      avgPnL: 15064,
     },
     performance: {
       pnlByTrade: generateMockTimeSeries('trade_pnl', period),
       volumeByDay: generateMockTimeSeries('volume', period),
-      tradeCount: generateMockTimeSeries('trade_count', period)
+      tradeCount: generateMockTimeSeries('trade_count', period),
     },
     breakdown: {
-      byCommodity: commodity ? [
-        { commodity, trades: 156, volume: 4500000000, pnl: 2350000 }
-      ] : [
-        { commodity: 'crude_oil', trades: 85, volume: 2500000000, pnl: 1200000 },
-        { commodity: 'natural_gas', trades: 45, volume: 1500000000, pnl: 850000 },
-        { commodity: 'renewable_certificates', trades: 26, volume: 500000000, pnl: 300000 }
-      ],
+      byCommodity: commodity
+        ? [{ commodity, trades: 156, volume: 4500000000, pnl: 2350000 }]
+        : [
+            { commodity: 'crude_oil', trades: 85, volume: 2500000000, pnl: 1200000 },
+            { commodity: 'natural_gas', trades: 45, volume: 1500000000, pnl: 850000 },
+            { commodity: 'renewable_certificates', trades: 26, volume: 500000000, pnl: 300000 },
+          ],
       byDirection: [
         { direction: 'buy', trades: 78, volume: 2250000000, pnl: 1100000 },
-        { direction: 'sell', trades: 78, volume: 2250000000, pnl: 1250000 }
+        { direction: 'sell', trades: 78, volume: 2250000000, pnl: 1250000 },
       ],
       byOrderType: [
         { type: 'market', trades: 89, volume: 2800000000, avgSlippage: 0.02 },
-        { type: 'limit', trades: 67, volume: 1700000000, fillRate: 0.85 }
-      ]
+        { type: 'limit', trades: 67, volume: 1700000000, fillRate: 0.85 },
+      ],
     },
     metrics: {
       winRate: 0.71,
@@ -458,8 +478,8 @@ async function generateTradingAnalytics(userId, period, commodity) {
       avgLoss: -18000,
       largestWin: 250000,
       largestLoss: -95000,
-      profitFactor: 2.5
-    }
+      profitFactor: 2.5,
+    },
   };
 }
 
@@ -468,21 +488,21 @@ async function generatePositionAnalytics(userId, groupBy, includeHistorical) {
     {
       commodity: 'crude_oil',
       quantity: 15000,
-      avgPrice: 78.50,
+      avgPrice: 78.5,
       currentPrice: 80.25,
       marketValue: 1203750,
       unrealizedPnL: 26250,
-      weight: 0.48
+      weight: 0.48,
     },
     {
       commodity: 'natural_gas',
       quantity: 25000,
-      avgPrice: 3.20,
+      avgPrice: 3.2,
       currentPrice: 3.35,
       marketValue: 83750,
       unrealizedPnL: 3750,
-      weight: 0.32
-    }
+      weight: 0.32,
+    },
   ];
 
   const analytics = {
@@ -492,25 +512,25 @@ async function generatePositionAnalytics(userId, groupBy, includeHistorical) {
         totalValue: basePositions.reduce((sum, pos) => sum + pos.marketValue, 0),
         totalPnL: basePositions.reduce((sum, pos) => sum + pos.unrealizedPnL, 0),
         longPositions: basePositions.filter(pos => pos.quantity > 0).length,
-        shortPositions: basePositions.filter(pos => pos.quantity < 0).length
-      }
+        shortPositions: basePositions.filter(pos => pos.quantity < 0).length,
+      },
     },
     concentration: {
       herfindahlIndex: 0.31,
       topCommodityWeight: 0.48,
-      diversificationRatio: 0.75
+      diversificationRatio: 0.75,
     },
     exposure: {
       grossExposure: 1287500,
       netExposure: 1287500,
-      leverage: 1.15
-    }
+      leverage: 1.15,
+    },
   };
 
   if (includeHistorical) {
     analytics.historical = {
       positionHistory: generateMockTimeSeries('position_value', '30D'),
-      pnlHistory: generateMockTimeSeries('position_pnl', '30D')
+      pnlHistory: generateMockTimeSeries('position_pnl', '30D'),
     };
   }
 
@@ -526,8 +546,8 @@ async function generateRiskAnalytics(userId, riskType, _confidence) {
       backtest: {
         exceptions: 5,
         expectedExceptions: 13,
-        pValue: 0.12
-      }
+        pValue: 0.12,
+      },
     },
     exposure: {
       grossExposure: 2500000,
@@ -536,25 +556,25 @@ async function generateRiskAnalytics(userId, riskType, _confidence) {
       concentration: {
         commodity: 0.48,
         geography: 0.65,
-        counterparty: 0.25
-      }
+        counterparty: 0.25,
+      },
     },
     stress: {
       scenarios: [
         { name: 'Oil Price Crash -30%', impact: -450000 },
         { name: 'Gas Supply Shock +50%', impact: +125000 },
-        { name: 'Credit Spread Widening', impact: -85000 }
+        { name: 'Credit Spread Widening', impact: -85000 },
       ],
-      worstCase: -450000
+      worstCase: -450000,
     },
     correlation: {
       portfolioCorrelation: 0.65,
       commodityCorrelations: [
         { pair: 'crude_oil-natural_gas', correlation: 0.45 },
         { pair: 'crude_oil-gasoline', correlation: 0.85 },
-        { pair: 'natural_gas-heating_oil', correlation: 0.32 }
-      ]
-    }
+        { pair: 'natural_gas-heating_oil', correlation: 0.32 },
+      ],
+    },
   };
 
   return riskType === 'all' ? baseRisk : { [riskType]: baseRisk[riskType] };
@@ -567,32 +587,32 @@ async function generateComplianceAnalytics(_userId, _region, _regulation) {
       violations: 0,
       warnings: 2,
       lastAudit: '2024-01-15',
-      nextAudit: '2024-04-15'
+      nextAudit: '2024-04-15',
     },
     regulations: {
       US: {
         CFTC: { status: 'compliant', lastCheck: '2024-01-20' },
         FERC: { status: 'compliant', lastCheck: '2024-01-18' },
-        EPA: { status: 'compliant', lastCheck: '2024-01-22' }
+        EPA: { status: 'compliant', lastCheck: '2024-01-22' },
       },
       EU: {
         REMIT: { status: 'compliant', lastCheck: '2024-01-19' },
         MiFID_II: { status: 'compliant', lastCheck: '2024-01-21' },
-        ETS: { status: 'warning', lastCheck: '2024-01-20', issues: ['Reporting delay'] }
-      }
+        ETS: { status: 'warning', lastCheck: '2024-01-20', issues: ['Reporting delay'] },
+      },
     },
     reporting: {
       required: 12,
       completed: 11,
       pending: 1,
-      overdue: 0
+      overdue: 0,
     },
     kycAml: {
       clientsReviewed: 45,
       clientsPending: 3,
       amlAlerts: 0,
-      sanctionsChecks: 48
-    }
+      sanctionsChecks: 48,
+    },
   };
 }
 
@@ -602,7 +622,7 @@ async function generateMarketAnalytics(commodities, _timeframe) {
       totalCommodities: commodities.length,
       activeMarkets: commodities.length,
       avgVolatility: 0.25,
-      marketSentiment: 'neutral'
+      marketSentiment: 'neutral',
     },
     commodities: commodities.map(commodity => ({
       commodity,
@@ -610,8 +630,8 @@ async function generateMarketAnalytics(commodities, _timeframe) {
       change: (Math.random() - 0.5) * 10,
       changePercent: (Math.random() - 0.5) * 0.05,
       volume: Math.random() * 10000000,
-      volatility: 0.15 + Math.random() * 0.20,
-      marketCap: Math.random() * 1000000000
+      volatility: 0.15 + Math.random() * 0.2,
+      marketCap: Math.random() * 1000000000,
     })),
     correlations: generateCorrelationMatrix(commodities),
     technicalIndicators: commodities.reduce((acc, commodity) => {
@@ -621,8 +641,8 @@ async function generateMarketAnalytics(commodities, _timeframe) {
         bollinger: {
           upper: getBasePrice(commodity) * 1.02,
           middle: getBasePrice(commodity),
-          lower: getBasePrice(commodity) * 0.98
-        }
+          lower: getBasePrice(commodity) * 0.98,
+        },
       };
       return acc;
     }, {}),
@@ -631,9 +651,9 @@ async function generateMarketAnalytics(commodities, _timeframe) {
       seasonalTrends: commodities.map(commodity => ({
         commodity,
         seasonal_bias: Math.random() > 0.5 ? 'bullish' : 'bearish',
-        strength: Math.random()
-      }))
-    }
+        strength: Math.random(),
+      })),
+    },
   };
 }
 
@@ -643,14 +663,14 @@ async function generateTradingReport(userId, dateRange, format) {
       generatedAt: new Date().toISOString(),
       period: dateRange,
       userId,
-      format
+      format,
     },
     executiveSummary: {
       totalTrades: 156,
       totalVolume: 4500000000,
       totalPnL: 2350000,
       successRate: 0.82,
-      avgTradeSize: 28846153
+      avgTradeSize: 28846153,
     },
     tradeDetails: Array.from({ length: 50 }, (_, i) => ({
       tradeId: `T${String(i + 1).padStart(6, '0')}`,
@@ -660,15 +680,15 @@ async function generateTradingReport(userId, dateRange, format) {
       quantity: Math.floor(Math.random() * 10000) + 1000,
       price: 50 + Math.random() * 100,
       value: 0,
-      pnl: (Math.random() - 0.4) * 50000
+      pnl: (Math.random() - 0.4) * 50000,
     })).map(trade => ({
       ...trade,
-      value: trade.quantity * trade.price
+      value: trade.quantity * trade.price,
     })),
     performance: {
       daily: generateMockTimeSeries('daily_pnl', '30D'),
-      monthly: generateMockTimeSeries('monthly_pnl', '12M')
-    }
+      monthly: generateMockTimeSeries('monthly_pnl', '12M'),
+    },
   };
 
   if (format === 'csv') {
@@ -686,22 +706,22 @@ async function generatePositionsReport(userId, asOfDate, format) {
       positionId: 'P000001',
       commodity: 'crude_oil',
       quantity: 15000,
-      avgPrice: 78.50,
+      avgPrice: 78.5,
       currentPrice: 80.25,
       marketValue: 1203750,
       unrealizedPnL: 26250,
-      lastUpdate: asOfDate
+      lastUpdate: asOfDate,
     },
     {
       positionId: 'P000002',
       commodity: 'natural_gas',
       quantity: 25000,
-      avgPrice: 3.20,
+      avgPrice: 3.2,
       currentPrice: 3.35,
       marketValue: 83750,
       unrealizedPnL: 3750,
-      lastUpdate: asOfDate
-    }
+      lastUpdate: asOfDate,
+    },
   ];
 
   const reportData = {
@@ -709,14 +729,14 @@ async function generatePositionsReport(userId, asOfDate, format) {
       generatedAt: new Date().toISOString(),
       asOfDate,
       userId,
-      format
+      format,
     },
     summary: {
       totalPositions: positions.length,
       totalValue: positions.reduce((sum, pos) => sum + pos.marketValue, 0),
-      totalPnL: positions.reduce((sum, pos) => sum + pos.unrealizedPnL, 0)
+      totalPnL: positions.reduce((sum, pos) => sum + pos.unrealizedPnL, 0),
     },
-    positions
+    positions,
   };
 
   if (format === 'csv') {
@@ -730,50 +750,52 @@ async function generatePositionsReport(userId, asOfDate, format) {
 
 // Utility functions
 function generateMockTimeSeries(type, period) {
-  const days = period === '1D' ? 1 : period === '7D' ? 7 : period === '30D' ? 30 : period === '90D' ? 90 : 365;
+  const days =
+    period === '1D' ? 1 : period === '7D' ? 7 : period === '30D' ? 30 : period === '90D' ? 90 : 365;
   const data = [];
-  
+
   for (let i = days; i >= 0; i--) {
     const date = new Date();
     date.setDate(date.getDate() - i);
-    
+
     let value;
     switch (type) {
-    case 'daily_pnl':
-      value = (Math.random() - 0.45) * 50000;
-      break;
-    case 'cumulative_pnl':
-      value = i === days ? 0 : (data[data.length - 1]?.value || 0) + (Math.random() - 0.45) * 50000;
-      break;
-    case 'returns':
-      value = (Math.random() - 0.5) * 0.05;
-      break;
-    case 'volume':
-      value = Math.random() * 10000000 + 5000000;
-      break;
-    default:
-      value = Math.random() * 100;
+      case 'daily_pnl':
+        value = (Math.random() - 0.45) * 50000;
+        break;
+      case 'cumulative_pnl':
+        value =
+          i === days ? 0 : (data[data.length - 1]?.value || 0) + (Math.random() - 0.45) * 50000;
+        break;
+      case 'returns':
+        value = (Math.random() - 0.5) * 0.05;
+        break;
+      case 'volume':
+        value = Math.random() * 10000000 + 5000000;
+        break;
+      default:
+        value = Math.random() * 100;
     }
-    
+
     data.push({
       date: date.toISOString().split('T')[0],
-      value: Math.round(value * 100) / 100
+      value: Math.round(value * 100) / 100,
     });
   }
-  
+
   return data;
 }
 
 function getBasePrice(commodity) {
   const basePrices = {
-    crude_oil: 80.50,
-    natural_gas: 3.20,
+    crude_oil: 80.5,
+    natural_gas: 3.2,
     heating_oil: 2.45,
-    gasoline: 2.30,
-    renewable_certificates: 45.00,
-    carbon_credits: 85.00
+    gasoline: 2.3,
+    renewable_certificates: 45.0,
+    carbon_credits: 85.0,
   };
-  return basePrices[commodity] || 50.00;
+  return basePrices[commodity] || 50.0;
 }
 
 function generateCorrelationMatrix(commodities) {
@@ -795,17 +817,17 @@ function getMimeType(format) {
   const mimeTypes = {
     csv: 'text/csv',
     pdf: 'application/pdf',
-    json: 'application/json'
+    json: 'application/json',
   };
   return mimeTypes[format] || 'application/octet-stream';
 }
 
 function convertToCSV(data) {
   if (!data || data.length === 0) return '';
-  
+
   const headers = Object.keys(data[0]);
   const csvRows = [headers.join(',')];
-  
+
   for (const row of data) {
     const values = headers.map(header => {
       const value = row[header];
@@ -813,7 +835,7 @@ function convertToCSV(data) {
     });
     csvRows.push(values.join(','));
   }
-  
+
   return csvRows.join('\n');
 }
 

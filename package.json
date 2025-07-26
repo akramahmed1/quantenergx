@@ -1,0 +1,72 @@
+{
+  "name": "quantenergx",
+  "version": "1.0.0",
+  "description": "QuantEnergx energy trading platform",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend",
+    "e2e"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend && npm install --prefix e2e",
+    "build": "npm run build --prefix frontend && npm run build --prefix backend",
+    "start": "concurrently \"npm run start --prefix backend\" \"npm run start --prefix frontend\"",
+    "test": "npm run test --prefix backend && npm run test --prefix frontend",
+    "test:coverage": "npm run test:coverage --prefix backend && npm run test:coverage --prefix frontend",
+    "lint": "npm run lint --prefix backend && npm run lint --prefix frontend",
+    "lint:fix": "npm run lint:fix --prefix backend && npm run lint:fix --prefix frontend",
+    "format": "npm run format --prefix backend && npm run format --prefix frontend",
+    "format:check": "npm run format:check --prefix backend && npm run format:check --prefix frontend",
+    "e2e": "npm run test:e2e --prefix e2e",
+    "e2e:cypress": "npm run cy:run --prefix e2e",
+    "e2e:playwright": "npm run pw:test --prefix e2e",
+    "security:audit": "npm audit && npm audit --prefix backend && npm audit --prefix frontend",
+    "security:fix": "npm audit fix && npm audit fix --prefix backend && npm audit fix --prefix frontend",
+    "quality:check": "npm run lint && npm run format:check && npm run test:coverage",
+    "prepare": "husky install",
+    "precommit": "lint-staged",
+    "postinstall": "npm run prepare"
+  },
+  "keywords": [
+    "energy-trading",
+    "commodities",
+    "oil",
+    "gas", 
+    "renewable-energy",
+    "trading-platform"
+  ],
+  "author": "QuantEnergx Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/akramahmed1/quantenergx.git"
+  },
+  "bugs": {
+    "url": "https://github.com/akramahmed1/quantenergx/issues"
+  },
+  "homepage": "https://github.com/akramahmed1/quantenergx#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.0"
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ],
+    "*.py": [
+      "black",
+      "isort",
+      "flake8"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

@@ -58,7 +58,7 @@ class PasswordUtils {
 
     try {
       const [algorithm, actualHash] = hash.split(':', 2);
-      
+
       if (algorithm === 'argon2') {
         return await argon2.verify(actualHash, password);
       } else if (algorithm === 'bcrypt') {
@@ -80,14 +80,14 @@ class PasswordUtils {
    */
   needsRehash(hash) {
     if (!hash) return true;
-    
+
     const [algorithm] = hash.split(':', 2);
-    
+
     // If no algorithm prefix, needs upgrade
     if (!algorithm || algorithm === hash) {
       return true;
     }
-    
+
     // If current algorithm is different from stored, needs upgrade
     return algorithm !== this.algorithm;
   }
@@ -100,12 +100,12 @@ class PasswordUtils {
   generateSecurePassword(length = 16) {
     const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
     let password = '';
-    
+
     for (let i = 0; i < length; i++) {
       const randomIndex = crypto.randomInt(0, charset.length);
       password += charset[randomIndex];
     }
-    
+
     return password;
   }
 
@@ -119,7 +119,7 @@ class PasswordUtils {
       valid: false,
       score: 0,
       issues: [],
-      suggestions: []
+      suggestions: [],
     };
 
     if (!password) {
@@ -157,7 +157,7 @@ class PasswordUtils {
       result.issues.push('Password must contain at least one number');
     }
 
-    if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    if (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
       result.score += 1;
     } else {
       result.suggestions.push('Include special characters for stronger security');

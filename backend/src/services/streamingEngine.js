@@ -1,5 +1,5 @@
 const EventEmitter = require('events');
-const WebSocket = require('ws');
+// const WebSocket = require('ws'); // Currently unused but kept for future implementations
 
 /**
  * Millisecond-level streaming and trading engine
@@ -21,10 +21,10 @@ class StreamingEngine extends EventEmitter {
         min: Infinity,
         max: 0,
         avg: 0,
-        samples: []
-      }
+        samples: [],
+      },
     };
-    
+
     this.isRunning = false;
   }
 
@@ -33,16 +33,16 @@ class StreamingEngine extends EventEmitter {
    */
   start() {
     if (this.isRunning) return;
-    
+
     this.isRunning = true;
-    
+
     // Process tick data every millisecond
     this.processingInterval = setInterval(() => {
       this.processTicks();
       this.processOrders();
       this.updateMetrics();
     }, 1);
-    
+
     this.emit('started');
   }
 
@@ -51,14 +51,14 @@ class StreamingEngine extends EventEmitter {
    */
   stop() {
     if (!this.isRunning) return;
-    
+
     this.isRunning = false;
-    
+
     if (this.processingInterval) {
       clearInterval(this.processingInterval);
       this.processingInterval = null;
     }
-    
+
     this.emit('stopped');
   }
 
@@ -70,13 +70,13 @@ class StreamingEngine extends EventEmitter {
       ws: websocket,
       subscriptions: new Set(),
       connected: true,
-      lastPing: Date.now()
+      lastPing: Date.now(),
     });
-    
+
     websocket.on('close', () => {
       this.unregisterClient(clientId);
     });
-    
+
     websocket.on('pong', () => {
       const client = this.clients.get(clientId);
       if (client) {
@@ -98,10 +98,10 @@ class StreamingEngine extends EventEmitter {
   subscribe(clientId, symbol, feedType = 'level1') {
     const client = this.clients.get(clientId);
     if (!client) return false;
-    
+
     const subscription = `${symbol}:${feedType}`;
     client.subscriptions.add(subscription);
-    
+
     return true;
   }
 
@@ -112,11 +112,11 @@ class StreamingEngine extends EventEmitter {
     const tick = {
       ...tickData,
       timestamp: Date.now(),
-      sequence: this.tickQueue.length
+      sequence: this.tickQueue.length,
     };
-    
+
     this.tickQueue.push(tick);
-    
+
     // Limit queue size to prevent memory issues
     if (this.tickQueue.length > 10000) {
       this.tickQueue.shift();
@@ -131,12 +131,12 @@ class StreamingEngine extends EventEmitter {
       ...orderData,
       id: this.generateOrderId(),
       timestamp: Date.now(),
-      status: 'pending'
+      status: 'pending',
     };
-    
+
     this.orderQueue.push(order);
     this.emit('orderSubmitted', order);
-    
+
     return order.id;
   }
 
@@ -144,9 +144,9 @@ class StreamingEngine extends EventEmitter {
    * Process tick data
    */
   processTicks() {
-    const currentTime = Date.now();
+    // const currentTime = Date.now(); // Currently unused but kept for future timing analysis
     const ticksToProcess = this.tickQueue.splice(0, 100); // Process up to 100 ticks per cycle
-    
+
     ticksToProcess.forEach(tick => {
       this.processTickData(tick);
       this.broadcastTick(tick);
@@ -166,17 +166,17 @@ class StreamingEngine extends EventEmitter {
         bid: 0,
         ask: 0,
         volume: 0,
-        lastUpdate: 0
+        lastUpdate: 0,
       });
     }
-    
+
     const feed = this.marketDataFeeds.get(symbol);
     feed.lastPrice = tick.price || feed.lastPrice;
     feed.bid = tick.bid || feed.bid;
     feed.ask = tick.ask || feed.ask;
     feed.volume += tick.volume || 0;
     feed.lastUpdate = tick.timestamp;
-    
+
     // Emit tick event for analytics
     this.emit('tick', tick);
   }
@@ -186,14 +186,16 @@ class StreamingEngine extends EventEmitter {
    */
   broadcastTick(tick) {
     const subscription = `${tick.symbol}:level1`;
-    
+
     this.clients.forEach((client, clientId) => {
       if (client.subscriptions.has(subscription) && client.connected) {
         try {
-          client.ws.send(JSON.stringify({
-            type: 'tick',
-            data: tick
-          }));
+          client.ws.send(
+            JSON.stringify({
+              type: 'tick',
+              data: tick,
+            })
+          );
         } catch (error) {
           console.error(`Failed to send tick to client ${clientId}:`, error);
           client.connected = false;
@@ -207,7 +209,7 @@ class StreamingEngine extends EventEmitter {
    */
   processOrders() {
     const ordersToProcess = this.orderQueue.splice(0, 50); // Process up to 50 orders per cycle
-    
+
     ordersToProcess.forEach(order => {
       this.executeOrder(order);
     });
@@ -218,7 +220,7 @@ class StreamingEngine extends EventEmitter {
    */
   executeOrder(order) {
     const startTime = Date.now();
-    
+
     // Simulate order execution logic
     const marketData = this.marketDataFeeds.get(order.symbol);
     if (!marketData) {
@@ -229,13 +231,13 @@ class StreamingEngine extends EventEmitter {
       order.status = 'executed';
       order.executionPrice = order.side === 'buy' ? marketData.ask : marketData.bid;
       order.executionTime = Date.now();
-      
+
       this.metrics.ordersExecuted++;
     }
-    
+
     const executionLatency = Date.now() - startTime;
     this.updateLatencyStats(executionLatency);
-    
+
     // Broadcast order update
     this.broadcastOrderUpdate(order);
     this.emit('orderExecuted', order);
@@ -248,10 +250,12 @@ class StreamingEngine extends EventEmitter {
     this.clients.forEach((client, clientId) => {
       if (client.connected) {
         try {
-          client.ws.send(JSON.stringify({
-            type: 'orderUpdate',
-            data: order
-          }));
+          client.ws.send(
+            JSON.stringify({
+              type: 'orderUpdate',
+              data: order,
+            })
+          );
         } catch (error) {
           console.error(`Failed to send order update to client ${clientId}:`, error);
           client.connected = false;
@@ -268,12 +272,12 @@ class StreamingEngine extends EventEmitter {
     stats.min = Math.min(stats.min, latency);
     stats.max = Math.max(stats.max, latency);
     stats.samples.push(latency);
-    
+
     // Keep only last 1000 samples
     if (stats.samples.length > 1000) {
       stats.samples.shift();
     }
-    
+
     // Calculate average
     stats.avg = stats.samples.reduce((sum, val) => sum + val, 0) / stats.samples.length;
   }
@@ -284,18 +288,19 @@ class StreamingEngine extends EventEmitter {
   updateMetrics() {
     const currentTime = Date.now();
     const elapsed = currentTime - this.lastProcessedTime;
-    
-    if (elapsed >= 1000) { // Update every second
+
+    if (elapsed >= 1000) {
+      // Update every second
       this.emit('metrics', {
         ...this.metrics,
         queueSizes: {
           ticks: this.tickQueue.length,
-          orders: this.orderQueue.length
+          orders: this.orderQueue.length,
         },
         connectedClients: this.clients.size,
-        timestamp: currentTime
+        timestamp: currentTime,
       });
-      
+
       this.lastProcessedTime = currentTime;
     }
   }
@@ -323,10 +328,10 @@ class StreamingEngine extends EventEmitter {
       metrics: this.metrics,
       queueSizes: {
         ticks: this.tickQueue.length,
-        orders: this.orderQueue.length
+        orders: this.orderQueue.length,
       },
       connectedClients: this.clients.size,
-      marketDataFeeds: Array.from(this.marketDataFeeds.keys())
+      marketDataFeeds: Array.from(this.marketDataFeeds.keys()),
     };
   }
 
@@ -335,19 +340,19 @@ class StreamingEngine extends EventEmitter {
    */
   simulateMarketData() {
     const symbols = ['CRUDE_OIL', 'NATURAL_GAS', 'ELECTRICITY', 'CARBON_CREDITS'];
-    
+
     setInterval(() => {
       symbols.forEach(symbol => {
         const basePrice = this.getBasePrice(symbol);
         const volatility = this.getVolatility(symbol);
-        
+
         this.addTick({
           symbol,
           price: basePrice + (Math.random() - 0.5) * volatility,
           bid: basePrice - Math.random() * 0.1,
           ask: basePrice + Math.random() * 0.1,
           volume: Math.floor(Math.random() * 1000) + 100,
-          source: 'simulation'
+          source: 'simulation',
         });
       });
     }, 10); // Add tick every 10ms for simulation
@@ -358,13 +363,13 @@ class StreamingEngine extends EventEmitter {
    */
   getBasePrice(symbol) {
     const basePrices = {
-      'CRUDE_OIL': 75.50,
-      'NATURAL_GAS': 3.25,
-      'ELECTRICITY': 45.75,
-      'CARBON_CREDITS': 25.00
+      CRUDE_OIL: 75.5,
+      NATURAL_GAS: 3.25,
+      ELECTRICITY: 45.75,
+      CARBON_CREDITS: 25.0,
     };
-    
-    return basePrices[symbol] || 50.00;
+
+    return basePrices[symbol] || 50.0;
   }
 
   /**
@@ -372,12 +377,12 @@ class StreamingEngine extends EventEmitter {
    */
   getVolatility(symbol) {
     const volatilities = {
-      'CRUDE_OIL': 2.0,
-      'NATURAL_GAS': 0.5,
-      'ELECTRICITY': 5.0,
-      'CARBON_CREDITS': 1.0
+      CRUDE_OIL: 2.0,
+      NATURAL_GAS: 0.5,
+      ELECTRICITY: 5.0,
+      CARBON_CREDITS: 1.0,
     };
-    
+
     return volatilities[symbol] || 1.0;
   }
 }

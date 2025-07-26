@@ -1,0 +1,173 @@
+repos:
+  # Pre-commit hooks for general file management
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-xml
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  # JavaScript/TypeScript formatting and linting
+  - repo: local
+    hooks:
+      - id: prettier-backend
+        name: Format JavaScript/TypeScript (Backend)
+        entry: npx prettier --write
+        language: node
+        files: ^backend/.*\.(js|ts|json)$
+        additional_dependencies: [prettier@latest]
+        
+      - id: prettier-frontend
+        name: Format JavaScript/TypeScript (Frontend)  
+        entry: npx prettier --write
+        language: node
+        files: ^frontend/.*\.(js|ts|tsx|json)$
+        additional_dependencies: [prettier@latest]
+        
+      - id: eslint-backend
+        name: ESLint (Backend)
+        entry: bash -c 'cd backend && npx eslint --fix'
+        language: system
+        files: ^backend/.*\.(js|ts)$
+        pass_filenames: false
+        
+      - id: eslint-frontend
+        name: ESLint (Frontend)
+        entry: bash -c 'cd frontend && npx eslint --fix --ext .ts,.tsx'
+        language: system
+        files: ^frontend/.*\.(ts|tsx)$
+        pass_filenames: false
+
+  # Python formatting and linting
+  - repo: https://github.com/psf/black
+    rev: 23.3.0
+    hooks:
+      - id: black
+        language_version: python3
+        args: [--line-length=100]
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        args: [--profile=black, --line-length=100]
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        args: [--max-line-length=100, --extend-ignore=E203,W503]
+
+  - repo: https://github.com/pycqa/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: [-r, --skip=B101,B601]
+        exclude: ^(tests/|test_)
+
+  # Security checks
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: ^(package-lock\.json|.*\.lock)$
+
+  # Commit message validation
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: 3.2.1
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+  # Security scanning for dependencies
+  - repo: local
+    hooks:
+      - id: npm-audit-backend
+        name: npm audit (Backend)
+        entry: bash -c 'cd backend && npm audit --audit-level=moderate'
+        language: system
+        files: ^backend/package.*\.json$
+        pass_filenames: false
+        
+      - id: npm-audit-frontend
+        name: npm audit (Frontend)
+        entry: bash -c 'cd frontend && npm audit --audit-level=moderate'
+        language: system
+        files: ^frontend/package.*\.json$
+        pass_filenames: false
+
+      - id: safety-check
+        name: Safety check (Python)
+        entry: safety check
+        language: python
+        files: ^requirements.*\.txt$
+        pass_filenames: false
+
+  # Type checking
+  - repo: local
+    hooks:
+      - id: typescript-check-frontend
+        name: TypeScript check (Frontend)
+        entry: bash -c 'cd frontend && npx tsc --noEmit'
+        language: system
+        files: ^frontend/.*\.(ts|tsx)$
+        pass_filenames: false
+
+      - id: mypy-check
+        name: MyPy check (Python)
+        entry: mypy
+        language: python
+        files: \.py$
+        additional_dependencies: [mypy]
+
+  # Documentation checks
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.35.0
+    hooks:
+      - id: markdownlint
+        args: [--fix]
+
+  # YAML and JSON validation
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.32.0
+    hooks:
+      - id: yamllint
+        args: [-d, 'relaxed']
+
+# Configuration for commit message format
+default_language_version:
+  python: python3.11
+  node: '20.0.0'
+
+# Fail fast - stop on first failure
+fail_fast: false
+
+# Repository-wide settings
+repos:
+  - repo: meta
+    hooks:
+      - id: check-hooks-apply
+      - id: check-useless-excludes
+
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false

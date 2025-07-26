@@ -1,0 +1,126 @@
+# Snyk Configuration for QuantEnergx
+# See https://docs.snyk.io/snyk-cli/configure-the-snyk-cli
+
+# Language settings
+language-settings:
+  javascript:
+    packageManager: npm
+  python:
+    packageManager: pip
+
+# Exclude specific files and directories
+exclude:
+  global:
+    - "**/*.test.js"
+    - "**/*.test.ts"
+    - "**/*.spec.js"  
+    - "**/*.spec.ts"
+    - "**/test/**"
+    - "**/tests/**"
+    - "**/cypress/**"
+    - "**/node_modules/**"
+    - "**/dist/**"
+    - "**/build/**"
+    - "**/.git/**"
+    - "**/coverage/**"
+
+# Patch settings
+patch:
+  disable: false
+  skip-unresolved: false
+
+# Update settings  
+update:
+  disable: false
+
+# Severity threshold
+severity-threshold: medium
+
+# Fail on
+fail-on:
+  - upgradable
+  - patchable
+
+# Policies for different project types
+policies:
+  # Backend Node.js project
+  - path: "./backend"
+    severity-threshold: low
+    fail-fast: true
+    
+  # Frontend React project  
+  - path: "./frontend"
+    severity-threshold: medium
+    fail-fast: true
+    
+  # E2E testing project
+  - path: "./e2e"
+    severity-threshold: high
+    fail-fast: false
+
+# Ignore specific vulnerabilities (use with caution)
+ignore:
+  # Example: ignore a specific vulnerability until a certain date
+  # SNYK-JS-LODASH-567746:
+  #   - '*':
+  #       reason: "No exploit available and fix coming in next release"
+  #       expires: '2024-03-01T00:00:00.000Z'
+
+# License policies
+license-policy:
+  # Allowed licenses
+  allowed-licenses:
+    - MIT
+    - Apache-2.0
+    - BSD-2-Clause
+    - BSD-3-Clause
+    - ISC
+    - CC0-1.0
+    - Unlicense
+    
+  # Forbidden licenses  
+  forbidden-licenses:
+    - GPL-2.0
+    - GPL-3.0
+    - AGPL-1.0
+    - AGPL-3.0
+    - LGPL-2.0
+    - LGPL-2.1
+    - LGPL-3.0
+    - CPAL-1.0
+    - EPL-1.0
+    - EPL-2.0
+    - EUPL-1.1
+    - EUPL-1.2
+
+# Remediation settings
+remediation:
+  # Auto-remediation for patches
+  pin: true
+  # Pin exact versions for patch updates
+  pin-exact: false
+  # Auto-generate pull requests for fixes
+  auto-pr: true
+  # PR settings
+  pr:
+    title: "[Snyk] Security upgrade"
+    assignees: 
+      - "security-team"
+    labels:
+      - "security"
+      - "dependencies"
+    reviewers:
+      - "security-team"
+
+# Reporting
+reporting:
+  format: json
+  output: snyk-report.json
+  
+# Integration settings
+integrations:
+  github:
+    # Auto-monitor new repositories
+    auto-monitor: true
+    # Import organization
+    import-org: true

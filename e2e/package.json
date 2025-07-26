@@ -1,0 +1,33 @@
+{
+  "name": "quantenergx-e2e",
+  "version": "1.0.0",
+  "description": "E2E tests for QuantEnergx platform",
+  "main": "index.js",
+  "scripts": {
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "cy:run:chrome": "cypress run --browser chrome",
+    "cy:run:firefox": "cypress run --browser firefox",
+    "cy:run:edge": "cypress run --browser edge",
+    "cy:run:record": "cypress run --record",
+    "cy:verify": "cypress verify",
+    "pw:test": "playwright test",
+    "pw:test:headed": "playwright test --headed",
+    "pw:test:debug": "playwright test --debug",
+    "pw:codegen": "playwright codegen",
+    "test:e2e": "npm run cy:run",
+    "test:e2e:headed": "npm run cy:run -- --headed",
+    "test:playwright": "npm run pw:test"
+  },
+  "keywords": ["e2e", "testing", "cypress", "playwright"],
+  "author": "QuantEnergx Team",
+  "license": "MIT",
+  "devDependencies": {
+    "cypress": "^13.6.0",
+    "@playwright/test": "^1.40.0",
+    "@cypress/code-coverage": "^3.12.0",
+    "cypress-real-events": "^1.11.0",
+    "cypress-axe": "^1.5.0",
+    "cypress-file-upload": "^5.0.8"
+  }
+}

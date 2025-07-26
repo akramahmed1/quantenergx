@@ -10,13 +10,13 @@ class IntegrationService {
     this.userService = new UserManagementService();
     this.notificationService = new NotificationService();
     this.riskService = new RiskManagementService();
-    
+
     // User preferences storage (in production, this would be database)
     this.userPreferences = new Map();
-    
+
     // Set up event listeners
     this.setupEventListeners();
-    
+
     // Initialize default user preferences
     this.initializeDefaultPreferences();
   }
@@ -45,8 +45,8 @@ class IntegrationService {
         marginCalls: true,
         complianceAlerts: true,
         dailyReports: true,
-        marketOpening: false
-      }
+        marketOpening: false,
+      },
     };
 
     // Set for demo users
@@ -59,7 +59,7 @@ class IntegrationService {
   async handleOrderPlaced(order) {
     try {
       const userPrefs = this.getUserPreferences(order.userId);
-      
+
       if (userPrefs?.preferences?.tradeNotifications) {
         await this.notificationService.notifyOrderPlaced(order, userPrefs);
       }
@@ -73,8 +73,8 @@ class IntegrationService {
           commodity: order.commodity,
           side: order.side,
           quantity: order.quantity,
-          type: order.type
-        }
+          type: order.type,
+        },
       });
 
       console.log(`Order placed notification sent for order ${order.id}`);
@@ -90,7 +90,7 @@ class IntegrationService {
       if (!aggressorOrder) return;
 
       const userPrefs = this.getUserPreferences(aggressorOrder.userId);
-      
+
       // Send trade notification
       if (userPrefs?.preferences?.tradeNotifications) {
         await this.notificationService.notifyTradeExecuted(trade, userPrefs);
@@ -109,8 +109,8 @@ class IntegrationService {
           commodity: trade.commodity,
           quantity: trade.quantity,
           price: trade.price,
-          value: trade.value
-        }
+          value: trade.value,
+        },
       });
 
       console.log(`Trade executed notification sent for trade ${trade.id}`);
@@ -122,7 +122,7 @@ class IntegrationService {
   async handleOrderCancelled(order) {
     try {
       const userPrefs = this.getUserPreferences(order.userId);
-      
+
       if (userPrefs?.preferences?.tradeNotifications) {
         await this.notificationService.notifyOrderCancelled(order, userPrefs);
       }
@@ -135,8 +135,8 @@ class IntegrationService {
           orderId: order.id,
           commodity: order.commodity,
           side: order.side,
-          remainingQuantity: order.remainingQuantity
-        }
+          remainingQuantity: order.remainingQuantity,
+        },
       });
 
       console.log(`Order cancelled notification sent for order ${order.id}`);
@@ -148,7 +148,7 @@ class IntegrationService {
   async handleOrderModified(data) {
     try {
       const { oldOrder, newOrder } = data;
-      
+
       // Log modification
       await this.userService.logAuditEvent({
         userId: newOrder.userId,
@@ -158,8 +158,8 @@ class IntegrationService {
           oldQuantity: oldOrder.quantity,
           newQuantity: newOrder.quantity,
           oldPrice: oldOrder.price,
-          newPrice: newOrder.price
-        }
+          newPrice: newOrder.price,
+        },
       });
 
       console.log(`Order modified for order ${newOrder.id}`);
@@ -173,7 +173,7 @@ class IntegrationService {
     try {
       // Get user positions
       const positions = this.tradingService.getUserPositions(userId);
-      
+
       // Mock portfolio data for risk assessment
       const portfolioData = {
         portfolioId: `portfolio_${userId}`,
@@ -182,21 +182,21 @@ class IntegrationService {
           commodity: pos.commodity,
           quantity: pos.quantity,
           currentPrice: 80.0, // Mock current price
-          value: pos.quantity * 80.0
+          value: pos.quantity * 80.0,
         })),
         trades: [trade],
         counterparties: {},
         marketData: {},
-        systems: {}
+        systems: {},
       };
 
       // Assess risk
       const riskAssessment = await this.riskService.assessPortfolioRisk(portfolioData);
-      
+
       // Check for limit breaches
       if (riskAssessment.alerts && riskAssessment.alerts.length > 0) {
         const userPrefs = this.getUserPreferences(userId);
-        
+
         for (const alert of riskAssessment.alerts) {
           if (alert.severity === 'high' || alert.severity === 'critical') {
             const riskData = {
@@ -205,7 +205,7 @@ class IntegrationService {
               limit: alert.limit || 0,
               message: alert.message,
               severity: alert.severity,
-              timestamp: new Date().toISOString()
+              timestamp: new Date().toISOString(),
             };
 
             if (alert.type === 'margin_call') {
@@ -216,7 +216,6 @@ class IntegrationService {
           }
         }
       }
-
     } catch (error) {
       console.error('Error checking risk limits:', error);
     }
@@ -226,7 +225,7 @@ class IntegrationService {
   getUserPreferences(userId) {
     // Try to get by userId first, then by username
     let preferences = this.userPreferences.get(userId);
-    
+
     if (!preferences) {
       // Try to find by username (for demo users)
       const user = this.userService.getUserById(userId);
@@ -244,7 +243,7 @@ class IntegrationService {
       const updatedPrefs = {
         ...existingPrefs,
         ...preferences,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
       this.userPreferences.set(userId, updatedPrefs);
@@ -253,7 +252,7 @@ class IntegrationService {
       await this.userService.logAuditEvent({
         userId,
         action: 'preferences_updated',
-        details: { updatedFields: Object.keys(preferences) }
+        details: { updatedFields: Object.keys(preferences) },
       });
 
       return updatedPrefs;
@@ -266,19 +265,15 @@ class IntegrationService {
   async sendDailyReports() {
     try {
       const users = this.userService.getAllUsers();
-      
+
       for (const user of users) {
         const userPrefs = this.getUserPreferences(user.id);
-        
+
         if (userPrefs?.preferences?.dailyReports) {
           const positions = this.tradingService.getUserPositions(user.id);
-          
+
           if (positions.length > 0) {
-            await this.notificationService.sendDailyPositionReport(
-              user.id,
-              positions,
-              userPrefs
-            );
+            await this.notificationService.sendDailyPositionReport(user.id, positions, userPrefs);
           }
         }
       }
@@ -295,14 +290,14 @@ class IntegrationService {
       const marketData = {
         crude_oil: 80.25,
         natural_gas: 3.35,
-        renewable_certificates: 45.50
+        renewable_certificates: 45.5,
       };
 
       const users = this.userService.getAllUsers();
-      
+
       for (const user of users) {
         const userPrefs = this.getUserPreferences(user.id);
-        
+
         if (userPrefs?.preferences?.marketOpening) {
           await this.notificationService.sendMarketOpeningAlert(marketData, userPrefs);
         }
@@ -321,18 +316,18 @@ class IntegrationService {
       const complianceResult = {
         compliant: true,
         warnings: [],
-        violations: []
+        violations: [],
       };
 
       if (!complianceResult.compliant || complianceResult.violations.length > 0) {
         const userPrefs = this.getUserPreferences(userId);
-        
+
         const complianceData = {
           issueType: 'compliance_violation',
           regulation: 'CFTC',
           reference: transactionData.id || 'N/A',
           timestamp: new Date().toISOString(),
-          details: complianceResult.violations
+          details: complianceResult.violations,
         };
 
         await this.notificationService.notifyComplianceAlert(complianceData, userPrefs);
@@ -355,12 +350,12 @@ class IntegrationService {
         side: tradeData.side,
         type: 'market',
         quantity: tradeData.quantity,
-        timeInForce: 'day'
+        timeInForce: 'day',
       };
 
       // Place order through trading service
       const order = await this.tradingService.placeOrder(orderRequest);
-      
+
       // Log external trade processing
       await this.userService.logAuditEvent({
         userId: tradeData.userId,
@@ -368,8 +363,8 @@ class IntegrationService {
         details: {
           externalTradeId: tradeData.externalId,
           orderId: order.id,
-          source: tradeData.source || 'external'
-        }
+          source: tradeData.source || 'external',
+        },
       });
 
       return order;
@@ -388,17 +383,17 @@ class IntegrationService {
           trading: this.tradingService ? 'healthy' : 'unavailable',
           users: this.userService ? 'healthy' : 'unavailable',
           notifications: this.notificationService ? 'healthy' : 'unavailable',
-          risk: this.riskService ? 'healthy' : 'unavailable'
+          risk: this.riskService ? 'healthy' : 'unavailable',
         },
         statistics: {
           totalOrders: this.tradingService.orders.size,
           totalTrades: this.tradingService.trades.size,
           activeUsers: this.userService.users.size,
-          userPreferences: this.userPreferences.size
+          userPreferences: this.userPreferences.size,
         },
         eventListeners: {
-          tradingEvents: 4 // orderPlaced, tradeExecuted, orderCancelled, orderModified
-        }
+          tradingEvents: 4, // orderPlaced, tradeExecuted, orderCancelled, orderModified
+        },
       };
 
       return health;
@@ -407,7 +402,7 @@ class IntegrationService {
       return {
         timestamp: new Date().toISOString(),
         status: 'error',
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -421,20 +416,20 @@ class IntegrationService {
       }
 
       switch (type) {
-      case 'trade_executed':
-        await this.notificationService.notifyTradeExecuted(data, userPrefs);
-        break;
-      case 'risk_alert':
-        await this.notificationService.notifyRiskLimitBreach(data, userPrefs);
-        break;
-      case 'margin_call':
-        await this.notificationService.notifyMarginCall(data, userPrefs);
-        break;
-      case 'compliance_alert':
-        await this.notificationService.notifyComplianceAlert(data, userPrefs);
-        break;
-      default:
-        throw new Error(`Unknown notification type: ${type}`);
+        case 'trade_executed':
+          await this.notificationService.notifyTradeExecuted(data, userPrefs);
+          break;
+        case 'risk_alert':
+          await this.notificationService.notifyRiskLimitBreach(data, userPrefs);
+          break;
+        case 'margin_call':
+          await this.notificationService.notifyMarginCall(data, userPrefs);
+          break;
+        case 'compliance_alert':
+          await this.notificationService.notifyComplianceAlert(data, userPrefs);
+          break;
+        default:
+          throw new Error(`Unknown notification type: ${type}`);
       }
 
       return { success: true, message: `${type} notification sent successfully` };

@@ -10,7 +10,7 @@ class UserManagementService {
     this.sessions = new Map();
     this.mfaTokens = new Map();
     this.auditLogs = new Map();
-    
+
     // Configuration
     this.config = {
       passwordMinLength: 8,
@@ -19,7 +19,7 @@ class UserManagementService {
       lockoutDuration: 30 * 60 * 1000, // 30 minutes
       sessionTimeout: 24 * 60 * 60 * 1000, // 24 hours
       mfaTokenExpiry: 5 * 60 * 1000, // 5 minutes
-      jwtSecret: process.env.JWT_SECRET || 'fallback-secret-key'
+      jwtSecret: process.env.JWT_SECRET || 'fallback-secret-key',
     };
 
     // Role definitions
@@ -27,7 +27,7 @@ class UserManagementService {
       admin: {
         name: 'Administrator',
         permissions: ['*'], // All permissions
-        description: 'Full system access'
+        description: 'Full system access',
       },
       trader: {
         name: 'Trader',
@@ -38,9 +38,9 @@ class UserManagementService {
           'trading.view_positions',
           'trading.view_portfolio',
           'market.view_data',
-          'reports.view_trading'
+          'reports.view_trading',
         ],
-        description: 'Trading operations'
+        description: 'Trading operations',
       },
       risk_manager: {
         name: 'Risk Manager',
@@ -52,9 +52,9 @@ class UserManagementService {
           'trading.view_orders',
           'trading.view_positions',
           'market.view_data',
-          'reports.view_all'
+          'reports.view_all',
         ],
-        description: 'Risk management and oversight'
+        description: 'Risk management and oversight',
       },
       compliance_officer: {
         name: 'Compliance Officer',
@@ -66,9 +66,9 @@ class UserManagementService {
           'compliance.view_audit_trail',
           'trading.view_orders',
           'trading.view_positions',
-          'reports.view_all'
+          'reports.view_all',
         ],
-        description: 'Compliance monitoring and reporting'
+        description: 'Compliance monitoring and reporting',
       },
       analyst: {
         name: 'Analyst',
@@ -76,18 +76,15 @@ class UserManagementService {
           'market.view_data',
           'reports.view_analytics',
           'trading.view_positions',
-          'risk.view_reports'
+          'risk.view_reports',
         ],
-        description: 'Market analysis and reporting'
+        description: 'Market analysis and reporting',
       },
       viewer: {
         name: 'Viewer',
-        permissions: [
-          'market.view_data',
-          'reports.view_basic'
-        ],
-        description: 'Read-only access'
-      }
+        permissions: ['market.view_data', 'reports.view_basic'],
+        description: 'Read-only access',
+      },
     };
 
     // Initialize demo users
@@ -103,7 +100,7 @@ class UserManagementService {
         password: 'Admin123!',
         role: 'admin',
         firstName: 'System',
-        lastName: 'Administrator'
+        lastName: 'Administrator',
       },
       {
         username: 'trader1',
@@ -111,7 +108,7 @@ class UserManagementService {
         password: 'Trader123!',
         role: 'trader',
         firstName: 'John',
-        lastName: 'Trader'
+        lastName: 'Trader',
       },
       {
         username: 'risk1',
@@ -119,8 +116,8 @@ class UserManagementService {
         password: 'Risk123!',
         role: 'risk_manager',
         firstName: 'Jane',
-        lastName: 'Risk'
-      }
+        lastName: 'Risk',
+      },
     ];
 
     for (const userData of demoUsers) {
@@ -137,11 +134,12 @@ class UserManagementService {
     try {
       // Validate input
       this.validateUserData(userData);
-      
+
       // Check if user already exists
-      const existingUser = Array.from(this.users.values())
-        .find(user => user.username === userData.username || user.email === userData.email);
-      
+      const existingUser = Array.from(this.users.values()).find(
+        user => user.username === userData.username || user.email === userData.email
+      );
+
       if (existingUser) {
         throw new Error('Username or email already exists');
       }
@@ -165,7 +163,7 @@ class UserManagementService {
         lastLogin: null,
         lockedUntil: null,
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
       // Store user
@@ -175,13 +173,12 @@ class UserManagementService {
       await this.logAuditEvent({
         userId: user.id,
         action: 'user_created',
-        details: { username: user.username, role: user.role }
+        details: { username: user.username, role: user.role },
       });
 
       // Return user without password
       const { password: _password, ...userWithoutPassword } = user;
       return userWithoutPassword;
-
     } catch (error) {
       throw new Error(`Failed to create user: ${error.message}`);
     }
@@ -190,13 +187,14 @@ class UserManagementService {
   // Authenticate user
   async authenticateUser(username, password, mfaToken = null) {
     // Find user
-    const user = Array.from(this.users.values())
-      .find(u => u.username === username || u.email === username);
+    const user = Array.from(this.users.values()).find(
+      u => u.username === username || u.email === username
+    );
 
     if (!user) {
       await this.logAuditEvent({
         action: 'login_failed',
-        details: { username, reason: 'user_not_found' }
+        details: { username, reason: 'user_not_found' },
       });
       throw new Error('Invalid credentials');
     }
@@ -206,7 +204,7 @@ class UserManagementService {
       await this.logAuditEvent({
         userId: user.id,
         action: 'login_failed',
-        details: { username, reason: 'account_locked' }
+        details: { username, reason: 'account_locked' },
       });
       throw new Error('Account temporarily locked due to multiple failed attempts');
     }
@@ -216,7 +214,7 @@ class UserManagementService {
       await this.logAuditEvent({
         userId: user.id,
         action: 'login_failed',
-        details: { username, reason: 'account_inactive' }
+        details: { username, reason: 'account_inactive' },
       });
       throw new Error('Account is inactive');
     }
@@ -229,13 +227,13 @@ class UserManagementService {
       if (user.loginAttempts >= this.config.maxLoginAttempts) {
         user.lockedUntil = new Date(Date.now() + this.config.lockoutDuration).toISOString();
       }
-        
+
       await this.logAuditEvent({
         userId: user.id,
         action: 'login_failed',
-        details: { username, reason: 'invalid_password', attempts: user.loginAttempts }
+        details: { username, reason: 'invalid_password', attempts: user.loginAttempts },
       });
-        
+
       throw new Error('Invalid credentials');
     }
 
@@ -246,13 +244,13 @@ class UserManagementService {
         const token = crypto.randomInt(100000, 999999).toString();
         this.mfaTokens.set(user.id, {
           token,
-          expiresAt: Date.now() + this.config.mfaTokenExpiry
+          expiresAt: Date.now() + this.config.mfaTokenExpiry,
         });
-          
+
         await this.logAuditEvent({
           userId: user.id,
           action: 'mfa_token_generated',
-          details: { username }
+          details: { username },
         });
 
         throw new Error('MFA_REQUIRED'); // Special error to indicate MFA is needed
@@ -260,11 +258,15 @@ class UserManagementService {
 
       // Verify MFA token
       const storedMfaData = this.mfaTokens.get(user.id);
-      if (!storedMfaData || Date.now() > storedMfaData.expiresAt || storedMfaData.token !== mfaToken) {
+      if (
+        !storedMfaData ||
+        Date.now() > storedMfaData.expiresAt ||
+        storedMfaData.token !== mfaToken
+      ) {
         await this.logAuditEvent({
           userId: user.id,
           action: 'login_failed',
-          details: { username, reason: 'invalid_mfa_token' }
+          details: { username, reason: 'invalid_mfa_token' },
         });
         throw new Error('Invalid or expired MFA token');
       }
@@ -281,11 +283,11 @@ class UserManagementService {
     // Generate JWT token
     const sessionId = uuidv4();
     const token = jwt.sign(
-      { 
-        id: user.id, 
-        username: user.username, 
+      {
+        id: user.id,
+        username: user.username,
         role: user.role,
-        sessionId 
+        sessionId,
       },
       this.config.jwtSecret,
       { expiresIn: '24h' }
@@ -297,20 +299,20 @@ class UserManagementService {
       createdAt: new Date().toISOString(),
       expiresAt: new Date(Date.now() + this.config.sessionTimeout).toISOString(),
       ipAddress: null, // Would be set by route handler
-      userAgent: null  // Would be set by route handler
+      userAgent: null, // Would be set by route handler
     });
 
     await this.logAuditEvent({
       userId: user.id,
       action: 'login_successful',
-      details: { username, sessionId }
+      details: { username, sessionId },
     });
 
     const { password: _userPassword, ...userWithoutPassword } = user;
     return {
       user: userWithoutPassword,
       token,
-      sessionId
+      sessionId,
     };
   }
 
@@ -320,14 +322,14 @@ class UserManagementService {
       const session = this.sessions.get(sessionId);
       if (session) {
         this.sessions.delete(sessionId);
-        
+
         await this.logAuditEvent({
           userId: session.userId,
           action: 'logout',
-          details: { sessionId }
+          details: { sessionId },
         });
       }
-      
+
       return true;
     } catch (error) {
       throw new Error(`Failed to logout: ${error.message}`);
@@ -338,7 +340,7 @@ class UserManagementService {
   validateToken(token) {
     try {
       const decoded = jwt.verify(token, this.config.jwtSecret);
-      
+
       // Check if session still exists
       const session = this.sessions.get(decoded.sessionId);
       if (!session || new Date() > new Date(session.expiresAt)) {
@@ -387,8 +389,9 @@ class UserManagementService {
       }
 
       if (updates.email && updates.email !== user.email) {
-        const existingUser = Array.from(this.users.values())
-          .find(u => u.email === updates.email && u.id !== userId);
+        const existingUser = Array.from(this.users.values()).find(
+          u => u.email === updates.email && u.id !== userId
+        );
         if (existingUser) {
           throw new Error('Email already exists');
         }
@@ -400,18 +403,17 @@ class UserManagementService {
 
       // Apply updates
       Object.assign(user, updates, {
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       });
 
       await this.logAuditEvent({
         userId,
         action: 'user_updated',
-        details: { updates: Object.keys(updates) }
+        details: { updates: Object.keys(updates) },
       });
 
       const { password: _password, ...userWithoutPassword } = user;
       return userWithoutPassword;
-
     } catch (error) {
       throw new Error(`Failed to update user: ${error.message}`);
     }
@@ -438,11 +440,10 @@ class UserManagementService {
       await this.logAuditEvent({
         userId,
         action: enable ? 'mfa_enabled' : 'mfa_disabled',
-        details: {}
+        details: {},
       });
 
       return { mfaEnabled: user.mfaEnabled };
-
     } catch (error) {
       throw new Error(`Failed to toggle MFA: ${error.message}`);
     }
@@ -461,11 +462,12 @@ class UserManagementService {
     }
     if (filters.search) {
       const search = filters.search.toLowerCase();
-      users = users.filter(user => 
-        user.username.toLowerCase().includes(search) ||
-        user.email.toLowerCase().includes(search) ||
-        user.firstName.toLowerCase().includes(search) ||
-        user.lastName.toLowerCase().includes(search)
+      users = users.filter(
+        user =>
+          user.username.toLowerCase().includes(search) ||
+          user.email.toLowerCase().includes(search) ||
+          user.firstName.toLowerCase().includes(search) ||
+          user.lastName.toLowerCase().includes(search)
       );
     }
 
@@ -503,7 +505,7 @@ class UserManagementService {
 
     // Sort by timestamp descending
     logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-    
+
     return logs.slice(0, limit);
   }
 
@@ -516,7 +518,7 @@ class UserManagementService {
       details: event.details || {},
       timestamp: new Date().toISOString(),
       ipAddress: event.ipAddress || null,
-      userAgent: event.userAgent || null
+      userAgent: event.userAgent || null,
     };
 
     this.auditLogs.set(auditLog.id, auditLog);
@@ -557,7 +559,9 @@ class UserManagementService {
       const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
       if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
-        throw new Error('Password must contain uppercase, lowercase, numbers, and special characters');
+        throw new Error(
+          'Password must contain uppercase, lowercase, numbers, and special characters'
+        );
       }
     }
   }
@@ -579,7 +583,7 @@ class UserManagementService {
       .filter(([_, session]) => session.userId === userId)
       .map(([sessionId, session]) => ({
         sessionId,
-        ...session
+        ...session,
       }));
   }
 
@@ -588,13 +592,13 @@ class UserManagementService {
     const session = this.sessions.get(sessionId);
     if (session) {
       this.sessions.delete(sessionId);
-      
+
       await this.logAuditEvent({
         userId: session.userId,
         action: 'session_revoked',
-        details: { sessionId }
+        details: { sessionId },
       });
-      
+
       return true;
     }
     return false;

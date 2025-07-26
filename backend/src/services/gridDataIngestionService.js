@@ -11,7 +11,7 @@ class GridDataIngestionService {
     this.queuePositions = new Map();
     this.processingQueue = [];
     this.isProcessing = false;
-    
+
     this.initializeDataSources();
     this.initializeAlertTriggers();
   }
@@ -29,10 +29,10 @@ class GridDataIngestionService {
         endpoints: {
           congestion: 'https://api.ercot.com/congestion',
           transmission: 'https://api.ercot.com/transmission',
-          queue: 'https://api.ercot.com/queue'
+          queue: 'https://api.ercot.com/queue',
         },
         updateFrequency: 300, // 5 minutes
-        protocols: ['REST', 'FTP']
+        protocols: ['REST', 'FTP'],
       },
       {
         id: 'PJM',
@@ -42,10 +42,10 @@ class GridDataIngestionService {
         endpoints: {
           congestion: 'https://api.pjm.com/congestion',
           transmission: 'https://api.pjm.com/transmission',
-          queue: 'https://api.pjm.com/queue'
+          queue: 'https://api.pjm.com/queue',
         },
         updateFrequency: 300,
-        protocols: ['REST', 'SOAP']
+        protocols: ['REST', 'SOAP'],
       },
       {
         id: 'CAISO',
@@ -55,10 +55,10 @@ class GridDataIngestionService {
         endpoints: {
           congestion: 'https://api.caiso.com/congestion',
           transmission: 'https://api.caiso.com/transmission',
-          queue: 'https://api.caiso.com/queue'
+          queue: 'https://api.caiso.com/queue',
         },
         updateFrequency: 300,
-        protocols: ['REST']
+        protocols: ['REST'],
       },
       {
         id: 'MISO',
@@ -68,10 +68,10 @@ class GridDataIngestionService {
         endpoints: {
           congestion: 'https://api.miso.com/congestion',
           transmission: 'https://api.miso.com/transmission',
-          queue: 'https://api.miso.com/queue'
+          queue: 'https://api.miso.com/queue',
         },
         updateFrequency: 600,
-        protocols: ['REST', 'FTP']
+        protocols: ['REST', 'FTP'],
       },
       {
         id: 'GUYANA_GRID',
@@ -81,10 +81,10 @@ class GridDataIngestionService {
         endpoints: {
           congestion: 'https://api.gpl.gy/congestion',
           transmission: 'https://api.gpl.gy/transmission',
-          queue: 'https://api.gpl.gy/queue'
+          queue: 'https://api.gpl.gy/queue',
         },
         updateFrequency: 900,
-        protocols: ['REST']
+        protocols: ['REST'],
       },
       {
         id: 'MENA_GRID',
@@ -94,11 +94,11 @@ class GridDataIngestionService {
         endpoints: {
           congestion: 'https://api.mena-grid.org/congestion',
           transmission: 'https://api.mena-grid.org/transmission',
-          queue: 'https://api.mena-grid.org/queue'
+          queue: 'https://api.mena-grid.org/queue',
         },
         updateFrequency: 1800,
-        protocols: ['REST']
-      }
+        protocols: ['REST'],
+      },
     ];
 
     dataSources.forEach(source => {
@@ -106,7 +106,7 @@ class GridDataIngestionService {
         ...source,
         status: 'disconnected',
         lastUpdate: null,
-        errorCount: 0
+        errorCount: 0,
       });
     });
   }
@@ -121,29 +121,29 @@ class GridDataIngestionService {
         name: 'High Congestion Alert',
         condition: 'congestion_cost > 50',
         severity: 'high',
-        actions: ['email', 'sms', 'dashboard_alert']
+        actions: ['email', 'sms', 'dashboard_alert'],
       },
       {
         id: 'TRANSMISSION_OUTAGE',
         name: 'Transmission Line Outage',
         condition: 'line_status == "outage"',
         severity: 'critical',
-        actions: ['email', 'sms', 'dashboard_alert', 'auto_hedge']
+        actions: ['email', 'sms', 'dashboard_alert', 'auto_hedge'],
       },
       {
         id: 'QUEUE_MILESTONE',
         name: 'Project Milestone Reached',
         condition: 'milestone_status == "completed"',
         severity: 'medium',
-        actions: ['email', 'dashboard_alert']
+        actions: ['email', 'dashboard_alert'],
       },
       {
         id: 'CAPACITY_CONSTRAINT',
         name: 'Transmission Capacity Constraint',
         condition: 'capacity_utilization > 90',
         severity: 'high',
-        actions: ['email', 'dashboard_alert', 'price_alert']
-      }
+        actions: ['email', 'dashboard_alert', 'price_alert'],
+      },
     ];
 
     triggers.forEach(trigger => {
@@ -151,7 +151,7 @@ class GridDataIngestionService {
         ...trigger,
         isActive: true,
         lastTriggered: null,
-        triggerCount: 0
+        triggerCount: 0,
       });
     });
   }
@@ -180,8 +180,9 @@ class GridDataIngestionService {
 
     return {
       status: 'started',
-      connectedSources: Array.from(this.dataSources.values()).filter(s => s.status === 'connected').length,
-      timestamp: new Date().toISOString()
+      connectedSources: Array.from(this.dataSources.values()).filter(s => s.status === 'connected')
+        .length,
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -190,7 +191,7 @@ class GridDataIngestionService {
    */
   async stopIngestion() {
     this.isProcessing = false;
-    
+
     // Disconnect from all sources
     for (const [sourceId, source] of this.dataSources) {
       if (source.status === 'connected') {
@@ -200,7 +201,7 @@ class GridDataIngestionService {
 
     return {
       status: 'stopped',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -215,7 +216,7 @@ class GridDataIngestionService {
 
     // Simulate connection process
     await this.delay(1000);
-    
+
     source.status = 'connected';
     source.lastUpdate = new Date().toISOString();
     source.errorCount = 0;
@@ -258,23 +259,22 @@ class GridDataIngestionService {
       const [congestionData, transmissionData, queueData] = await Promise.all([
         this.collectCongestionData(sourceId),
         this.collectTransmissionData(sourceId),
-        this.collectQueueData(sourceId)
+        this.collectQueueData(sourceId),
       ]);
 
       // Process and store data
       await this.processIngestedData(sourceId, {
         congestion: congestionData,
         transmission: transmissionData,
-        queue: queueData
+        queue: queueData,
       });
 
       source.lastUpdate = new Date().toISOString();
       source.errorCount = 0;
-
     } catch (error) {
       console.error(`Data collection failed for ${sourceId}:`, error);
       source.errorCount++;
-      
+
       if (source.errorCount > 5) {
         source.status = 'error';
         await this.triggerAlert('DATA_SOURCE_ERROR', { sourceId, error: error.message });
@@ -299,7 +299,7 @@ class GridDataIngestionService {
         flowDirection: Math.random() > 0.5 ? 'import' : 'export',
         capacity: point.capacity,
         utilization: Math.random() * 100,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
 
@@ -324,7 +324,7 @@ class GridDataIngestionService {
         status: this.simulateLineStatus(),
         voltage: line.voltage,
         outageScheduled: this.generateOutageInfo(),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
 
@@ -349,7 +349,7 @@ class GridDataIngestionService {
         expectedOnlineDate: project.expectedOnlineDate,
         interconnectionCost: this.simulateInterconnectionCost(),
         studyStatus: this.simulateStudyStatus(),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
 
@@ -362,10 +362,10 @@ class GridDataIngestionService {
   async processIngestedData(sourceId, data) {
     // Store data
     this.congestionData.set(`${sourceId}_${Date.now()}`, data.congestion);
-    
+
     // Check for alert triggers
     await this.checkAlertTriggers(sourceId, data);
-    
+
     // Update analytics
     this.updateAnalytics(sourceId, data);
   }
@@ -378,7 +378,7 @@ class GridDataIngestionService {
       if (!trigger.isActive) continue;
 
       const shouldTrigger = await this.evaluateTriggerCondition(trigger, data);
-      
+
       if (shouldTrigger) {
         await this.executeTriggerActions(triggerId, trigger, { sourceId, data });
         trigger.lastTriggered = new Date().toISOString();
@@ -392,24 +392,24 @@ class GridDataIngestionService {
    */
   async evaluateTriggerCondition(trigger, data) {
     const condition = trigger.condition;
-    
+
     // Simple condition evaluation (in production, use proper expression parser)
     if (condition.includes('congestion_cost > 50')) {
       return data.congestion.some(point => point.congestionCost > 50);
     }
-    
+
     if (condition.includes('line_status == "outage"')) {
       return data.transmission.some(line => line.status === 'outage');
     }
-    
+
     if (condition.includes('milestone_status == "completed"')) {
       return data.queue.some(project => project.currentMilestone === 'completed');
     }
-    
+
     if (condition.includes('capacity_utilization > 90')) {
       return data.transmission.some(line => line.currentFlow / line.capacity > 0.9);
     }
-    
+
     return false;
   }
 
@@ -464,7 +464,7 @@ class GridDataIngestionService {
       queue: queueSummary,
       alerts: alertSummary,
       dataSourceStatus: this.getDataSourceStatus(),
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
   }
 
@@ -473,7 +473,7 @@ class GridDataIngestionService {
    */
   async getCongestionAnalysis(region = null, timeRange = '24h') {
     const congestionData = Array.from(this.congestionData.values()).flat();
-    
+
     if (region) {
       // Filter by region if specified
     }
@@ -483,7 +483,7 @@ class GridDataIngestionService {
       highCongestionNodes: this.identifyHighCongestionNodes(congestionData),
       congestionTrends: this.calculateCongestionTrends(congestionData, timeRange),
       impactedMarkets: this.identifyImpactedMarkets(congestionData),
-      recommendations: this.generateCongestionRecommendations(congestionData)
+      recommendations: this.generateCongestionRecommendations(congestionData),
     };
 
     return analysis;
@@ -501,7 +501,7 @@ class GridDataIngestionService {
         nodeId: `${sourceId}_NODE_${i + 1}`,
         nodeName: `${sourceId} Node ${i + 1}`,
         capacity: Math.floor(Math.random() * 1000) + 500,
-        voltage: Math.random() > 0.5 ? 345 : 138
+        voltage: Math.random() > 0.5 ? 345 : 138,
       });
     }
 
@@ -520,7 +520,7 @@ class GridDataIngestionService {
         fromNode: `${sourceId}_NODE_${i + 1}`,
         toNode: `${sourceId}_NODE_${i + 2}`,
         capacity: Math.floor(Math.random() * 500) + 200,
-        voltage: Math.random() > 0.5 ? 345 : 138
+        voltage: Math.random() > 0.5 ? 345 : 138,
       });
     }
 
@@ -528,7 +528,14 @@ class GridDataIngestionService {
   }
 
   generateQueueProjects(sourceId) {
-    const projectCounts = { ERCOT: 100, PJM: 80, CAISO: 70, MISO: 60, GUYANA_GRID: 20, MENA_GRID: 30 };
+    const projectCounts = {
+      ERCOT: 100,
+      PJM: 80,
+      CAISO: 70,
+      MISO: 60,
+      GUYANA_GRID: 20,
+      MENA_GRID: 30,
+    };
     const count = projectCounts[sourceId] || 40;
     const projects = [];
     const technologies = ['solar', 'wind', 'battery', 'natural_gas', 'hydro'];
@@ -540,7 +547,9 @@ class GridDataIngestionService {
         capacity: Math.floor(Math.random() * 200) + 50,
         technology: technologies[Math.floor(Math.random() * technologies.length)],
         queuePosition: i + 1,
-        expectedOnlineDate: new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString()
+        expectedOnlineDate: new Date(
+          Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000
+        ).toISOString(),
       });
     }
 
@@ -564,30 +573,39 @@ class GridDataIngestionService {
     const weights = [0.8, 0.1, 0.05, 0.05];
     const random = Math.random();
     let sum = 0;
-    
+
     for (let i = 0; i < weights.length; i++) {
       sum += weights[i];
       if (random < sum) {
         return statuses[i];
       }
     }
-    
+
     return 'normal';
   }
 
   generateOutageInfo() {
-    if (Math.random() < 0.1) { // 10% chance of scheduled outage
+    if (Math.random() < 0.1) {
+      // 10% chance of scheduled outage
       return {
         scheduled: true,
         startDate: new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-        duration: Math.floor(Math.random() * 48) + 4 // 4-52 hours
+        duration: Math.floor(Math.random() * 48) + 4, // 4-52 hours
       };
     }
     return { scheduled: false };
   }
 
   simulateProjectMilestone() {
-    const milestones = ['application', 'feasibility_study', 'system_impact_study', 'facilities_study', 'agreement', 'construction', 'completed'];
+    const milestones = [
+      'application',
+      'feasibility_study',
+      'system_impact_study',
+      'facilities_study',
+      'agreement',
+      'construction',
+      'completed',
+    ];
     return milestones[Math.floor(Math.random() * milestones.length)];
   }
 
@@ -605,7 +623,7 @@ class GridDataIngestionService {
     console.log(`Analytics updated for ${sourceId}`, {
       congestionPoints: data.congestion.length,
       transmissionLines: data.transmission.length,
-      queueProjects: data.queue.length
+      queueProjects: data.queue.length,
     });
   }
 
@@ -637,12 +655,12 @@ class GridDataIngestionService {
   async getCongestionSummary() {
     const allCongestionData = Array.from(this.congestionData.values()).flat();
     const highCongestionCount = allCongestionData.filter(point => point.congestionCost > 50).length;
-    
+
     return {
       totalNodes: allCongestionData.length,
       highCongestionNodes: highCongestionCount,
       averageCost: this.calculateAverageCongestionCost(allCongestionData),
-      maxCost: Math.max(...allCongestionData.map(point => point.congestionCost))
+      maxCost: Math.max(...allCongestionData.map(point => point.congestionCost)),
     };
   }
 
@@ -653,7 +671,7 @@ class GridDataIngestionService {
       normalOperating: 140,
       maintenance: 8,
       outages: 2,
-      avgUtilization: 65.5
+      avgUtilization: 65.5,
     };
   }
 
@@ -664,21 +682,22 @@ class GridDataIngestionService {
       activeProjects: 280,
       completedThisMonth: 5,
       totalCapacity: 15000, // MW
-      avgQueueTime: 18 // months
+      avgQueueTime: 18, // months
     };
   }
 
   async getAlertSummary() {
-    const activeAlerts = Array.from(this.alertTriggers.values())
-      .filter(trigger => trigger.isActive && trigger.lastTriggered);
-    
+    const activeAlerts = Array.from(this.alertTriggers.values()).filter(
+      trigger => trigger.isActive && trigger.lastTriggered
+    );
+
     return {
       totalAlerts: activeAlerts.length,
       criticalAlerts: activeAlerts.filter(alert => alert.severity === 'critical').length,
       highAlerts: activeAlerts.filter(alert => alert.severity === 'high').length,
-      recentAlerts: activeAlerts.filter(alert => 
-        new Date(alert.lastTriggered) > new Date(Date.now() - 24 * 60 * 60 * 1000)
-      ).length
+      recentAlerts: activeAlerts.filter(
+        alert => new Date(alert.lastTriggered) > new Date(Date.now() - 24 * 60 * 60 * 1000)
+      ).length,
     };
   }
 
@@ -694,14 +713,16 @@ class GridDataIngestionService {
         name: s.name,
         status: s.status,
         lastUpdate: s.lastUpdate,
-        errorCount: s.errorCount
-      }))
+        errorCount: s.errorCount,
+      })),
     };
   }
 
   calculateAverageCongestionCost(congestionData) {
     if (congestionData.length === 0) return 0;
-    return congestionData.reduce((sum, point) => sum + point.congestionCost, 0) / congestionData.length;
+    return (
+      congestionData.reduce((sum, point) => sum + point.congestionCost, 0) / congestionData.length
+    );
   }
 
   identifyHighCongestionNodes(congestionData) {
@@ -716,40 +737,40 @@ class GridDataIngestionService {
     return {
       trend: Math.random() > 0.5 ? 'increasing' : 'decreasing',
       changePercent: (Math.random() - 0.5) * 20, // ±10%
-      timeRange
+      timeRange,
     };
   }
 
   identifyImpactedMarkets(congestionData) {
     const impactedMarkets = [];
     const highCongestionNodes = this.identifyHighCongestionNodes(congestionData);
-    
+
     highCongestionNodes.forEach(node => {
       impactedMarkets.push({
         nodeId: node.nodeId,
         nodeName: node.nodeName,
         impactLevel: node.congestionCost > 90 ? 'severe' : 'moderate',
-        estimatedPriceImpact: node.congestionCost * 0.8 // Estimated price impact
+        estimatedPriceImpact: node.congestionCost * 0.8, // Estimated price impact
       });
     });
-    
+
     return impactedMarkets;
   }
 
   generateCongestionRecommendations(congestionData) {
     const recommendations = [];
     const highCongestionCount = congestionData.filter(point => point.congestionCost > 75).length;
-    
+
     if (highCongestionCount > 5) {
       recommendations.push('Consider hedging exposure in high-congestion zones');
       recommendations.push('Monitor transmission maintenance schedules');
     }
-    
+
     if (highCongestionCount > 10) {
       recommendations.push('Implement dynamic pricing strategies');
       recommendations.push('Explore virtual transmission rights');
     }
-    
+
     return recommendations;
   }
 

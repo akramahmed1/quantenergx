@@ -12,7 +12,7 @@ class EnhancedComplianceService {
     this.regulatoryMappings = new Map();
     this.complianceReports = new Map();
     this.violationTracking = new Map();
-    
+
     this.initializeRegulatoryMappings();
     this.initializeBlockchainNotary();
   }
@@ -31,19 +31,19 @@ class EnhancedComplianceService {
           reporting: {
             transactions: { threshold: 1000, currency: 'EUR', timeframe: 'T+1' },
             fundamental_data: { timeframe: 'real_time', delay_max: 60 },
-            inside_information: { timeframe: 'immediate', delay_max: 15 }
+            inside_information: { timeframe: 'immediate', delay_max: 15 },
           },
           recordKeeping: {
             duration: '5_years',
             format: 'electronic',
-            accessibility: 'immediate'
+            accessibility: 'immediate',
           },
           marketSurveillance: {
             suspicious_trading: true,
             market_manipulation: true,
-            inside_information_abuse: true
-          }
-        }
+            inside_information_abuse: true,
+          },
+        },
       },
       {
         id: 'FERC_ORDER_760',
@@ -54,14 +54,14 @@ class EnhancedComplianceService {
           reporting: {
             outages: { timeframe: 'immediate', delay_max: 60 },
             cyber_incidents: { timeframe: 'immediate', delay_max: 60 },
-            market_data: { timeframe: 'T+1', format: 'XML' }
+            market_data: { timeframe: 'T+1', format: 'XML' },
           },
           compliance: {
             reliability_standards: 'NERC_CIP',
             cybersecurity: 'NIST_framework',
-            physical_security: 'NERC_physical'
-          }
-        }
+            physical_security: 'NERC_physical',
+          },
+        },
       },
       {
         id: 'MENA_ENERGY_REG',
@@ -72,14 +72,14 @@ class EnhancedComplianceService {
           reporting: {
             production: { timeframe: 'monthly', format: 'standardized' },
             exports: { timeframe: 'weekly', customs_integration: true },
-            pricing: { timeframe: 'daily', transparency: true }
+            pricing: { timeframe: 'daily', transparency: true },
           },
           compliance: {
             local_content: { minimum: 0.3, sector: 'renewable' },
             environmental: 'national_standards',
-            social_responsibility: 'local_investment'
-          }
-        }
+            social_responsibility: 'local_investment',
+          },
+        },
       },
       {
         id: 'GUYANA_PETROLEUM_ACT',
@@ -90,14 +90,14 @@ class EnhancedComplianceService {
           reporting: {
             production_sharing: { timeframe: 'monthly', government_copy: true },
             environmental_impact: { timeframe: 'quarterly', public_disclosure: true },
-            revenue_transparency: { timeframe: 'quarterly', eiti_compliant: true }
+            revenue_transparency: { timeframe: 'quarterly', eiti_compliant: true },
           },
           compliance: {
             local_content: { minimum: 0.1, increasing: true },
             environmental_standards: 'international',
-            community_investment: { minimum: 0.02, revenue_percentage: true }
-          }
-        }
+            community_investment: { minimum: 0.02, revenue_percentage: true },
+          },
+        },
       },
       {
         id: 'SOC2_TYPE_II',
@@ -110,14 +110,14 @@ class EnhancedComplianceService {
             availability: '99.9_percent',
             processing_integrity: 'data_validation',
             confidentiality: 'encryption',
-            privacy: 'gdpr_ccpa_compliance'
+            privacy: 'gdpr_ccpa_compliance',
           },
           audit: {
             frequency: 'annual',
             continuous_monitoring: true,
-            evidence_retention: '7_years'
-          }
-        }
+            evidence_retention: '7_years',
+          },
+        },
       },
       {
         id: 'ISO27001',
@@ -131,14 +131,14 @@ class EnhancedComplianceService {
             physical_security: 'A.11',
             operations_security: 'A.12',
             communications_security: 'A.13',
-            incident_management: 'A.16'
+            incident_management: 'A.16',
           },
           documentation: {
             isms_policy: true,
             risk_assessment: true,
-            statement_applicability: true
-          }
-        }
+            statement_applicability: true,
+          },
+        },
       },
       {
         id: 'NERC_CIP',
@@ -156,10 +156,10 @@ class EnhancedComplianceService {
             cip_008: 'incident_reporting',
             cip_009: 'recovery_plans',
             cip_010: 'configuration_change',
-            cip_011: 'information_protection'
-          }
-        }
-      }
+            cip_011: 'information_protection',
+          },
+        },
+      },
     ];
 
     regulations.forEach(regulation => {
@@ -177,7 +177,7 @@ class EnhancedComplianceService {
       gas_limit: 21000,
       confirmation_blocks: 12,
       hash_algorithm: 'SHA-256',
-      timestamp_authority: 'RFC3161_compliant'
+      timestamp_authority: 'RFC3161_compliant',
     });
   }
 
@@ -199,27 +199,27 @@ class EnhancedComplianceService {
         platform: communicationData.platform,
         encryption: communicationData.encryption || 'AES-256',
         retention_policy: this.getRetentionPolicy(communicationData.type),
-        regulatory_flags: await this.scanForRegulatoryContent(communicationData.content)
+        regulatory_flags: await this.scanForRegulatoryContent(communicationData.content),
       },
       compliance: {
         recorded: true,
         searchable: true,
         tamper_proof: true,
-        blockchain_hash: await this.notarizeOnBlockchain(logEntry)
-      }
+        blockchain_hash: await this.notarizeOnBlockchain(logEntry),
+      },
     };
 
     this.communicationLogs.set(logId, logEntry);
-    
+
     // Check for compliance violations
     await this.analyzeForCompliance(logEntry);
-    
+
     return {
       logId,
       status: 'logged',
       blockchain_hash: logEntry.compliance.blockchain_hash,
       retention_until: this.calculateRetentionDate(logEntry.metadata.retention_policy),
-      timestamp
+      timestamp,
     };
   }
 
@@ -241,48 +241,48 @@ class EnhancedComplianceService {
           step: 'initial_intent',
           timestamp,
           data: tradeData.initial_intent,
-          source: 'trader_input'
+          source: 'trader_input',
         },
         {
           step: 'risk_check',
           timestamp: new Date(Date.now() + 100).toISOString(),
           data: await this.performRiskCheck(tradeData),
-          source: 'risk_engine'
+          source: 'risk_engine',
         },
         {
           step: 'compliance_check',
           timestamp: new Date(Date.now() + 200).toISOString(),
           data: await this.performComplianceCheck(tradeData),
-          source: 'compliance_engine'
+          source: 'compliance_engine',
         },
         {
           step: 'execution_decision',
           timestamp: new Date(Date.now() + 300).toISOString(),
           data: this.makeExecutionDecision(tradeData),
-          source: 'execution_engine'
-        }
+          source: 'execution_engine',
+        },
       ],
       reconstruction_data: {
         market_conditions: await this.captureMarketConditions(tradeData.instrument),
         trader_context: await this.getTraderContext(tradeData.trader),
         system_state: await this.captureSystemState(),
-        external_factors: await this.captureExternalFactors(tradeData.instrument)
+        external_factors: await this.captureExternalFactors(tradeData.instrument),
       },
       compliance: {
         blockchain_hash: await this.notarizeOnBlockchain(intentLog),
         regulatory_requirements: this.mapRegulatoryRequirements(tradeData),
-        audit_trail: true
-      }
+        audit_trail: true,
+      },
     };
 
     this.tradeIntentLogs.set(intentId, intentLog);
-    
+
     return {
       intentId,
       status: 'logged',
       blockchain_hash: intentLog.compliance.blockchain_hash,
       reconstruction_available: true,
-      timestamp
+      timestamp,
     };
   }
 
@@ -292,10 +292,10 @@ class EnhancedComplianceService {
   async performEnhancedComplianceCheck(transactionData, region = 'US') {
     const checkId = this.generateLogId('COMP');
     const timestamp = new Date().toISOString();
-    
+
     // Get applicable regulations
     const applicableRegulations = this.getApplicableRegulations(transactionData, region);
-    
+
     const complianceResults = {
       checkId,
       timestamp,
@@ -303,21 +303,28 @@ class EnhancedComplianceService {
       region,
       applicable_regulations: applicableRegulations.map(reg => reg.id),
       detailed_checks: await this.performDetailedChecks(transactionData, applicableRegulations),
-      regulatory_reporting: await this.generateRegulatoryReporting(transactionData, applicableRegulations),
+      regulatory_reporting: await this.generateRegulatoryReporting(
+        transactionData,
+        applicableRegulations
+      ),
       audit_trail: {
         blockchain_hash: null,
         evidence_package: await this.createEvidencePackage(transactionData),
-        digital_signature: await this.createDigitalSignature(transactionData)
+        digital_signature: await this.createDigitalSignature(transactionData),
       },
       violation_analysis: await this.analyzeViolations(transactionData, applicableRegulations),
-      recommendations: await this.generateComplianceRecommendations(transactionData, applicableRegulations)
+      recommendations: await this.generateComplianceRecommendations(
+        transactionData,
+        applicableRegulations
+      ),
     };
 
     // Notarize on blockchain
-    complianceResults.audit_trail.blockchain_hash = await this.notarizeOnBlockchain(complianceResults);
-    
+    complianceResults.audit_trail.blockchain_hash =
+      await this.notarizeOnBlockchain(complianceResults);
+
     this.complianceReports.set(checkId, complianceResults);
-    
+
     return complianceResults;
   }
 
@@ -327,7 +334,7 @@ class EnhancedComplianceService {
   async generateAuditReport(reportType = 'full', dateRange = null, region = null) {
     const reportId = this.generateLogId('AUDIT');
     const timestamp = new Date().toISOString();
-    
+
     const auditReport = {
       reportId,
       timestamp,
@@ -342,33 +349,33 @@ class EnhancedComplianceService {
         violation_summary: await this.generateViolationSummary(dateRange, region),
         regulatory_mapping: await this.generateRegulatoryMapping(region),
         blockchain_verification: await this.verifyBlockchainIntegrity(dateRange),
-        recommendations: await this.generateAuditRecommendations(dateRange, region)
+        recommendations: await this.generateAuditRecommendations(dateRange, region),
       },
       metrics: {
         total_transactions: await this.countTransactions(dateRange, region),
         total_communications: await this.countCommunications(dateRange, region),
         compliance_rate: await this.calculateComplianceRate(dateRange, region),
         violation_count: await this.countViolations(dateRange, region),
-        blockchain_verification_rate: await this.calculateBlockchainVerificationRate(dateRange)
+        blockchain_verification_rate: await this.calculateBlockchainVerificationRate(dateRange),
       },
       attachments: {
         raw_data_hash: await this.generateRawDataHash(dateRange, region),
         evidence_packages: await this.collectEvidencePackages(dateRange, region),
-        regulatory_reports: await this.collectRegulatoryReports(dateRange, region)
+        regulatory_reports: await this.collectRegulatoryReports(dateRange, region),
       },
       certification: {
         auditor: 'QuantEnergx_Compliance_Engine',
         blockchain_hash: null,
         digital_signature: await this.createAuditSignature(reportId),
-        compliance_standards: ['SOC2', 'ISO27001', 'NERC_CIP']
-      }
+        compliance_standards: ['SOC2', 'ISO27001', 'NERC_CIP'],
+      },
     };
 
     // Notarize audit report on blockchain
     auditReport.certification.blockchain_hash = await this.notarizeOnBlockchain(auditReport);
-    
+
     this.auditLogs.set(reportId, auditReport);
-    
+
     return auditReport;
   }
 
@@ -377,32 +384,32 @@ class EnhancedComplianceService {
    */
   async getComplianceDashboard() {
     const currentTime = new Date().toISOString();
-    
+
     return {
       timestamp: currentTime,
       real_time_status: {
         compliance_score: await this.calculateCurrentComplianceScore(),
         active_violations: await this.getActiveViolations(),
         pending_reports: await this.getPendingReports(),
-        blockchain_sync_status: await this.getBlockchainSyncStatus()
+        blockchain_sync_status: await this.getBlockchainSyncStatus(),
       },
       communication_monitoring: {
         monitored_channels: this.getMonitoredChannels(),
         flagged_communications: await this.getFlaggedCommunications(),
-        retention_status: await this.getRetentionStatus()
+        retention_status: await this.getRetentionStatus(),
       },
       regulatory_compliance: {
         by_regulation: await this.getComplianceByRegulation(),
         upcoming_deadlines: await this.getUpcomingDeadlines(),
-        filing_status: await this.getFilingStatus()
+        filing_status: await this.getFilingStatus(),
       },
       audit_readiness: {
         documentation_completeness: await this.assessDocumentationCompleteness(),
         evidence_integrity: await this.verifyEvidenceIntegrity(),
-        blockchain_verification: await this.getBlockchainVerificationStatus()
+        blockchain_verification: await this.getBlockchainVerificationStatus(),
       },
       alerts: await this.getCurrentComplianceAlerts(),
-      recommendations: await this.getCurrentRecommendations()
+      recommendations: await this.getCurrentRecommendations(),
     };
   }
 
@@ -414,12 +421,12 @@ class EnhancedComplianceService {
 
   getRetentionPolicy(type) {
     const policies = {
-      'chat': '7_years',
-      'email': '7_years', 
-      'voice': '7_years',
-      'video': '7_years',
-      'trade': '7_years',
-      'compliance': '10_years'
+      chat: '7_years',
+      email: '7_years',
+      voice: '7_years',
+      video: '7_years',
+      trade: '7_years',
+      compliance: '10_years',
     };
     return policies[type] || '7_years';
   }
@@ -428,17 +435,17 @@ class EnhancedComplianceService {
     // Simulate regulatory content scanning
     const flags = [];
     const keywords = ['insider', 'manipulation', 'confidential', 'material', 'non-public'];
-    
+
     keywords.forEach(keyword => {
       if (content.toLowerCase().includes(keyword)) {
         flags.push({
           keyword,
           risk_level: 'medium',
-          regulation: 'market_abuse'
+          regulation: 'market_abuse',
         });
       }
     });
-    
+
     return flags;
   }
 
@@ -451,9 +458,9 @@ class EnhancedComplianceService {
       block_number: Math.floor(Math.random() * 1000000) + 10000000,
       timestamp: new Date().toISOString(),
       gas_used: 21000,
-      confirmations: 12
+      confirmations: 12,
     };
-    
+
     this.blockchainNotary.set(hash, blockchainTx);
     return hash;
   }
@@ -487,7 +494,7 @@ class EnhancedComplianceService {
     return {
       risk_score: Math.random() * 100,
       risk_factors: ['position_limit', 'credit_risk'],
-      approved: Math.random() > 0.1
+      approved: Math.random() > 0.1,
     };
   }
 
@@ -495,7 +502,7 @@ class EnhancedComplianceService {
     return {
       compliance_score: Math.random() * 100,
       violations: [],
-      approved: Math.random() > 0.05
+      approved: Math.random() > 0.05,
     };
   }
 
@@ -503,7 +510,7 @@ class EnhancedComplianceService {
     return {
       decision: Math.random() > 0.1 ? 'approved' : 'rejected',
       reasons: ['risk_approved', 'compliance_approved'],
-      execution_venue: 'primary_exchange'
+      execution_venue: 'primary_exchange',
     };
   }
 
@@ -512,7 +519,7 @@ class EnhancedComplianceService {
       price: Math.random() * 100 + 50,
       volume: Math.floor(Math.random() * 10000),
       volatility: Math.random() * 0.3,
-      spread: Math.random() * 0.1
+      spread: Math.random() * 0.1,
     };
   }
 
@@ -521,7 +528,7 @@ class EnhancedComplianceService {
       trader_id: trader,
       current_positions: Math.floor(Math.random() * 1000000),
       risk_limit: 5000000,
-      recent_activity: 'normal'
+      recent_activity: 'normal',
     };
   }
 
@@ -530,7 +537,7 @@ class EnhancedComplianceService {
       system_load: Math.random() * 100,
       latency: Math.random() * 10,
       available_liquidity: Math.random() * 10000000,
-      market_status: 'open'
+      market_status: 'open',
     };
   }
 
@@ -539,57 +546,55 @@ class EnhancedComplianceService {
       weather_impact: Math.random() * 0.1,
       geopolitical_risk: Math.random() * 0.05,
       supply_disruption: Math.random() > 0.9,
-      demand_forecast: Math.random() * 1000000
+      demand_forecast: Math.random() * 1000000,
     };
   }
 
   getApplicableRegulations(transactionData, region) {
     const regulations = Array.from(this.regulatoryMappings.values());
-    return regulations.filter(reg => 
-      reg.region === region || reg.region === 'Global'
-    );
+    return regulations.filter(reg => reg.region === region || reg.region === 'Global');
   }
 
   async performDetailedChecks(transactionData, regulations) {
     const checks = [];
-    
+
     for (const regulation of regulations) {
       checks.push({
         regulation_id: regulation.id,
         checks: await this.performRegulationSpecificChecks(transactionData, regulation),
-        compliance_status: Math.random() > 0.1 ? 'compliant' : 'non_compliant'
+        compliance_status: Math.random() > 0.1 ? 'compliant' : 'non_compliant',
       });
     }
-    
+
     return checks;
   }
 
   async performRegulationSpecificChecks(transactionData, regulation) {
     // Regulation-specific compliance checks
     const checks = [];
-    
+
     if (regulation.requirements.reporting) {
       checks.push({
         type: 'reporting_requirements',
         status: 'compliant',
-        details: regulation.requirements.reporting
+        details: regulation.requirements.reporting,
       });
     }
-    
+
     if (regulation.requirements.recordKeeping) {
       checks.push({
         type: 'record_keeping',
         status: 'compliant',
-        details: regulation.requirements.recordKeeping
+        details: regulation.requirements.recordKeeping,
       });
     }
-    
+
     return checks;
   }
 
   async generateRegulatoryReporting(transactionData, regulations) {
     const reports = [];
-    
+
     for (const regulation of regulations) {
       if (regulation.requirements.reporting) {
         reports.push({
@@ -597,11 +602,11 @@ class EnhancedComplianceService {
           report_type: 'transaction_report',
           due_date: this.calculateReportingDeadline(regulation.requirements.reporting),
           status: 'generated',
-          file_reference: `${regulation.id}_${Date.now()}.xml`
+          file_reference: `${regulation.id}_${Date.now()}.xml`,
         });
       }
     }
-    
+
     return reports;
   }
 
@@ -623,11 +628,11 @@ class EnhancedComplianceService {
         'market_data_snapshot',
         'risk_calculations',
         'compliance_approvals',
-        'audit_trail'
+        'audit_trail',
       ],
       encryption: 'AES-256',
       digital_signature: await this.generateHash('evidence_package'),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -641,7 +646,7 @@ class EnhancedComplianceService {
       violations_found: 0,
       potential_violations: [],
       risk_score: Math.random() * 100,
-      recommendations: ['maintain_current_practices']
+      recommendations: ['maintain_current_practices'],
     };
   }
 
@@ -650,22 +655,22 @@ class EnhancedComplianceService {
       'Ensure all communication is properly logged',
       'Maintain adequate documentation for audit trail',
       'Regular compliance training for trading staff',
-      'Update risk parameters based on regulatory changes'
+      'Update risk parameters based on regulatory changes',
     ];
   }
 
   mapRegulatoryRequirements(tradeData) {
     const requirements = [];
-    
+
     // Map based on trade characteristics
     if (tradeData.value > 1000000) {
       requirements.push('large_trader_reporting');
     }
-    
+
     if (tradeData.instrument.includes('derivative')) {
       requirements.push('derivative_reporting');
     }
-    
+
     return requirements;
   }
 
@@ -673,10 +678,10 @@ class EnhancedComplianceService {
     const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(endDate.getDate() - 30); // Last 30 days
-    
+
     return {
       start: startDate.toISOString(),
-      end: endDate.toISOString()
+      end: endDate.toISOString(),
     };
   }
 
@@ -686,40 +691,40 @@ class EnhancedComplianceService {
       key_metrics: {
         total_trades: Math.floor(Math.random() * 10000),
         compliance_rate: 99.8,
-        violations: 0
+        violations: 0,
       },
       highlights: [
         'Zero material compliance violations',
         'All regulatory deadlines met',
-        'Blockchain verification 100% complete'
-      ]
+        'Blockchain verification 100% complete',
+      ],
     };
   }
 
   async analyzeCommunicationLogs(dateRange, region) {
     const totalComms = Array.from(this.communicationLogs.values()).length;
-    
+
     return {
       total_communications: totalComms,
       by_type: {
         chat: Math.floor(totalComms * 0.4),
         email: Math.floor(totalComms * 0.3),
         voice: Math.floor(totalComms * 0.2),
-        video: Math.floor(totalComms * 0.1)
+        video: Math.floor(totalComms * 0.1),
       },
       flagged_communications: 0,
-      retention_compliance: 100
+      retention_compliance: 100,
     };
   }
 
   async analyzeTradeIntentLogs(dateRange, region) {
     const totalIntents = Array.from(this.tradeIntentLogs.values()).length;
-    
+
     return {
       total_trade_intents: totalIntents,
       successful_reconstructions: totalIntents,
       decision_accuracy: 99.5,
-      average_decision_time: 450 // milliseconds
+      average_decision_time: 450, // milliseconds
     };
   }
 
@@ -727,13 +732,13 @@ class EnhancedComplianceService {
     return {
       overall_score: 98.5,
       by_regulation: {
-        'REMIT_II': 99.0,
-        'FERC_ORDER_760': 98.0,
-        'SOC2_TYPE_II': 99.5,
-        'ISO27001': 98.5
+        REMIT_II: 99.0,
+        FERC_ORDER_760: 98.0,
+        SOC2_TYPE_II: 99.5,
+        ISO27001: 98.5,
       },
       areas_for_improvement: [],
-      corrective_actions: []
+      corrective_actions: [],
     };
   }
 
@@ -744,35 +749,36 @@ class EnhancedComplianceService {
         critical: 0,
         high: 0,
         medium: 0,
-        low: 0
+        low: 0,
       },
       resolved_violations: 0,
-      pending_violations: 0
+      pending_violations: 0,
     };
   }
 
   async generateRegulatoryMapping(region) {
-    const applicableRegs = Array.from(this.regulatoryMappings.values())
-      .filter(reg => reg.region === region || reg.region === 'Global');
-    
+    const applicableRegs = Array.from(this.regulatoryMappings.values()).filter(
+      reg => reg.region === region || reg.region === 'Global'
+    );
+
     return {
       applicable_regulations: applicableRegs.length,
       compliance_status: applicableRegs.map(reg => ({
         regulation_id: reg.id,
         status: 'compliant',
-        last_review: new Date().toISOString()
-      }))
+        last_review: new Date().toISOString(),
+      })),
     };
   }
 
   async verifyBlockchainIntegrity(dateRange) {
     const totalHashes = this.blockchainNotary.size;
-    
+
     return {
       total_entries: totalHashes,
       verified_entries: totalHashes,
       verification_rate: 100,
-      last_verification: new Date().toISOString()
+      last_verification: new Date().toISOString(),
     };
   }
 
@@ -781,7 +787,7 @@ class EnhancedComplianceService {
       'Continue current compliance monitoring practices',
       'Regular review of regulatory updates',
       'Enhanced training on new regulations',
-      'Periodic third-party compliance audits'
+      'Periodic third-party compliance audits',
     ];
   }
 
@@ -798,8 +804,8 @@ class EnhancedComplianceService {
       {
         report_type: 'REMIT_transaction_report',
         due_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        status: 'in_progress'
-      }
+        status: 'in_progress',
+      },
     ];
   }
 
@@ -807,7 +813,7 @@ class EnhancedComplianceService {
     return {
       status: 'synced',
       last_sync: new Date().toISOString(),
-      pending_transactions: 0
+      pending_transactions: 0,
     };
   }
 
@@ -816,30 +822,31 @@ class EnhancedComplianceService {
   }
 
   async getFlaggedCommunications() {
-    return Array.from(this.communicationLogs.values())
-      .filter(log => log.metadata.regulatory_flags.length > 0);
+    return Array.from(this.communicationLogs.values()).filter(
+      log => log.metadata.regulatory_flags.length > 0
+    );
   }
 
   async getRetentionStatus() {
     return {
       total_records: this.communicationLogs.size,
       within_retention: this.communicationLogs.size,
-      scheduled_deletion: 0
+      scheduled_deletion: 0,
     };
   }
 
   async getComplianceByRegulation() {
     const regulations = Array.from(this.regulatoryMappings.keys());
     const complianceMap = {};
-    
+
     regulations.forEach(regId => {
       complianceMap[regId] = {
         status: 'compliant',
         score: 95 + Math.random() * 5,
-        last_assessment: new Date().toISOString()
+        last_assessment: new Date().toISOString(),
       };
     });
-    
+
     return complianceMap;
   }
 
@@ -848,8 +855,8 @@ class EnhancedComplianceService {
       {
         regulation: 'REMIT_II',
         requirement: 'quarterly_report',
-        due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-      }
+        due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      },
     ];
   }
 
@@ -857,7 +864,7 @@ class EnhancedComplianceService {
     return {
       current_filings: 'up_to_date',
       pending_submissions: 1,
-      overdue_filings: 0
+      overdue_filings: 0,
     };
   }
 
@@ -865,7 +872,7 @@ class EnhancedComplianceService {
     return {
       completeness_score: 99.2,
       missing_documents: [],
-      documentation_gaps: []
+      documentation_gaps: [],
     };
   }
 
@@ -873,7 +880,7 @@ class EnhancedComplianceService {
     return {
       integrity_score: 100,
       corrupted_evidence: 0,
-      verification_failures: 0
+      verification_failures: 0,
     };
   }
 
@@ -881,7 +888,7 @@ class EnhancedComplianceService {
     return {
       verification_rate: 100,
       failed_verifications: 0,
-      last_verification: new Date().toISOString()
+      last_verification: new Date().toISOString(),
     };
   }
 
@@ -890,8 +897,8 @@ class EnhancedComplianceService {
       {
         level: 'info',
         message: 'Upcoming regulatory filing deadline in 7 days',
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     ];
   }
 
@@ -899,7 +906,7 @@ class EnhancedComplianceService {
     return [
       'Schedule quarterly compliance review',
       'Update trader training materials',
-      'Review new regulatory guidance documents'
+      'Review new regulatory guidance documents',
     ];
   }
 
@@ -929,8 +936,9 @@ class EnhancedComplianceService {
   }
 
   async collectEvidencePackages(dateRange, region) {
-    return Array.from(this.complianceReports.values())
-      .map(report => report.audit_trail.evidence_package);
+    return Array.from(this.complianceReports.values()).map(
+      report => report.audit_trail.evidence_package
+    );
   }
 
   async collectRegulatoryReports(dateRange, region) {

@@ -10,7 +10,7 @@ class MLPredictionService {
     this.modelPerformance = new Map();
     this.features = new Map();
     this.ensembleModels = new Map();
-    
+
     this.initializeModels();
     this.initializeFeatureEngineering();
   }
@@ -36,8 +36,8 @@ class MLPredictionService {
           activation: 'tanh',
           optimizer: 'adam',
           loss: 'mse',
-          epochs: 100
-        }
+          epochs: 100,
+        },
       },
       {
         id: 'natural_gas_demand_prophet',
@@ -53,8 +53,8 @@ class MLPredictionService {
           seasonality_mode: 'multiplicative',
           weekly_seasonality: true,
           yearly_seasonality: true,
-          changepoint_prior_scale: 0.05
-        }
+          changepoint_prior_scale: 0.05,
+        },
       },
       {
         id: 'electricity_volatility_garch',
@@ -70,8 +70,8 @@ class MLPredictionService {
           q: 1,
           distribution: 'normal',
           mean_model: 'AR',
-          vol_model: 'GARCH'
-        }
+          vol_model: 'GARCH',
+        },
       },
       {
         id: 'portfolio_optimization_rl',
@@ -88,8 +88,8 @@ class MLPredictionService {
           gamma: 0.99,
           epsilon: 0.2,
           value_coefficient: 0.5,
-          entropy_coefficient: 0.01
-        }
+          entropy_coefficient: 0.01,
+        },
       },
       {
         id: 'renewable_generation_xgb',
@@ -97,7 +97,12 @@ class MLPredictionService {
         type: 'xgboost',
         target: 'generation_forecast',
         commodity: 'renewable_energy',
-        features: ['weather_forecast', 'historical_generation', 'seasonal_patterns', 'grid_conditions'],
+        features: [
+          'weather_forecast',
+          'historical_generation',
+          'seasonal_patterns',
+          'grid_conditions',
+        ],
         timeframe: '1h',
         forecast_horizon: 48, // 48 hours ahead
         model_params: {
@@ -107,8 +112,8 @@ class MLPredictionService {
           subsample: 0.8,
           colsample_bytree: 0.8,
           reg_alpha: 0.1,
-          reg_lambda: 1.0
-        }
+          reg_lambda: 1.0,
+        },
       },
       {
         id: 'carbon_price_ensemble',
@@ -122,9 +127,9 @@ class MLPredictionService {
         model_params: {
           base_models: ['lstm', 'xgboost', 'arima'],
           ensemble_method: 'weighted_average',
-          weights: [0.4, 0.4, 0.2]
-        }
-      }
+          weights: [0.4, 0.4, 0.2],
+        },
+      },
     ];
 
     modelConfigs.forEach(config => {
@@ -139,9 +144,9 @@ class MLPredictionService {
           mae: null,
           mape: null,
           r2: null,
-          directional_accuracy: null
+          directional_accuracy: null,
         },
-        is_production_ready: false
+        is_production_ready: false,
       });
     });
   }
@@ -159,8 +164,8 @@ class MLPredictionService {
           ema_periods: [12, 26],
           rsi_period: 14,
           macd_params: [12, 26, 9],
-          bollinger_period: 20
-        }
+          bollinger_period: 20,
+        },
       },
       {
         name: 'market_microstructure',
@@ -168,26 +173,31 @@ class MLPredictionService {
         parameters: {
           imbalance_levels: 5,
           intensity_window: 60,
-          impact_window: 300
-        }
+          impact_window: 300,
+        },
       },
       {
         name: 'external_factors',
-        features: ['weather_data', 'economic_indicators', 'geopolitical_events', 'regulatory_changes'],
+        features: [
+          'weather_data',
+          'economic_indicators',
+          'geopolitical_events',
+          'regulatory_changes',
+        ],
         parameters: {
           weather_lag: 24,
           economic_lag: 30,
-          event_impact_window: 7
-        }
+          event_impact_window: 7,
+        },
       },
       {
         name: 'seasonal_decomposition',
         features: ['trend', 'seasonal', 'residual', 'day_of_week', 'hour_of_day', 'month_of_year'],
         parameters: {
           decomposition_method: 'stl',
-          seasonal_periods: [24, 168, 8760] // hourly, weekly, yearly
-        }
-      }
+          seasonal_periods: [24, 168, 8760], // hourly, weekly, yearly
+        },
+      },
     ];
   }
 
@@ -202,34 +212,34 @@ class MLPredictionService {
 
     try {
       model.training_status = 'in_progress';
-      
+
       // Get or generate training data
-      const data = trainingData || await this.generateTrainingData(model);
-      
+      const data = trainingData || (await this.generateTrainingData(model));
+
       // Feature engineering
       const engineeredFeatures = await this.engineerFeatures(data, model);
-      
+
       // Split data
       const { trainSet, validationSet, testSet } = this.splitData(engineeredFeatures);
-      
+
       // Train model based on type
       const trainedModel = await this.trainModelByType(model, trainSet, validationSet);
-      
+
       // Evaluate performance
       const performance = await this.evaluateModel(trainedModel, testSet, model);
-      
+
       // Update model
       model.training_status = 'completed';
       model.last_trained = new Date().toISOString();
       model.performance_metrics = performance;
       model.is_production_ready = performance.mape < 15; // 15% MAPE threshold
       model.trained_model = trainedModel;
-      
+
       this.modelPerformance.set(modelId, {
         training_performance: performance,
         training_date: new Date().toISOString(),
         data_points: trainSet.length,
-        features_used: engineeredFeatures.features.length
+        features_used: engineeredFeatures.features.length,
       });
 
       return {
@@ -237,9 +247,8 @@ class MLPredictionService {
         training_status: 'completed',
         performance: performance,
         is_production_ready: model.is_production_ready,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-
     } catch (error) {
       model.training_status = 'failed';
       model.training_error = error.message;
@@ -262,17 +271,17 @@ class MLPredictionService {
 
     try {
       // Get current data if not provided
-      const data = inputData || await this.getCurrentMarketData(model.commodity);
-      
+      const data = inputData || (await this.getCurrentMarketData(model.commodity));
+
       // Engineer features
       const features = await this.engineerFeatures(data, model);
-      
+
       // Generate prediction based on model type
       const prediction = await this.generatePredictionByType(model, features, forecastHorizon);
-      
+
       // Calculate confidence intervals
       const confidenceIntervals = await this.calculateConfidenceIntervals(model, prediction);
-      
+
       // Store prediction
       const predictionResult = {
         model_id: modelId,
@@ -282,14 +291,13 @@ class MLPredictionService {
         prediction: prediction,
         confidence_intervals: confidenceIntervals,
         features_used: features.feature_names,
-        market_conditions: await this.getMarketConditions(model.commodity)
+        market_conditions: await this.getMarketConditions(model.commodity),
       };
-      
+
       this.predictions.set(predictionResult.prediction_id, predictionResult);
       model.last_prediction = new Date().toISOString();
-      
-      return predictionResult;
 
+      return predictionResult;
     } catch (error) {
       throw new Error(`Prediction failed for model ${modelId}: ${error.message}`);
     }
@@ -301,7 +309,7 @@ class MLPredictionService {
   async optimizeAssets(portfolioData, constraints = {}) {
     const modelId = 'portfolio_optimization_rl';
     const model = this.models.get(modelId);
-    
+
     if (!model || !model.is_production_ready) {
       throw new Error('Portfolio optimization model not ready');
     }
@@ -309,16 +317,16 @@ class MLPredictionService {
     try {
       // Prepare state representation
       const state = await this.preparePortfolioState(portfolioData, constraints);
-      
+
       // Get optimal actions from RL model
       const actions = await this.getOptimalActions(model, state);
-      
+
       // Convert actions to portfolio weights
       const optimizedWeights = await this.convertActionsToWeights(actions, constraints);
-      
+
       // Calculate expected returns and risks
       const expectedMetrics = await this.calculateExpectedMetrics(optimizedWeights, portfolioData);
-      
+
       // Generate rebalancing recommendations
       const rebalancingPlan = await this.generateRebalancingPlan(
         portfolioData.current_weights,
@@ -336,9 +344,8 @@ class MLPredictionService {
         sharpe_ratio: expectedMetrics.sharpe_ratio,
         rebalancing_plan: rebalancingPlan,
         constraints_applied: constraints,
-        model_confidence: expectedMetrics.confidence
+        model_confidence: expectedMetrics.confidence,
       };
-
     } catch (error) {
       throw new Error(`Asset optimization failed: ${error.message}`);
     }
@@ -358,7 +365,7 @@ class MLPredictionService {
       risk_alerts: await this.getRiskAlerts(),
       optimization_opportunities: await this.getOptimizationOpportunities(),
       feature_importance: await this.getFeatureImportance(),
-      model_explanations: await this.getModelExplanations()
+      model_explanations: await this.getModelExplanations(),
     };
 
     return dashboard;
@@ -369,12 +376,12 @@ class MLPredictionService {
    */
   async generateEnsemblePrediction(commodity, forecastHorizon = 24) {
     // Find all models for the commodity
-    const commodityModels = Array.from(this.models.values())
-      .filter(model => 
-        model.commodity === commodity && 
+    const commodityModels = Array.from(this.models.values()).filter(
+      model =>
+        model.commodity === commodity &&
         model.is_production_ready &&
         model.target === 'price_prediction'
-      );
+    );
 
     if (commodityModels.length === 0) {
       throw new Error(`No production-ready models found for ${commodity}`);
@@ -388,7 +395,7 @@ class MLPredictionService {
       try {
         const prediction = await this.predict(model.id, null, forecastHorizon);
         predictions.push(prediction);
-        
+
         // Weight based on historical performance
         const weight = this.calculateModelWeight(model);
         weights.push(weight);
@@ -412,7 +419,7 @@ class MLPredictionService {
       individual_predictions: predictions,
       ensemble_prediction: ensemblePrediction,
       model_weights: normalizedWeights,
-      confidence_score: this.calculateEnsembleConfidence(predictions, normalizedWeights)
+      confidence_score: this.calculateEnsembleConfidence(predictions, normalizedWeights),
     };
   }
 
@@ -424,19 +431,19 @@ class MLPredictionService {
     const data = {
       timestamps: [],
       features: {},
-      target: []
+      target: [],
     };
 
     for (let i = 0; i < dataPoints; i++) {
       const timestamp = new Date(Date.now() - (dataPoints - i) * 3600000).toISOString();
       data.timestamps.push(timestamp);
-      
+
       // Generate simulated features
       model.features.forEach(feature => {
         if (!data.features[feature]) data.features[feature] = [];
         data.features[feature].push(this.generateSimulatedFeature(feature, i));
       });
-      
+
       // Generate target based on model type
       data.target.push(this.generateSimulatedTarget(model.target, i));
     }
@@ -446,13 +453,13 @@ class MLPredictionService {
 
   generateSimulatedFeature(featureName, index) {
     const generators = {
-      'price_history': () => 50 + Math.sin(index * 0.1) * 10 + Math.random() * 5,
-      'volume': () => Math.floor(Math.random() * 10000) + 1000,
-      'volatility': () => Math.random() * 0.5,
-      'weather': () => 20 + Math.random() * 30,
-      'external_factors': () => Math.random(),
-      'returns': () => (Math.random() - 0.5) * 0.1,
-      'correlations': () => Math.random() * 2 - 1
+      price_history: () => 50 + Math.sin(index * 0.1) * 10 + Math.random() * 5,
+      volume: () => Math.floor(Math.random() * 10000) + 1000,
+      volatility: () => Math.random() * 0.5,
+      weather: () => 20 + Math.random() * 30,
+      external_factors: () => Math.random(),
+      returns: () => (Math.random() - 0.5) * 0.1,
+      correlations: () => Math.random() * 2 - 1,
     };
 
     return generators[featureName] ? generators[featureName]() : Math.random();
@@ -460,11 +467,11 @@ class MLPredictionService {
 
   generateSimulatedTarget(targetType, index) {
     const generators = {
-      'price_prediction': () => 50 + Math.sin(index * 0.1) * 10 + Math.random() * 5,
-      'demand_prediction': () => 1000 + Math.sin(index * 0.05) * 200 + Math.random() * 100,
-      'volatility_prediction': () => Math.random() * 0.3,
-      'portfolio_weights': () => Math.random(),
-      'generation_forecast': () => Math.random() * 1000
+      price_prediction: () => 50 + Math.sin(index * 0.1) * 10 + Math.random() * 5,
+      demand_prediction: () => 1000 + Math.sin(index * 0.05) * 200 + Math.random() * 100,
+      volatility_prediction: () => Math.random() * 0.3,
+      portfolio_weights: () => Math.random(),
+      generation_forecast: () => Math.random() * 1000,
     };
 
     return generators[targetType] ? generators[targetType]() : Math.random();
@@ -475,7 +482,7 @@ class MLPredictionService {
     const engineeredData = {
       features: {},
       feature_names: [],
-      target: data.target
+      target: data.target,
     };
 
     // Apply feature pipelines
@@ -490,7 +497,7 @@ class MLPredictionService {
 
   async applyFeaturePipeline(pipeline, data) {
     const features = {};
-    
+
     pipeline.features.forEach(featureName => {
       // Simulate feature calculation
       features[`${pipeline.name}_${featureName}`] = Array(data.target.length)
@@ -509,14 +516,14 @@ class MLPredictionService {
     return {
       trainSet: this.sliceData(data, 0, trainSize),
       validationSet: this.sliceData(data, trainSize, trainSize + validationSize),
-      testSet: this.sliceData(data, trainSize + validationSize, totalSamples)
+      testSet: this.sliceData(data, trainSize + validationSize, totalSamples),
     };
   }
 
   sliceData(data, start, end) {
     const sliced = {
       features: {},
-      target: data.target.slice(start, end)
+      target: data.target.slice(start, end),
     };
 
     Object.keys(data.features).forEach(key => {
@@ -535,7 +542,7 @@ class MLPredictionService {
       validation_samples: validationSet.target.length,
       trained_at: new Date().toISOString(),
       weights: this.generateRandomWeights(model.features.length),
-      intercept: Math.random()
+      intercept: Math.random(),
     };
 
     // Simulate training time
@@ -561,7 +568,7 @@ class MLPredictionService {
       mape,
       r2,
       directional_accuracy: directionalAccuracy,
-      test_samples: testSet.target.length
+      test_samples: testSet.target.length,
     };
   }
 
@@ -576,8 +583,8 @@ class MLPredictionService {
   }
 
   calculateMAPE(predictions, actual) {
-    const percentageErrors = predictions.map((pred, i) => 
-      Math.abs((actual[i] - pred) / actual[i]) * 100
+    const percentageErrors = predictions.map(
+      (pred, i) => Math.abs((actual[i] - pred) / actual[i]) * 100
     );
     return percentageErrors.reduce((sum, err) => sum + err, 0) / percentageErrors.length;
   }
@@ -585,18 +592,19 @@ class MLPredictionService {
   calculateR2(predictions, actual) {
     const actualMean = actual.reduce((sum, val) => sum + val, 0) / actual.length;
     const totalSumSquares = actual.reduce((sum, val) => sum + Math.pow(val - actualMean, 2), 0);
-    const residualSumSquares = predictions.reduce((sum, pred, i) => 
-      sum + Math.pow(actual[i] - pred, 2), 0
+    const residualSumSquares = predictions.reduce(
+      (sum, pred, i) => sum + Math.pow(actual[i] - pred, 2),
+      0
     );
-    
-    return 1 - (residualSumSquares / totalSumSquares);
+
+    return 1 - residualSumSquares / totalSumSquares;
   }
 
   calculateDirectionalAccuracy(predictions, actual) {
     let correct = 0;
     for (let i = 1; i < predictions.length; i++) {
-      const predDirection = predictions[i] > predictions[i-1];
-      const actualDirection = actual[i] > actual[i-1];
+      const predDirection = predictions[i] > predictions[i - 1];
+      const actualDirection = actual[i] > actual[i - 1];
       if (predDirection === actualDirection) correct++;
     }
     return correct / (predictions.length - 1);
@@ -611,7 +619,7 @@ class MLPredictionService {
       const prediction = {
         timestamp: new Date(Date.now() + i * 3600000).toISOString(),
         value: Math.random() * 100 + 50,
-        confidence: 0.8 + Math.random() * 0.2
+        confidence: 0.8 + Math.random() * 0.2,
       };
       predictions.push(prediction);
     }
@@ -624,12 +632,14 @@ class MLPredictionService {
       timestamp: pred.timestamp,
       lower_bound: pred.value * 0.9,
       upper_bound: pred.value * 1.1,
-      confidence_level: 0.95
+      confidence_level: 0.95,
     }));
   }
 
   generateRandomWeights(size) {
-    return Array(size).fill(0).map(() => Math.random() - 0.5);
+    return Array(size)
+      .fill(0)
+      .map(() => Math.random() - 0.5);
   }
 
   generatePredictionId() {
@@ -655,27 +665,30 @@ class MLPredictionService {
       total_models: models.length,
       production_ready: models.filter(m => m.is_production_ready).length,
       training: models.filter(m => m.training_status === 'in_progress').length,
-      failed: models.filter(m => m.training_status === 'failed').length
+      failed: models.filter(m => m.training_status === 'failed').length,
     };
   }
 
   async getRecentPredictions(timeframe) {
     const cutoffTime = new Date(Date.now() - this.parseTimeframe(timeframe));
-    const recentPredictions = Array.from(this.predictions.values())
-      .filter(pred => new Date(pred.timestamp) > cutoffTime);
-    
+    const recentPredictions = Array.from(this.predictions.values()).filter(
+      pred => new Date(pred.timestamp) > cutoffTime
+    );
+
     return recentPredictions.slice(0, 10); // Return latest 10
   }
 
   async getPerformanceSummary() {
     const performances = Array.from(this.modelPerformance.values());
-    
+
     return {
-      average_mape: performances.reduce((sum, p) => sum + p.training_performance.mape, 0) / performances.length,
-      average_r2: performances.reduce((sum, p) => sum + p.training_performance.r2, 0) / performances.length,
-      best_model: performances.reduce((best, p) => 
+      average_mape:
+        performances.reduce((sum, p) => sum + p.training_performance.mape, 0) / performances.length,
+      average_r2:
+        performances.reduce((sum, p) => sum + p.training_performance.r2, 0) / performances.length,
+      best_model: performances.reduce((best, p) =>
         p.training_performance.mape < best.training_performance.mape ? p : best
-      )
+      ),
     };
   }
 
@@ -684,7 +697,7 @@ class MLPredictionService {
       'Crude oil prices showing bullish trend with 78% directional accuracy',
       'Natural gas demand forecast indicates 15% increase next month',
       'Renewable generation expected to peak during midday hours',
-      'Carbon credit prices stabilizing after recent volatility'
+      'Carbon credit prices stabilizing after recent volatility',
     ];
   }
 
@@ -693,8 +706,8 @@ class MLPredictionService {
       {
         level: 'medium',
         message: 'Electricity volatility model predicting high variance next week',
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     ];
   }
 
@@ -703,37 +716,40 @@ class MLPredictionService {
       {
         type: 'portfolio_rebalancing',
         potential_improvement: '8.5% Sharpe ratio increase',
-        confidence: 0.85
+        confidence: 0.85,
       },
       {
         type: 'hedging_strategy',
         potential_improvement: '12% risk reduction',
-        confidence: 0.92
-      }
+        confidence: 0.92,
+      },
     ];
   }
 
   async getFeatureImportance() {
     return {
-      'price_history': 0.35,
-      'volume': 0.20,
-      'volatility': 0.15,
-      'external_factors': 0.15,
-      'technical_indicators': 0.10,
-      'seasonal_patterns': 0.05
+      price_history: 0.35,
+      volume: 0.2,
+      volatility: 0.15,
+      external_factors: 0.15,
+      technical_indicators: 0.1,
+      seasonal_patterns: 0.05,
     };
   }
 
   async getModelExplanations() {
     return {
-      'crude_oil_price_lstm': 'LSTM model captures temporal dependencies in price movements with strong predictive power during trending markets',
-      'natural_gas_demand_prophet': 'Prophet model excels at capturing seasonal patterns and holiday effects in demand forecasting',
-      'portfolio_optimization_rl': 'Reinforcement learning adapts to changing market conditions for dynamic portfolio allocation'
+      crude_oil_price_lstm:
+        'LSTM model captures temporal dependencies in price movements with strong predictive power during trending markets',
+      natural_gas_demand_prophet:
+        'Prophet model excels at capturing seasonal patterns and holiday effects in demand forecasting',
+      portfolio_optimization_rl:
+        'Reinforcement learning adapts to changing market conditions for dynamic portfolio allocation',
     };
   }
 
   parseTimeframe(timeframe) {
-    const multipliers = { 'h': 3600000, 'd': 86400000, 'w': 604800000 };
+    const multipliers = { h: 3600000, d: 86400000, w: 604800000 };
     const match = timeframe.match(/(\d+)([hdw])/);
     if (match) {
       return parseInt(match[1]) * multipliers[match[2]];
@@ -744,9 +760,10 @@ class MLPredictionService {
   calculateModelWeight(model) {
     // Weight based on inverse of MAPE and recency
     const mapeWeight = 1 / (model.performance_metrics.mape + 1);
-    const recencyWeight = model.last_trained ? 
-      1 / ((Date.now() - new Date(model.last_trained)) / 86400000 + 1) : 0.1;
-    
+    const recencyWeight = model.last_trained
+      ? 1 / ((Date.now() - new Date(model.last_trained)) / 86400000 + 1)
+      : 0.1;
+
     return mapeWeight * recencyWeight;
   }
 
@@ -769,7 +786,7 @@ class MLPredictionService {
         combinedPrediction.push({
           timestamp: predictions[0].prediction[i]?.timestamp,
           value: weightedSum / totalWeight,
-          confidence: this.calculateCombinedConfidence(predictions, weights, i)
+          confidence: this.calculateCombinedConfidence(predictions, weights, i),
         });
       }
     }
@@ -793,13 +810,14 @@ class MLPredictionService {
 
   calculateEnsembleConfidence(predictions, weights) {
     const avgConfidence = predictions.reduce((sum, pred, idx) => {
-      const predAvgConfidence = pred.prediction.reduce((pSum, p) => pSum + p.confidence, 0) / pred.prediction.length;
+      const predAvgConfidence =
+        pred.prediction.reduce((pSum, p) => pSum + p.confidence, 0) / pred.prediction.length;
       return sum + predAvgConfidence * weights[idx];
     }, 0);
 
     // Add diversity bonus
     const diversityBonus = predictions.length > 1 ? 0.1 : 0;
-    
+
     return Math.min(1.0, avgConfidence + diversityBonus);
   }
 
@@ -813,11 +831,17 @@ class MLPredictionService {
   }
 
   async preparePortfolioState(portfolioData, constraints) {
-    return { state_vector: Array(10).fill(0).map(() => Math.random()) };
+    return {
+      state_vector: Array(10)
+        .fill(0)
+        .map(() => Math.random()),
+    };
   }
 
   async getOptimalActions(model, state) {
-    return Array(5).fill(0).map(() => Math.random() - 0.5);
+    return Array(5)
+      .fill(0)
+      .map(() => Math.random() - 0.5);
   }
 
   async convertActionsToWeights(actions, constraints) {
@@ -831,7 +855,7 @@ class MLPredictionService {
       expected_return: 0.08 + Math.random() * 0.04,
       expected_risk: 0.15 + Math.random() * 0.05,
       sharpe_ratio: 0.8 + Math.random() * 0.4,
-      confidence: 0.85
+      confidence: 0.85,
     };
   }
 
@@ -840,7 +864,7 @@ class MLPredictionService {
       trades_required: 5,
       total_turnover: 0.15,
       estimated_cost: 0.001,
-      execution_time: '2_hours'
+      execution_time: '2_hours',
     };
   }
 }

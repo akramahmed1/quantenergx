@@ -7,23 +7,23 @@ class NotificationService {
     this.whatsappConfig = {
       apiUrl: process.env.WHATSAPP_API_URL || 'https://graph.facebook.com/v18.0',
       token: process.env.WHATSAPP_API_TOKEN,
-      phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID
+      phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID,
     };
-    
+
     this.emailConfig = {
       provider: process.env.EMAIL_PROVIDER || 'sendgrid', // sendgrid, ses, mailgun
       apiKey: process.env.EMAIL_API_KEY,
       fromEmail: process.env.FROM_EMAIL || 'notifications@quantenergx.com',
-      fromName: process.env.FROM_NAME || 'QuantEnergx'
+      fromName: process.env.FROM_NAME || 'QuantEnergx',
     };
-    
+
     this.smsConfig = {
       provider: process.env.SMS_PROVIDER || 'twilio', // twilio, aws-sns, vonage
       accountSid: process.env.TWILIO_ACCOUNT_SID,
       authToken: process.env.TWILIO_AUTH_TOKEN,
-      fromNumber: process.env.TWILIO_FROM_NUMBER
+      fromNumber: process.env.TWILIO_FROM_NUMBER,
     };
-    
+
     // Initialize Telegram bot if token is provided
     if (process.env.TELEGRAM_BOT_TOKEN) {
       this.telegramBot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: false });
@@ -33,16 +33,16 @@ class NotificationService {
   async sendNotification(channel, recipient, message, options = {}) {
     try {
       switch (channel) {
-      case 'telegram':
-        return await this.sendTelegramMessage(recipient, message, options);
-      case 'whatsapp':
-        return await this.sendWhatsAppMessage(recipient, message, options);
-      case 'email':
-        return await this.sendEmailNotification(recipient, message, options);
-      case 'sms':
-        return await this.sendSMSNotification(recipient, message, options);
-      default:
-        throw new Error(`Unsupported notification channel: ${channel}`);
+        case 'telegram':
+          return await this.sendTelegramMessage(recipient, message, options);
+        case 'whatsapp':
+          return await this.sendWhatsAppMessage(recipient, message, options);
+        case 'email':
+          return await this.sendEmailNotification(recipient, message, options);
+        case 'sms':
+          return await this.sendSMSNotification(recipient, message, options);
+        default:
+          throw new Error(`Unsupported notification channel: ${channel}`);
       }
     } catch (error) {
       console.error(`Notification failed for channel ${channel}:`, error);
@@ -56,14 +56,14 @@ class NotificationService {
     }
 
     const { keyboard, parseMode = 'Markdown' } = options;
-    
+
     const telegramOptions = {
       parse_mode: parseMode,
     };
 
     if (keyboard) {
       telegramOptions.reply_markup = {
-        inline_keyboard: keyboard
+        inline_keyboard: keyboard,
       };
     }
 
@@ -71,7 +71,7 @@ class NotificationService {
     return {
       success: true,
       messageId: result.message_id,
-      channel: 'telegram'
+      channel: 'telegram',
     };
   }
 
@@ -84,14 +84,14 @@ class NotificationService {
           messageId: `wa_${Date.now()}`,
           channel: 'whatsapp',
           recipient: phoneNumber,
-          status: 'simulated'
+          status: 'simulated',
         };
       }
 
       const { templateName, templateParams } = options;
-      
+
       let requestBody;
-      
+
       if (templateName && templateParams) {
         // Use WhatsApp template message
         requestBody = {
@@ -101,14 +101,16 @@ class NotificationService {
           template: {
             name: templateName,
             language: { code: 'en_US' },
-            components: [{
-              type: 'body',
-              parameters: templateParams.map(param => ({
-                type: 'text',
-                text: param
-              }))
-            }]
-          }
+            components: [
+              {
+                type: 'body',
+                parameters: templateParams.map(param => ({
+                  type: 'text',
+                  text: param,
+                })),
+              },
+            ],
+          },
         };
       } else {
         // Use regular text message
@@ -116,7 +118,7 @@ class NotificationService {
           messaging_product: 'whatsapp',
           to: phoneNumber,
           type: 'text',
-          text: { body: message }
+          text: { body: message },
         };
       }
 
@@ -125,9 +127,9 @@ class NotificationService {
         requestBody,
         {
           headers: {
-            'Authorization': `Bearer ${this.whatsappConfig.token}`,
-            'Content-Type': 'application/json'
-          }
+            Authorization: `Bearer ${this.whatsappConfig.token}`,
+            'Content-Type': 'application/json',
+          },
         }
       );
 
@@ -136,16 +138,15 @@ class NotificationService {
         messageId: response.data.messages[0].id,
         channel: 'whatsapp',
         recipient: phoneNumber,
-        status: 'sent'
+        status: 'sent',
       };
-
     } catch (error) {
       console.error('WhatsApp message failed:', error.response?.data || error.message);
       return {
         success: false,
         channel: 'whatsapp',
         recipient: phoneNumber,
-        error: error.response?.data?.error || error.message
+        error: error.response?.data?.error || error.message,
       };
     }
   }
@@ -153,7 +154,7 @@ class NotificationService {
   async sendEmailNotification(email, message, options = {}) {
     try {
       const { subject = 'QuantEnergx Notification', html, attachments } = options;
-      
+
       if (!this.emailConfig.apiKey) {
         console.log(`Email credentials missing. Would send to ${email}:`);
         console.log(`Subject: ${subject}`);
@@ -163,24 +164,24 @@ class NotificationService {
           messageId: `email_${Date.now()}`,
           channel: 'email',
           recipient: email,
-          status: 'simulated'
+          status: 'simulated',
         };
       }
 
       let result;
-      
+
       switch (this.emailConfig.provider) {
-      case 'sendgrid':
-        result = await this._sendEmailViaSendGrid(email, subject, message, html, attachments);
-        break;
-      case 'ses':
-        result = await this._sendEmailViaSES(email, subject, message, html, attachments);
-        break;
-      case 'mailgun':
-        result = await this._sendEmailViaMailgun(email, subject, message, html, attachments);
-        break;
-      default:
-        throw new Error(`Unsupported email provider: ${this.emailConfig.provider}`);
+        case 'sendgrid':
+          result = await this._sendEmailViaSendGrid(email, subject, message, html, attachments);
+          break;
+        case 'ses':
+          result = await this._sendEmailViaSES(email, subject, message, html, attachments);
+          break;
+        case 'mailgun':
+          result = await this._sendEmailViaMailgun(email, subject, message, html, attachments);
+          break;
+        default:
+          throw new Error(`Unsupported email provider: ${this.emailConfig.provider}`);
       }
 
       return {
@@ -188,16 +189,15 @@ class NotificationService {
         messageId: result.messageId,
         channel: 'email',
         recipient: email,
-        status: 'sent'
+        status: 'sent',
       };
-
     } catch (error) {
       console.error('Email sending failed:', error.message);
       return {
         success: false,
         channel: 'email',
         recipient: email,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -206,28 +206,30 @@ class NotificationService {
     const response = await axios.post(
       'https://api.sendgrid.com/v3/mail/send',
       {
-        personalizations: [{
-          to: [{ email }],
-          subject
-        }],
+        personalizations: [
+          {
+            to: [{ email }],
+            subject,
+          },
+        ],
         from: {
           email: this.emailConfig.fromEmail,
-          name: this.emailConfig.fromName
+          name: this.emailConfig.fromName,
         },
         content: [
           { type: 'text/plain', value: message },
-          ...(html ? [{ type: 'text/html', value: html }] : [])
+          ...(html ? [{ type: 'text/html', value: html }] : []),
         ],
-        ...(attachments && { attachments })
+        ...(attachments && { attachments }),
       },
       {
         headers: {
-          'Authorization': `Bearer ${this.emailConfig.apiKey}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${this.emailConfig.apiKey}`,
+          'Content-Type': 'application/json',
+        },
       }
     );
-    
+
     return { messageId: response.headers['x-message-id'] || `sg_${Date.now()}` };
   }
 
@@ -247,16 +249,16 @@ class NotificationService {
         to: email,
         subject,
         text: message,
-        ...(html && { html })
+        ...(html && { html }),
       }),
       {
         auth: {
           username: 'api',
-          password: this.emailConfig.apiKey
-        }
+          password: this.emailConfig.apiKey,
+        },
       }
     );
-    
+
     return { messageId: response.data.id };
   }
 
@@ -269,24 +271,24 @@ class NotificationService {
           messageId: `sms_${Date.now()}`,
           channel: 'sms',
           recipient: phoneNumber,
-          status: 'simulated'
+          status: 'simulated',
         };
       }
 
       let result;
-      
+
       switch (this.smsConfig.provider) {
-      case 'twilio':
-        result = await this._sendSMSViaTwilio(phoneNumber, message, options);
-        break;
-      case 'aws-sns':
-        result = await this._sendSMSViaSNS(phoneNumber, message, options);
-        break;
-      case 'vonage':
-        result = await this._sendSMSViaVonage(phoneNumber, message, options);
-        break;
-      default:
-        throw new Error(`Unsupported SMS provider: ${this.smsConfig.provider}`);
+        case 'twilio':
+          result = await this._sendSMSViaTwilio(phoneNumber, message, options);
+          break;
+        case 'aws-sns':
+          result = await this._sendSMSViaSNS(phoneNumber, message, options);
+          break;
+        case 'vonage':
+          result = await this._sendSMSViaVonage(phoneNumber, message, options);
+          break;
+        default:
+          throw new Error(`Unsupported SMS provider: ${this.smsConfig.provider}`);
       }
 
       return {
@@ -294,16 +296,15 @@ class NotificationService {
         messageId: result.messageId,
         channel: 'sms',
         recipient: phoneNumber,
-        status: 'sent'
+        status: 'sent',
       };
-
     } catch (error) {
       console.error('SMS sending failed:', error.message);
       return {
         success: false,
         channel: 'sms',
         recipient: phoneNumber,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -314,16 +315,16 @@ class NotificationService {
       new URLSearchParams({
         From: this.smsConfig.fromNumber,
         To: phoneNumber,
-        Body: message
+        Body: message,
       }),
       {
         auth: {
           username: this.smsConfig.accountSid,
-          password: this.smsConfig.authToken
-        }
+          password: this.smsConfig.authToken,
+        },
       }
     );
-    
+
     return { messageId: response.data.sid };
   }
 
@@ -335,26 +336,23 @@ class NotificationService {
 
   async _sendSMSViaVonage(phoneNumber, message, _options) {
     // For Vonage (Nexmo) API
-    const response = await axios.post(
-      'https://rest.nexmo.com/sms/json',
-      {
-        from: this.smsConfig.fromNumber,
-        to: phoneNumber,
-        text: message,
-        api_key: process.env.VONAGE_API_KEY,
-        api_secret: process.env.VONAGE_API_SECRET
-      }
-    );
-    
+    const response = await axios.post('https://rest.nexmo.com/sms/json', {
+      from: this.smsConfig.fromNumber,
+      to: phoneNumber,
+      text: message,
+      api_key: process.env.VONAGE_API_KEY,
+      api_secret: process.env.VONAGE_API_SECRET,
+    });
+
     return { messageId: response.data.messages[0]['message-id'] };
   }
 
   // OCR-specific notification methods
   async notifyDocumentProcessed(documentId, result, userPreferences) {
     const message = this.formatOCRCompletionMessage(documentId, result);
-    
+
     const notifications = [];
-    
+
     // Send notifications based on user preferences
     for (const channel of userPreferences.channels || ['email']) {
       try {
@@ -364,7 +362,7 @@ class NotificationService {
           message,
           {
             subject: 'Document Processing Complete',
-            keyboard: channel === 'telegram' ? this.getOCRTelegramKeyboard(documentId) : null
+            keyboard: channel === 'telegram' ? this.getOCRTelegramKeyboard(documentId) : null,
           }
         );
         notifications.push(notificationResult);
@@ -372,15 +370,15 @@ class NotificationService {
         console.error(`Failed to send ${channel} notification:`, error);
       }
     }
-    
+
     return notifications;
   }
 
   async notifyBatchProcessed(batchId, results, userPreferences) {
     const message = this.formatBatchCompletionMessage(batchId, results);
-    
+
     const notifications = [];
-    
+
     for (const channel of userPreferences.channels || ['email']) {
       try {
         const notificationResult = await this.sendNotification(
@@ -396,15 +394,15 @@ class NotificationService {
         console.error(`Failed to send ${channel} notification:`, error);
       }
     }
-    
+
     return notifications;
   }
 
   async notifyReviewRequired(documentId, confidence, userPreferences) {
     const message = this.formatReviewRequiredMessage(documentId, confidence);
-    
+
     const notifications = [];
-    
+
     for (const channel of userPreferences.channels || ['email']) {
       try {
         const notificationResult = await this.sendNotification(
@@ -413,7 +411,7 @@ class NotificationService {
           message,
           {
             subject: 'Document Review Required',
-            keyboard: channel === 'telegram' ? this.getReviewTelegramKeyboard(documentId) : null
+            keyboard: channel === 'telegram' ? this.getReviewTelegramKeyboard(documentId) : null,
           }
         );
         notifications.push(notificationResult);
@@ -421,7 +419,7 @@ class NotificationService {
         console.error(`Failed to send ${channel} notification:`, error);
       }
     }
-    
+
     return notifications;
   }
 
@@ -444,7 +442,7 @@ View details in QuantEnergx platform.`;
     const total = results.total_documents;
     const completed = results.completed;
     const failed = results.failed;
-    
+
     return `📦 *Batch Processing Complete*
 
 🆔 Batch ID: \`${batchId}\`
@@ -469,83 +467,72 @@ Please review and approve in QuantEnergx platform.`;
     return [
       [
         { text: '👀 View Document', url: `${process.env.FRONTEND_URL}/ocr/review/${documentId}` },
-        { text: '📊 Dashboard', url: `${process.env.FRONTEND_URL}/` }
-      ]
+        { text: '📊 Dashboard', url: `${process.env.FRONTEND_URL}/` },
+      ],
     ];
   }
 
   getReviewTelegramKeyboard(documentId) {
     return [
-      [
-        { text: '✅ Review Now', url: `${process.env.FRONTEND_URL}/ocr/review/${documentId}` }
-      ],
+      [{ text: '✅ Review Now', url: `${process.env.FRONTEND_URL}/ocr/review/${documentId}` }],
       [
         { text: '📋 Queue', url: `${process.env.FRONTEND_URL}/ocr/review` },
-        { text: '📊 Dashboard', url: `${process.env.FRONTEND_URL}/` }
-      ]
+        { text: '📊 Dashboard', url: `${process.env.FRONTEND_URL}/` },
+      ],
     ];
   }
 
   // Trading-specific notifications
   async notifyTradeExecuted(trade, userPreferences) {
     const message = this.formatTradeExecutedMessage(trade);
-    return await this.sendMultiChannelNotification(
-      userPreferences,
-      message,
-      { subject: 'Trade Executed' }
-    );
+    return await this.sendMultiChannelNotification(userPreferences, message, {
+      subject: 'Trade Executed',
+    });
   }
 
   async notifyOrderPlaced(order, userPreferences) {
     const message = this.formatOrderPlacedMessage(order);
-    return await this.sendMultiChannelNotification(
-      userPreferences,
-      message,
-      { subject: 'Order Placed' }
-    );
+    return await this.sendMultiChannelNotification(userPreferences, message, {
+      subject: 'Order Placed',
+    });
   }
 
   async notifyOrderCancelled(order, userPreferences) {
     const message = this.formatOrderCancelledMessage(order);
-    return await this.sendMultiChannelNotification(
-      userPreferences,
-      message,
-      { subject: 'Order Cancelled' }
-    );
+    return await this.sendMultiChannelNotification(userPreferences, message, {
+      subject: 'Order Cancelled',
+    });
   }
 
   async notifyRiskLimitBreach(riskData, userPreferences) {
     const message = this.formatRiskLimitBreachMessage(riskData);
-    return await this.sendMultiChannelNotification(
-      userPreferences,
-      message,
-      { subject: 'Risk Limit Breach - Immediate Action Required', priority: 'high' }
-    );
+    return await this.sendMultiChannelNotification(userPreferences, message, {
+      subject: 'Risk Limit Breach - Immediate Action Required',
+      priority: 'high',
+    });
   }
 
   async notifyMarginCall(marginData, userPreferences) {
     const message = this.formatMarginCallMessage(marginData);
-    return await this.sendMultiChannelNotification(
-      userPreferences,
-      message,
-      { subject: 'Margin Call - Urgent Action Required', priority: 'critical' }
-    );
+    return await this.sendMultiChannelNotification(userPreferences, message, {
+      subject: 'Margin Call - Urgent Action Required',
+      priority: 'critical',
+    });
   }
 
   async notifyComplianceAlert(complianceData, userPreferences) {
     const message = this.formatComplianceAlertMessage(complianceData);
-    return await this.sendMultiChannelNotification(
-      userPreferences,
-      message,
-      { subject: 'Compliance Alert', priority: 'high' }
-    );
+    return await this.sendMultiChannelNotification(userPreferences, message, {
+      subject: 'Compliance Alert',
+      priority: 'high',
+    });
   }
 
   // Multi-channel notification helper
   async sendMultiChannelNotification(userPreferences, message, options = {}) {
     const notifications = [];
     const channels = userPreferences.channels || ['email'];
-    
+
     for (const channel of channels) {
       try {
         const recipient = this.getRecipientForChannel(channel, userPreferences);
@@ -558,26 +545,26 @@ Please review and approve in QuantEnergx platform.`;
         notifications.push({
           success: false,
           channel,
-          error: error.message
+          error: error.message,
         });
       }
     }
-    
+
     return notifications;
   }
 
   getRecipientForChannel(channel, userPreferences) {
     switch (channel) {
-    case 'email':
-      return userPreferences.email;
-    case 'sms':
-      return userPreferences.phone;
-    case 'telegram':
-      return userPreferences.telegramChatId;
-    case 'whatsapp':
-      return userPreferences.whatsappPhone;
-    default:
-      return null;
+      case 'email':
+        return userPreferences.email;
+      case 'sms':
+        return userPreferences.phone;
+      case 'telegram':
+        return userPreferences.telegramChatId;
+      case 'whatsapp':
+        return userPreferences.whatsappPhone;
+      default:
+        return null;
     }
   }
 
@@ -651,27 +638,25 @@ Please review and address this compliance issue immediately.`;
 
   formatPositionReportMessage(positions) {
     let message = '📊 *Daily Position Report*\n\n';
-    
+
     positions.forEach(pos => {
       const pnlIcon = pos.unrealizedPnL >= 0 ? '📈' : '📉';
       message += `${pnlIcon} ${pos.commodity.toUpperCase()}: ${pos.quantity > 0 ? 'LONG' : 'SHORT'} ${Math.abs(pos.quantity)}\n`;
       message += `💰 P&L: $${pos.unrealizedPnL.toLocaleString()}\n\n`;
     });
-    
+
     const totalPnL = positions.reduce((sum, pos) => sum + pos.unrealizedPnL, 0);
     message += `📈 Total P&L: $${totalPnL.toLocaleString()}`;
-    
+
     return message;
   }
 
   // Scheduled notification methods
   async sendDailyPositionReport(userId, positions, userPreferences) {
     const message = this.formatPositionReportMessage(positions);
-    return await this.sendMultiChannelNotification(
-      userPreferences,
-      message,
-      { subject: 'Daily Position Report' }
-    );
+    return await this.sendMultiChannelNotification(userPreferences, message, {
+      subject: 'Daily Position Report',
+    });
   }
 
   async sendMarketOpeningAlert(marketData, userPreferences) {
@@ -687,11 +672,9 @@ Key Prices:
 
 Ready to trade!`;
 
-    return await this.sendMultiChannelNotification(
-      userPreferences,
-      message,
-      { subject: 'Market Opening' }
-    );
+    return await this.sendMultiChannelNotification(userPreferences, message, {
+      subject: 'Market Opening',
+    });
   }
 
   async notifyTradeProcessed(tradeData, userPreferences) {
@@ -705,7 +688,7 @@ Ready to trade!`;
 Trade has been added to your portfolio.`;
 
     const notifications = [];
-    
+
     for (const channel of userPreferences.channels || ['email']) {
       try {
         const notificationResult = await this.sendNotification(
@@ -719,7 +702,7 @@ Trade has been added to your portfolio.`;
         console.error(`Failed to send ${channel} notification:`, error);
       }
     }
-    
+
     return notifications;
   }
 
@@ -734,7 +717,7 @@ Trade has been added to your portfolio.`;
 Please review your positions immediately.`;
 
     const notifications = [];
-    
+
     for (const channel of userPreferences.channels || ['telegram', 'email']) {
       try {
         const result = await this.sendNotification(
@@ -748,7 +731,7 @@ Please review your positions immediately.`;
         notifications.push({
           success: false,
           channel,
-          error: error.message
+          error: error.message,
         });
       }
     }
@@ -758,4 +741,3 @@ Please review your positions immediately.`;
 }
 
 module.exports = NotificationService;
-

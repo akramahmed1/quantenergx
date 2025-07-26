@@ -22,10 +22,10 @@ router.get('/', (req, res) => {
       prices: 'GET /market/prices/:commodity',
       analytics: 'GET /market/analytics/:commodity',
       report: 'GET /market/report',
-      commodities: 'GET /market/commodities'
+      commodities: 'GET /market/commodities',
     },
     supportedCommodities: marketDataService ? Object.keys(marketDataService.commodities) : [],
-    serviceStatus: marketDataService ? 'online' : 'offline'
+    serviceStatus: marketDataService ? 'online' : 'offline',
   });
 });
 
@@ -34,28 +34,29 @@ router.get('/commodities', (req, res) => {
   if (!marketDataService) {
     return res.status(503).json({
       success: false,
-      error: 'Market data service unavailable'
+      error: 'Market data service unavailable',
     });
   }
-  
+
   res.json({
     success: true,
-    commodities: marketDataService.commodities
+    commodities: marketDataService.commodities,
   });
 });
 
 // Get market prices for a commodity
-router.get('/prices/:commodity',
+router.get(
+  '/prices/:commodity',
   [
     query('symbol').optional().isString(),
-    query('timeframe').optional().isIn(['1H', '1D', '1W', '1M', '30D', '90D', '1Y'])
+    query('timeframe').optional().isIn(['1H', '1D', '1W', '1M', '30D', '90D', '1Y']),
   ],
   async (req, res) => {
     try {
       if (!marketDataService) {
         return res.status(503).json({
           success: false,
-          error: 'Market data service unavailable'
+          error: 'Market data service unavailable',
         });
       }
 
@@ -71,7 +72,7 @@ router.get('/prices/:commodity',
       if (!marketDataService.commodities[commodity]) {
         return res.status(404).json({
           success: false,
-          error: `Commodity '${commodity}' not supported`
+          error: `Commodity '${commodity}' not supported`,
         });
       }
 
@@ -80,24 +81,22 @@ router.get('/prices/:commodity',
 
       res.json({
         success: true,
-        marketData
+        marketData,
       });
-
     } catch (error) {
       console.error('Market data error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
 );
 
 // Get analytics for a commodity
-router.get('/analytics/:commodity',
-  [
-    query('period').optional().isIn(['30D', '90D', '1Y'])
-  ],
+router.get(
+  '/analytics/:commodity',
+  [query('period').optional().isIn(['30D', '90D', '1Y'])],
   async (req, res) => {
     try {
       const errors = validationResult(req);
@@ -112,7 +111,7 @@ router.get('/analytics/:commodity',
       if (!marketDataService.commodities[commodity]) {
         return res.status(404).json({
           success: false,
-          error: `Commodity '${commodity}' not supported`
+          error: `Commodity '${commodity}' not supported`,
         });
       }
 
@@ -120,25 +119,25 @@ router.get('/analytics/:commodity',
 
       res.json({
         success: true,
-        analytics
+        analytics,
       });
-
     } catch (error) {
       console.error('Analytics error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
 );
 
 // Generate comprehensive market report
-router.get('/report',
+router.get(
+  '/report',
   authenticateToken,
   [
     query('commodities').optional().isString(),
-    query('period').optional().isIn(['30D', '90D', '1Y'])
+    query('period').optional().isIn(['30D', '90D', '1Y']),
   ],
   async (req, res) => {
     try {
@@ -148,16 +147,16 @@ router.get('/report',
       }
 
       const { commodities, period = '30D' } = req.query;
-      
+
       // Parse commodities list or use all available
-      const commodityList = commodities ? 
-        commodities.split(',').filter(c => marketDataService.commodities[c]) :
-        Object.keys(marketDataService.commodities);
+      const commodityList = commodities
+        ? commodities.split(',').filter(c => marketDataService.commodities[c])
+        : Object.keys(marketDataService.commodities);
 
       if (commodityList.length === 0) {
         return res.status(400).json({
           success: false,
-          error: 'No valid commodities specified'
+          error: 'No valid commodities specified',
         });
       }
 
@@ -165,24 +164,22 @@ router.get('/report',
 
       res.json({
         success: true,
-        report
+        report,
       });
-
     } catch (error) {
       console.error('Market report error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
 );
 
 // Get real-time quotes (WebSocket endpoint would be better for this)
-router.get('/quotes',
-  [
-    query('symbols').isString().withMessage('Symbols parameter is required')
-  ],
+router.get(
+  '/quotes',
+  [query('symbols').isString().withMessage('Symbols parameter is required')],
   async (req, res) => {
     try {
       const errors = validationResult(req);
@@ -194,19 +191,20 @@ router.get('/quotes',
       const symbolList = symbols.split(',');
 
       const quotes = await Promise.all(
-        symbolList.map(async (symbol) => {
+        symbolList.map(async symbol => {
           try {
             // Find commodity for this symbol
-            const commodity = Object.keys(marketDataService.commodities)
-              .find(c => marketDataService.commodities[c].symbols.includes(symbol));
-            
+            const commodity = Object.keys(marketDataService.commodities).find(c =>
+              marketDataService.commodities[c].symbols.includes(symbol)
+            );
+
             if (!commodity) {
               return { symbol, error: 'Symbol not found' };
             }
 
             const data = await marketDataService.getMarketData(commodity, symbol, '1D');
             const latestPrice = data.data[data.data.length - 1];
-            
+
             return {
               symbol,
               commodity,
@@ -214,7 +212,7 @@ router.get('/quotes',
               change: latestPrice.close - latestPrice.open,
               changePercent: ((latestPrice.close - latestPrice.open) / latestPrice.open) * 100,
               volume: latestPrice.volume,
-              timestamp: latestPrice.timestamp
+              timestamp: latestPrice.timestamp,
             };
           } catch (error) {
             return { symbol, error: error.message };
@@ -225,25 +223,22 @@ router.get('/quotes',
       res.json({
         success: true,
         quotes,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
-
     } catch (error) {
       console.error('Quotes error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
 );
 
 // Get historical volatility
-router.get('/volatility/:commodity',
-  [
-    query('period').optional().isIn(['30D', '90D', '1Y']),
-    query('window').optional().isNumeric()
-  ],
+router.get(
+  '/volatility/:commodity',
+  [query('period').optional().isIn(['30D', '90D', '1Y']), query('window').optional().isNumeric()],
   async (req, res) => {
     try {
       const errors = validationResult(req);
@@ -257,12 +252,12 @@ router.get('/volatility/:commodity',
       if (!marketDataService.commodities[commodity]) {
         return res.status(404).json({
           success: false,
-          error: `Commodity '${commodity}' not supported`
+          error: `Commodity '${commodity}' not supported`,
         });
       }
 
       const analytics = await marketDataService.getAggregatedAnalytics(commodity, period);
-      
+
       res.json({
         success: true,
         volatility: {
@@ -271,26 +266,26 @@ router.get('/volatility/:commodity',
           percentile: analytics.volatilityMetrics.percentile,
           forecast: analytics.volatilityMetrics.garchForecast,
           period,
-          window: parseInt(window)
-        }
+          window: parseInt(window),
+        },
       });
-
     } catch (error) {
       console.error('Volatility error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
 );
 
 // Get correlations between commodities
-router.get('/correlations',
+router.get(
+  '/correlations',
   [
     query('base').isString().withMessage('Base commodity is required'),
     query('targets').isString().withMessage('Target commodities are required'),
-    query('period').optional().isIn(['30D', '90D', '1Y'])
+    query('period').optional().isIn(['30D', '90D', '1Y']),
   ],
   async (req, res) => {
     try {
@@ -305,7 +300,7 @@ router.get('/correlations',
       if (!marketDataService.commodities[base]) {
         return res.status(404).json({
           success: false,
-          error: `Base commodity '${base}' not supported`
+          error: `Base commodity '${base}' not supported`,
         });
       }
 
@@ -323,14 +318,13 @@ router.get('/correlations',
         success: true,
         base,
         correlations,
-        period
+        period,
       });
-
     } catch (error) {
       console.error('Correlations error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }

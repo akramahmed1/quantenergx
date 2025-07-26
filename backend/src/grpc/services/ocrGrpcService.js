@@ -35,13 +35,13 @@ class OCRGRPCService {
   async processDocument(call, callback) {
     try {
       const { document_data, filename, mime_type, options } = call.request;
-      
+
       // Create a temporary file object similar to multer
       const file = {
         buffer: document_data,
         originalname: filename,
         mimetype: mime_type,
-        path: `/tmp/${filename}_${Date.now()}` // Temporary path
+        path: `/tmp/${filename}_${Date.now()}`, // Temporary path
       };
 
       // Write buffer to temporary file
@@ -92,7 +92,6 @@ class OCRGRPCService {
       } catch (error) {
         console.error('Failed to cleanup temporary file:', error);
       }
-
     } catch (error) {
       console.error('gRPC ProcessDocument error:', error);
       callback(null, {
@@ -113,13 +112,13 @@ class OCRGRPCService {
   async processBatch(call, callback) {
     try {
       const { documents, options } = call.request;
-      
+
       // Convert documents to file objects
       const files = documents.map((doc, index) => ({
         buffer: doc.document_data,
         originalname: doc.filename,
         mimetype: doc.mime_type,
-        path: `/tmp/${doc.filename}_${Date.now()}_${index}`
+        path: `/tmp/${doc.filename}_${Date.now()}_${index}`,
       }));
 
       const ocrOptions = {
@@ -139,7 +138,6 @@ class OCRGRPCService {
       };
 
       callback(null, response);
-
     } catch (error) {
       console.error('gRPC ProcessBatch error:', error);
       callback(null, {
@@ -154,7 +152,7 @@ class OCRGRPCService {
   async getBatchStatus(call, callback) {
     try {
       const { batch_id } = call.request;
-      
+
       const status = await ocrService.getBatchStatus(batch_id);
 
       const results = (status.results || []).map(result => ({
@@ -177,7 +175,6 @@ class OCRGRPCService {
       };
 
       callback(null, response);
-
     } catch (error) {
       console.error('gRPC GetBatchStatus error:', error);
       callback(null, {
@@ -234,7 +231,6 @@ class OCRGRPCService {
       };
 
       callback(null, response);
-
     } catch (error) {
       console.error('gRPC ExtractFields error:', error);
       callback(null, {
@@ -277,7 +273,6 @@ class OCRGRPCService {
       };
 
       callback(null, response);
-
     } catch (error) {
       console.error('gRPC SubmitReview error:', error);
       callback(null, {
@@ -292,10 +287,10 @@ class OCRGRPCService {
 
   mapFieldType(type) {
     const typeMap = {
-      'text': 0,
-      'number': 1,
-      'date': 2,
-      'currency': 3,
+      text: 0,
+      number: 1,
+      date: 2,
+      currency: 3,
     };
     return typeMap[type] || 0;
   }
@@ -317,7 +312,7 @@ class OCRGRPCService {
         console.error('gRPC server bind error:', err);
         return;
       }
-      
+
       console.log(`gRPC OCR Service running on port ${boundPort}`);
       this.server.start();
     });

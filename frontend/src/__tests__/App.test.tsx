@@ -19,9 +19,7 @@ const renderWithProviders = (component: React.ReactElement) => {
   const store = createMockStore();
   return render(
     <Provider store={store}>
-      <BrowserRouter>
-        {component}
-      </BrowserRouter>
+      <BrowserRouter>{component}</BrowserRouter>
     </Provider>
   );
 };

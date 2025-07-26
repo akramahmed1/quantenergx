@@ -11,7 +11,7 @@ class IoTSCADAIntegrationService {
     this.historicalData = new Map();
     this.onboardingQueue = [];
     this.connectionPool = new Map();
-    
+
     this.initializeProtocolHandlers();
     this.initializeDeviceTypes();
     this.initializeAlertRules();
@@ -32,15 +32,15 @@ class IoTSCADAIntegrationService {
           sampled_values: true,
           mms: true, // Manufacturing Message Specification
           logical_nodes: true,
-          data_modeling: true
+          data_modeling: true,
         },
         security: {
           authentication: true,
           encryption: 'TLS_1.3',
           digital_signatures: true,
-          role_based_access: true
+          role_based_access: true,
         },
-        applications: ['power_substation', 'renewable_integration', 'smart_grid']
+        applications: ['power_substation', 'renewable_integration', 'smart_grid'],
       },
       {
         id: 'DNP3',
@@ -52,15 +52,15 @@ class IoTSCADAIntegrationService {
           event_reporting: true,
           time_synchronization: true,
           file_transfer: true,
-          dataset_support: true
+          dataset_support: true,
         },
         security: {
           challenge_response: true,
           hmac_authentication: true,
           encryption: 'AES_256',
-          key_management: true
+          key_management: true,
         },
-        applications: ['scada_systems', 'telemetry', 'power_distribution', 'water_systems']
+        applications: ['scada_systems', 'telemetry', 'power_distribution', 'water_systems'],
       },
       {
         id: 'MODBUS',
@@ -72,14 +72,14 @@ class IoTSCADAIntegrationService {
           coil_operations: true,
           register_operations: true,
           diagnostic_functions: true,
-          encapsulated_interface: true
+          encapsulated_interface: true,
         },
         security: {
           basic_authentication: true,
           firewall_rules: true,
-          vlan_segmentation: true
+          vlan_segmentation: true,
         },
-        applications: ['industrial_automation', 'building_management', 'process_control']
+        applications: ['industrial_automation', 'building_management', 'process_control'],
       },
       {
         id: 'OPENADR',
@@ -91,15 +91,15 @@ class IoTSCADAIntegrationService {
           event_signals: true,
           market_context: true,
           program_management: true,
-          reporting: true
+          reporting: true,
         },
         security: {
           xml_signatures: true,
           tls_encryption: true,
           certificate_based_auth: true,
-          message_integrity: true
+          message_integrity: true,
         },
-        applications: ['demand_response', 'grid_balancing', 'energy_markets', 'peak_shaving']
+        applications: ['demand_response', 'grid_balancing', 'energy_markets', 'peak_shaving'],
       },
       {
         id: 'MQTT',
@@ -111,16 +111,16 @@ class IoTSCADAIntegrationService {
           quality_of_service: true,
           retained_messages: true,
           will_messages: true,
-          shared_subscriptions: true
+          shared_subscriptions: true,
         },
         security: {
           tls_encryption: true,
           client_certificates: true,
           username_password: true,
-          access_control_lists: true
+          access_control_lists: true,
         },
-        applications: ['iot_devices', 'sensor_networks', 'remote_monitoring']
-      }
+        applications: ['iot_devices', 'sensor_networks', 'remote_monitoring'],
+      },
     ];
 
     protocols.forEach(protocol => {
@@ -129,7 +129,7 @@ class IoTSCADAIntegrationService {
         active_connections: 0,
         message_count: 0,
         error_count: 0,
-        last_activity: null
+        last_activity: null,
       });
     });
   }
@@ -141,28 +141,40 @@ class IoTSCADAIntegrationService {
     this.deviceTypes = [
       {
         category: 'power_generation',
-        types: ['gas_turbine', 'wind_turbine', 'solar_inverter', 'hydro_generator', 'nuclear_reactor']
+        types: [
+          'gas_turbine',
+          'wind_turbine',
+          'solar_inverter',
+          'hydro_generator',
+          'nuclear_reactor',
+        ],
       },
       {
         category: 'power_transmission',
-        types: ['transformer', 'circuit_breaker', 'relay_protection', 'capacitor_bank', 'reactor']
+        types: ['transformer', 'circuit_breaker', 'relay_protection', 'capacitor_bank', 'reactor'],
       },
       {
         category: 'power_distribution',
-        types: ['distribution_transformer', 'load_switch', 'recloser', 'voltage_regulator', 'smart_meter']
+        types: [
+          'distribution_transformer',
+          'load_switch',
+          'recloser',
+          'voltage_regulator',
+          'smart_meter',
+        ],
       },
       {
         category: 'renewable_energy',
-        types: ['pv_inverter', 'wind_controller', 'battery_storage', 'energy_management_system']
+        types: ['pv_inverter', 'wind_controller', 'battery_storage', 'energy_management_system'],
       },
       {
         category: 'industrial_control',
-        types: ['plc', 'hmi', 'scada_server', 'historian', 'safety_system']
+        types: ['plc', 'hmi', 'scada_server', 'historian', 'safety_system'],
       },
       {
         category: 'environmental_monitoring',
-        types: ['weather_station', 'pollution_monitor', 'seismic_sensor', 'flood_sensor']
-      }
+        types: ['weather_station', 'pollution_monitor', 'seismic_sensor', 'flood_sensor'],
+      },
     ];
   }
 
@@ -176,36 +188,36 @@ class IoTSCADAIntegrationService {
         name: 'Device Offline Alert',
         condition: 'last_communication > 300', // 5 minutes
         severity: 'high',
-        actions: ['email', 'dashboard_alert', 'auto_diagnostic']
+        actions: ['email', 'dashboard_alert', 'auto_diagnostic'],
       },
       {
         id: 'communication_failure',
         name: 'Communication Failure',
         condition: 'consecutive_failures >= 3',
         severity: 'critical',
-        actions: ['email', 'sms', 'dashboard_alert', 'failover']
+        actions: ['email', 'sms', 'dashboard_alert', 'failover'],
       },
       {
         id: 'data_anomaly',
         name: 'Data Anomaly Detection',
         condition: 'value_deviation > 3_sigma',
         severity: 'medium',
-        actions: ['dashboard_alert', 'data_validation']
+        actions: ['dashboard_alert', 'data_validation'],
       },
       {
         id: 'security_breach',
         name: 'Security Breach Detection',
         condition: 'unauthorized_access OR protocol_violation',
         severity: 'critical',
-        actions: ['email', 'sms', 'security_response', 'device_isolation']
+        actions: ['email', 'sms', 'security_response', 'device_isolation'],
       },
       {
         id: 'performance_degradation',
         name: 'Performance Degradation',
         condition: 'response_time > threshold OR error_rate > 5%',
         severity: 'medium',
-        actions: ['dashboard_alert', 'performance_analysis']
-      }
+        actions: ['dashboard_alert', 'performance_analysis'],
+      },
     ];
 
     alertRules.forEach(rule => {
@@ -213,7 +225,7 @@ class IoTSCADAIntegrationService {
         ...rule,
         is_active: true,
         last_triggered: null,
-        trigger_count: 0
+        trigger_count: 0,
       });
     });
   }
@@ -237,11 +249,11 @@ class IoTSCADAIntegrationService {
           endpoint: deviceConfig.endpoint,
           port: deviceConfig.port,
           authentication: deviceConfig.authentication,
-          security_profile: deviceConfig.security_profile
+          security_profile: deviceConfig.security_profile,
         },
         data_points: deviceConfig.data_points || [],
         sampling_rate: deviceConfig.sampling_rate || 1000, // 1 second
-        retention_policy: deviceConfig.retention_policy || '1_year'
+        retention_policy: deviceConfig.retention_policy || '1_year',
       },
       status: {
         onboarding_status: 'in_progress',
@@ -249,13 +261,13 @@ class IoTSCADAIntegrationService {
         last_communication: null,
         message_count: 0,
         error_count: 0,
-        uptime: 0
+        uptime: 0,
       },
       security: {
         certificates: await this.generateDeviceCertificates(deviceId),
         access_permissions: await this.generateAccessPermissions(deviceConfig),
         encryption_keys: await this.generateEncryptionKeys(deviceId),
-        security_policies: await this.getSecurityPolicies(deviceConfig.protocol)
+        security_policies: await this.getSecurityPolicies(deviceConfig.protocol),
       },
       onboarding_steps: [
         { step: 'device_registration', status: 'completed', timestamp },
@@ -263,8 +275,8 @@ class IoTSCADAIntegrationService {
         { step: 'protocol_configuration', status: 'pending', timestamp: null },
         { step: 'connectivity_test', status: 'pending', timestamp: null },
         { step: 'data_validation', status: 'pending', timestamp: null },
-        { step: 'monitoring_setup', status: 'pending', timestamp: null }
-      ]
+        { step: 'monitoring_setup', status: 'pending', timestamp: null },
+      ],
     };
 
     this.deviceRegistry.set(deviceId, device);
@@ -278,7 +290,7 @@ class IoTSCADAIntegrationService {
       onboarding_status: 'initiated',
       estimated_completion: this.calculateOnboardingTime(deviceConfig),
       next_steps: device.onboarding_steps.filter(step => step.status === 'pending'),
-      timestamp
+      timestamp,
     };
   }
 
@@ -292,16 +304,16 @@ class IoTSCADAIntegrationService {
     try {
       // Security provisioning
       await this.executeOnboardingStep(deviceId, 'security_provisioning');
-      
+
       // Protocol configuration
       await this.executeOnboardingStep(deviceId, 'protocol_configuration');
-      
+
       // Connectivity test
       await this.executeOnboardingStep(deviceId, 'connectivity_test');
-      
+
       // Data validation
       await this.executeOnboardingStep(deviceId, 'data_validation');
-      
+
       // Monitoring setup
       await this.executeOnboardingStep(deviceId, 'monitoring_setup');
 
@@ -312,7 +324,6 @@ class IoTSCADAIntegrationService {
 
       // Start data streaming
       await this.startDataStreaming(deviceId);
-
     } catch (error) {
       device.status.onboarding_status = 'failed';
       device.status.error_details = error.message;
@@ -343,8 +354,8 @@ class IoTSCADAIntegrationService {
       quality_metrics: {
         success_rate: 100,
         average_latency: 0,
-        packet_loss: 0
-      }
+        packet_loss: 0,
+      },
     };
 
     this.dataStreams.set(streamId, dataStream);
@@ -359,7 +370,7 @@ class IoTSCADAIntegrationService {
       stream_id: streamId,
       status: 'started',
       sampling_rate: device.config.sampling_rate,
-      data_points: device.config.data_points.length
+      data_points: device.config.data_points.length,
     };
   }
 
@@ -396,23 +407,23 @@ class IoTSCADAIntegrationService {
   async collectDeviceData(deviceId) {
     const device = this.deviceRegistry.get(deviceId);
     const stream = this.dataStreams.get(`${deviceId}_stream`);
-    
+
     if (!device || !stream) return null;
 
     try {
       const data = await this.readProtocolData(device);
       const processedData = await this.processRawData(data, device);
-      
+
       // Store historical data
       await this.storeHistoricalData(deviceId, processedData);
-      
+
       // Check alert conditions
       await this.checkAlertConditions(deviceId, processedData);
-      
+
       // Update stream metrics
       stream.message_count++;
       stream.quality_metrics.success_rate = this.calculateSuccessRate(stream);
-      
+
       // Update device status
       device.status.last_communication = new Date().toISOString();
       device.status.message_count++;
@@ -421,13 +432,12 @@ class IoTSCADAIntegrationService {
         device_id: deviceId,
         timestamp: new Date().toISOString(),
         data: processedData,
-        quality: stream.quality_metrics
+        quality: stream.quality_metrics,
       };
-
     } catch (error) {
       device.status.error_count++;
       stream.quality_metrics.success_rate = this.calculateSuccessRate(stream);
-      
+
       await this.handleDataCollectionError(deviceId, error);
       throw error;
     }
@@ -449,7 +459,7 @@ class IoTSCADAIntegrationService {
         online_devices: deviceStatus.online_count,
         active_streams: this.dataStreams.size,
         total_messages: streamingMetrics.total_messages,
-        active_alerts: alertSummary.active_count
+        active_alerts: alertSummary.active_count,
       },
       device_status: deviceStatus,
       streaming_metrics: streamingMetrics,
@@ -457,7 +467,7 @@ class IoTSCADAIntegrationService {
       alerts: alertSummary,
       performance: await this.getPerformanceMetrics(),
       security: await this.getSecurityStatus(),
-      onboarding: await this.getOnboardingStatus()
+      onboarding: await this.getOnboardingStatus(),
     };
   }
 
@@ -479,17 +489,17 @@ class IoTSCADAIntegrationService {
         name: device.config.name,
         type: device.config.type,
         protocol: device.config.protocol,
-        uptime: this.calculateUptime(device)
+        uptime: this.calculateUptime(device),
       },
       performance_metrics: performanceMetrics,
       data_quality: {
         completeness: await this.calculateDataCompleteness(deviceId, timeRange),
         accuracy: await this.calculateDataAccuracy(deviceId, timeRange),
-        timeliness: await this.calculateDataTimeliness(deviceId, timeRange)
+        timeliness: await this.calculateDataTimeliness(deviceId, timeRange),
       },
       pattern_analysis: patternAnalysis,
       anomalies: await this.detectAnomalies(historicalData),
-      recommendations: await this.generateDeviceRecommendations(deviceId, performanceMetrics)
+      recommendations: await this.generateDeviceRecommendations(deviceId, performanceMetrics),
     };
   }
 
@@ -504,7 +514,7 @@ class IoTSCADAIntegrationService {
       device_certificate: `cert_${deviceId}`,
       ca_certificate: 'ca_root_cert',
       private_key: `key_${deviceId}`,
-      expiry_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+      expiry_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
     };
   }
 
@@ -513,7 +523,7 @@ class IoTSCADAIntegrationService {
       read_permissions: deviceConfig.data_points || ['all'],
       write_permissions: [],
       admin_permissions: false,
-      role: 'device'
+      role: 'device',
     };
   }
 
@@ -522,42 +532,42 @@ class IoTSCADAIntegrationService {
       symmetric_key: `sym_key_${deviceId}`,
       key_exchange: 'ECDH',
       algorithm: 'AES_256_GCM',
-      rotation_interval: '30_days'
+      rotation_interval: '30_days',
     };
   }
 
   async getSecurityPolicies(protocol) {
     const policies = {
-      'IEC_61850': ['TLS_1.3', 'digital_signatures', 'role_based_access'],
-      'DNP3': ['secure_auth', 'hmac', 'key_management'],
-      'MODBUS': ['firewall_rules', 'vlan_segmentation'],
-      'OPENADR': ['xml_signatures', 'certificate_auth'],
-      'MQTT': ['tls_encryption', 'client_certificates']
+      IEC_61850: ['TLS_1.3', 'digital_signatures', 'role_based_access'],
+      DNP3: ['secure_auth', 'hmac', 'key_management'],
+      MODBUS: ['firewall_rules', 'vlan_segmentation'],
+      OPENADR: ['xml_signatures', 'certificate_auth'],
+      MQTT: ['tls_encryption', 'client_certificates'],
     };
-    
+
     return policies[protocol] || ['basic_security'];
   }
 
   calculateOnboardingTime(deviceConfig) {
     const baseTime = 300000; // 5 minutes
     const protocolComplexity = {
-      'IEC_61850': 1.5,
-      'DNP3': 1.3,
-      'MODBUS': 1.0,
-      'OPENADR': 1.2,
-      'MQTT': 0.8
+      IEC_61850: 1.5,
+      DNP3: 1.3,
+      MODBUS: 1.0,
+      OPENADR: 1.2,
+      MQTT: 0.8,
     };
-    
+
     const multiplier = protocolComplexity[deviceConfig.protocol] || 1.0;
     const estimatedTime = baseTime * multiplier;
-    
+
     return new Date(Date.now() + estimatedTime).toISOString();
   }
 
   async executeOnboardingStep(deviceId, stepName) {
     const device = this.deviceRegistry.get(deviceId);
     const step = device.onboarding_steps.find(s => s.step === stepName);
-    
+
     if (step) {
       // Simulate step execution
       await this.delay(1000);
@@ -583,7 +593,7 @@ class IoTSCADAIntegrationService {
       logical_nodes: device.config.logical_nodes || [],
       goose_enabled: true,
       sampled_values: true,
-      mms_connection: true
+      mms_connection: true,
     };
   }
 
@@ -593,7 +603,7 @@ class IoTSCADAIntegrationService {
       master_address: 1,
       outstation_address: device.config.outstation_address || 10,
       unsolicited_enabled: true,
-      secure_auth: device.security.access_permissions.read_permissions.length > 0
+      secure_auth: device.security.access_permissions.read_permissions.length > 0,
     };
   }
 
@@ -602,7 +612,7 @@ class IoTSCADAIntegrationService {
     dataStream.protocol_specific = {
       unit_id: device.config.unit_id || 1,
       function_codes: ['read_coils', 'read_discrete_inputs', 'read_holding_registers'],
-      register_mapping: device.config.register_mapping || {}
+      register_mapping: device.config.register_mapping || {},
     };
   }
 
@@ -612,7 +622,7 @@ class IoTSCADAIntegrationService {
       ven_id: device.config.ven_id,
       vtn_url: device.config.connection.endpoint,
       market_context: device.config.market_context || 'default',
-      event_signals: []
+      event_signals: [],
     };
   }
 
@@ -622,7 +632,7 @@ class IoTSCADAIntegrationService {
       client_id: device.device_id,
       topics: device.config.data_points.map(dp => `devices/${device.device_id}/${dp.name}`),
       qos: device.config.qos || 1,
-      retain: false
+      retain: false,
     };
   }
 
@@ -631,7 +641,7 @@ class IoTSCADAIntegrationService {
     const baseData = {
       timestamp: new Date().toISOString(),
       device_id: device.device_id,
-      values: {}
+      values: {},
     };
 
     // Generate simulated data for each data point
@@ -666,7 +676,7 @@ class IoTSCADAIntegrationService {
     const processedData = {
       ...rawData,
       processed_timestamp: new Date().toISOString(),
-      quality_flags: {}
+      quality_flags: {},
     };
 
     // Validate data quality
@@ -709,12 +719,12 @@ class IoTSCADAIntegrationService {
 
   async checkAlertConditions(deviceId, data) {
     const device = this.deviceRegistry.get(deviceId);
-    
+
     for (const [ruleId, rule] of this.alertRules) {
       if (!rule.is_active) continue;
 
       const shouldTrigger = await this.evaluateAlertRule(rule, deviceId, data);
-      
+
       if (shouldTrigger) {
         await this.executeAlertActions(rule, deviceId, data);
         rule.last_triggered = new Date().toISOString();
@@ -725,25 +735,25 @@ class IoTSCADAIntegrationService {
 
   async evaluateAlertRule(rule, deviceId, data) {
     const device = this.deviceRegistry.get(deviceId);
-    
+
     switch (rule.id) {
       case 'device_offline':
         const lastComm = new Date(device.status.last_communication);
         const timeDiff = (Date.now() - lastComm.getTime()) / 1000;
         return timeDiff > 300; // 5 minutes
-        
+
       case 'communication_failure':
         return device.status.error_count >= 3;
-        
+
       case 'data_anomaly':
         return this.detectDataAnomaly(data);
-        
+
       case 'security_breach':
         return this.detectSecurityBreach(deviceId, data);
-        
+
       case 'performance_degradation':
         return this.detectPerformanceDegradation(deviceId);
-        
+
       default:
         return false;
     }
@@ -757,7 +767,7 @@ class IoTSCADAIntegrationService {
         const historicalMean = 50;
         const historicalStdDev = 10;
         const zScore = Math.abs((value - historicalMean) / historicalStdDev);
-        
+
         if (zScore > 3) return true;
       }
     }
@@ -816,56 +826,59 @@ class IoTSCADAIntegrationService {
   async getDeviceStatus() {
     const devices = Array.from(this.deviceRegistry.values());
     const onlineDevices = devices.filter(d => d.status.connection_status === 'connected');
-    
+
     return {
       total_devices: devices.length,
       online_count: onlineDevices.length,
       offline_count: devices.length - onlineDevices.length,
       by_protocol: this.groupDevicesByProtocol(devices),
-      by_category: this.groupDevicesByCategory(devices)
+      by_category: this.groupDevicesByCategory(devices),
     };
   }
 
   async getStreamingMetrics() {
     const streams = Array.from(this.dataStreams.values());
-    
+
     return {
       active_streams: streams.length,
       total_messages: streams.reduce((sum, s) => sum + s.message_count, 0),
-      average_success_rate: streams.reduce((sum, s) => sum + s.quality_metrics.success_rate, 0) / streams.length,
-      data_throughput: this.calculateDataThroughput(streams)
+      average_success_rate:
+        streams.reduce((sum, s) => sum + s.quality_metrics.success_rate, 0) / streams.length,
+      data_throughput: this.calculateDataThroughput(streams),
     };
   }
 
   async getAlertSummary() {
-    const recentAlerts = Array.from(this.alertRules.values())
-      .filter(rule => rule.last_triggered && 
-        new Date(rule.last_triggered) > new Date(Date.now() - 24 * 60 * 60 * 1000));
-    
+    const recentAlerts = Array.from(this.alertRules.values()).filter(
+      rule =>
+        rule.last_triggered &&
+        new Date(rule.last_triggered) > new Date(Date.now() - 24 * 60 * 60 * 1000)
+    );
+
     return {
       active_count: recentAlerts.length,
       by_severity: {
         critical: recentAlerts.filter(a => a.severity === 'critical').length,
         high: recentAlerts.filter(a => a.severity === 'high').length,
-        medium: recentAlerts.filter(a => a.severity === 'medium').length
+        medium: recentAlerts.filter(a => a.severity === 'medium').length,
       },
-      recent_alerts: recentAlerts.slice(0, 10)
+      recent_alerts: recentAlerts.slice(0, 10),
     };
   }
 
   async getProtocolStatus() {
     const status = {};
-    
+
     for (const [protocolId, protocol] of this.protocolHandlers) {
       status[protocolId] = {
         active_connections: protocol.active_connections,
         message_count: protocol.message_count,
         error_count: protocol.error_count,
         last_activity: protocol.last_activity,
-        health_status: protocol.error_count === 0 ? 'healthy' : 'degraded'
+        health_status: protocol.error_count === 0 ? 'healthy' : 'degraded',
       };
     }
-    
+
     return status;
   }
 
@@ -907,13 +920,27 @@ class IoTSCADAIntegrationService {
   }
 
   // Stub methods for alert actions
-  async sendEmailAlert(rule, deviceId, data) { console.log(`Email alert: ${rule.name} for device ${deviceId}`); }
-  async sendSMSAlert(rule, deviceId, data) { console.log(`SMS alert: ${rule.name} for device ${deviceId}`); }
-  async createDashboardAlert(rule, deviceId, data) { console.log(`Dashboard alert: ${rule.name} for device ${deviceId}`); }
-  async runAutoDiagnostic(deviceId) { console.log(`Running diagnostics for device ${deviceId}`); }
-  async executeFailover(deviceId) { console.log(`Executing failover for device ${deviceId}`); }
-  async isolateDevice(deviceId) { console.log(`Isolating device ${deviceId}`); }
-  async executeSecurityResponse(deviceId, data) { console.log(`Security response for device ${deviceId}`); }
+  async sendEmailAlert(rule, deviceId, data) {
+    console.log(`Email alert: ${rule.name} for device ${deviceId}`);
+  }
+  async sendSMSAlert(rule, deviceId, data) {
+    console.log(`SMS alert: ${rule.name} for device ${deviceId}`);
+  }
+  async createDashboardAlert(rule, deviceId, data) {
+    console.log(`Dashboard alert: ${rule.name} for device ${deviceId}`);
+  }
+  async runAutoDiagnostic(deviceId) {
+    console.log(`Running diagnostics for device ${deviceId}`);
+  }
+  async executeFailover(deviceId) {
+    console.log(`Executing failover for device ${deviceId}`);
+  }
+  async isolateDevice(deviceId) {
+    console.log(`Isolating device ${deviceId}`);
+  }
+  async executeSecurityResponse(deviceId, data) {
+    console.log(`Security response for device ${deviceId}`);
+  }
 
   // Additional methods
   async getPerformanceMetrics() {
@@ -921,7 +948,7 @@ class IoTSCADAIntegrationService {
       average_latency: 50,
       throughput: 1000,
       error_rate: 0.1,
-      availability: 99.9
+      availability: 99.9,
     };
   }
 
@@ -930,7 +957,7 @@ class IoTSCADAIntegrationService {
       secure_connections: this.deviceRegistry.size,
       certificate_status: 'valid',
       security_incidents: 0,
-      compliance_score: 98
+      compliance_score: 98,
     };
   }
 
@@ -938,13 +965,12 @@ class IoTSCADAIntegrationService {
     return {
       devices_in_queue: this.onboardingQueue.length,
       average_onboarding_time: 300, // 5 minutes
-      success_rate: 95
+      success_rate: 95,
     };
   }
 
   async getHistoricalData(deviceId, timeRange) {
-    return Array.from(this.historicalData.values())
-      .filter(data => data.device_id === deviceId);
+    return Array.from(this.historicalData.values()).filter(data => data.device_id === deviceId);
   }
 
   async calculateDevicePerformance(deviceId, timeRange) {
@@ -952,7 +978,7 @@ class IoTSCADAIntegrationService {
       uptime_percentage: 99.5,
       data_completion_rate: 98.5,
       error_rate: 1.5,
-      average_response_time: 100
+      average_response_time: 100,
     };
   }
 
@@ -961,19 +987,27 @@ class IoTSCADAIntegrationService {
       trend: 'stable',
       seasonality: 'none',
       anomalies_detected: 0,
-      correlation_score: 0.85
+      correlation_score: 0.85,
     };
   }
 
-  async calculateDataCompleteness(deviceId, timeRange) { return 98.5; }
-  async calculateDataAccuracy(deviceId, timeRange) { return 99.2; }
-  async calculateDataTimeliness(deviceId, timeRange) { return 97.8; }
-  async detectAnomalies(historicalData) { return []; }
+  async calculateDataCompleteness(deviceId, timeRange) {
+    return 98.5;
+  }
+  async calculateDataAccuracy(deviceId, timeRange) {
+    return 99.2;
+  }
+  async calculateDataTimeliness(deviceId, timeRange) {
+    return 97.8;
+  }
+  async detectAnomalies(historicalData) {
+    return [];
+  }
   async generateDeviceRecommendations(deviceId, performanceMetrics) {
     return [
       'Monitor data quality trends',
       'Consider firmware updates',
-      'Review communication protocols'
+      'Review communication protocols',
     ];
   }
 }

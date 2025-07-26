@@ -8,8 +8,8 @@ export const TradingDashboard: React.FC = () => {
         Trading Dashboard
       </Typography>
       <Alert severity="info">
-        Trading dashboard implementation pending. This will include real-time positions, 
-        market data, order management, and portfolio analytics.
+        Trading dashboard implementation pending. This will include real-time positions, market
+        data, order management, and portfolio analytics.
       </Alert>
     </Box>
   );

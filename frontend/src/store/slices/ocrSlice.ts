@@ -68,7 +68,7 @@ export const uploadDocument = createAsyncThunk(
       method: 'POST',
       body: formData,
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     });
 
@@ -95,7 +95,7 @@ export const uploadBatch = createAsyncThunk(
       method: 'POST',
       body: formData,
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     });
 
@@ -107,22 +107,19 @@ export const uploadBatch = createAsyncThunk(
   }
 );
 
-export const getBatchStatus = createAsyncThunk(
-  'ocr/getBatchStatus',
-  async (batchId: string) => {
-    const response = await fetch(`/api/v1/ocr/batch/${batchId}`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
+export const getBatchStatus = createAsyncThunk('ocr/getBatchStatus', async (batchId: string) => {
+  const response = await fetch(`/api/v1/ocr/batch/${batchId}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+  });
 
-    if (!response.ok) {
-      throw new Error('Failed to get batch status');
-    }
-
-    return response.json();
+  if (!response.ok) {
+    throw new Error('Failed to get batch status');
   }
-);
+
+  return response.json();
+});
 
 export const submitReview = createAsyncThunk(
   'ocr/submitReview',
@@ -136,7 +133,7 @@ export const submitReview = createAsyncThunk(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify({
         corrections: data.corrections,
@@ -163,17 +160,17 @@ const ocrSlice = createSlice({
     setUploadProgress: (state, action: PayloadAction<number>) => {
       state.uploadProgress = action.payload;
     },
-    clearError: (state) => {
+    clearError: state => {
       state.error = null;
     },
     addDocument: (state, action: PayloadAction<DocumentResult>) => {
       state.documents.push(action.payload);
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     // Upload document
     builder
-      .addCase(uploadDocument.pending, (state) => {
+      .addCase(uploadDocument.pending, state => {
         state.isProcessing = true;
         state.error = null;
       })
@@ -189,7 +186,7 @@ const ocrSlice = createSlice({
 
     // Upload batch
     builder
-      .addCase(uploadBatch.pending, (state) => {
+      .addCase(uploadBatch.pending, state => {
         state.isProcessing = true;
         state.error = null;
       })
@@ -213,11 +210,11 @@ const ocrSlice = createSlice({
 
     // Submit review
     builder
-      .addCase(submitReview.pending, (state) => {
+      .addCase(submitReview.pending, state => {
         state.isProcessing = true;
         state.error = null;
       })
-      .addCase(submitReview.fulfilled, (state) => {
+      .addCase(submitReview.fulfilled, state => {
         state.isProcessing = false;
       })
       .addCase(submitReview.rejected, (state, action) => {
