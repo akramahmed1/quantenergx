@@ -40,6 +40,18 @@ class ComplianceService {
     const checkId = uuidv4();
     const timestamp = new Date().toISOString();
     
+    // Validate required fields
+    if (!transactionData || typeof transactionData !== 'object') {
+      throw new Error('Compliance check failed: Invalid transaction data');
+    }
+    
+    const requiredFields = ['commodity', 'volume'];
+    const missingFields = requiredFields.filter(field => !(field in transactionData));
+    
+    if (missingFields.length > 0) {
+      throw new Error(`Compliance check failed: Missing required fields: ${missingFields.join(', ')}`);
+    }
+    
     try {
       const results = await Promise.all([
         this._checkPositionLimits(transactionData, region),
