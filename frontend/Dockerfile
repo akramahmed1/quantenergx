@@ -22,9 +22,6 @@ RUN npm run build
 # Stage 2: Production nginx server
 FROM nginx:alpine AS production
 
-# Install security updates
-RUN apk update && apk upgrade
-
 # Remove default nginx configuration
 RUN rm /etc/nginx/conf.d/default.conf
 

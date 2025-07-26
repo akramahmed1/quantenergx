@@ -1,0 +1,102 @@
+name: Deploy to Cloud Platforms
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # Build and test
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    # Backend tests
+    - name: Install Backend Dependencies
+      run: cd backend && npm ci
+    
+    - name: Run Backend Tests
+      run: cd backend && npm test
+    
+    # Frontend tests
+    - name: Install Frontend Dependencies
+      run: cd frontend && npm ci
+    
+    - name: Run Frontend Tests
+      run: cd frontend && npm test -- --coverage --watchAll=false
+    
+    - name: Build Frontend
+      run: cd frontend && npm run build
+
+  # Docker build verification
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build Backend Docker Image
+      run: docker build -t quantenergx-backend ./backend
+    
+    - name: Build Frontend Docker Image
+      run: docker build -t quantenergx-frontend ./frontend
+    
+    - name: Test Docker Compose
+      run: docker compose config
+
+  # Deploy to Vercel (Frontend)
+  deploy-vercel:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to Vercel
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        working-directory: ./frontend
+
+  # Deploy to Render (Full Stack)
+  deploy-render:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Trigger Render Deploy
+      run: |
+        curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" \
+          -H "Content-Type: application/json" \
+          -d '{"ref": "${{ github.sha }}"}'
+
+  # Deploy to Railway (Full Stack)
+  deploy-railway:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to Railway
+      uses: bervProject/railway-deploy@v1.1.0
+      with:
+        railway_token: ${{ secrets.RAILWAY_TOKEN }}
+        service: quantenergx

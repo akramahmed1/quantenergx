@@ -23,8 +23,8 @@ RUN npm ci
 # Stage 3: Production build
 FROM node:20-alpine AS production
 
-# Install security updates
-RUN apk update && apk upgrade && apk add --no-cache dumb-init
+# Install dumb-init for signal handling
+RUN apk add --no-cache dumb-init
 
 # Create app user for security
 RUN addgroup -g 1001 -S nodejs

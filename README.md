@@ -157,6 +157,136 @@ npm run lint:backend
 npm run lint:frontend
 ```
 
+## ☁️ Cloud Deployment
+
+QuantEnergx supports one-click deployment on multiple cloud platforms with zero configuration.
+
+### Render.com
+
+Deploy both backend and frontend services automatically:
+
+1. **Connect Repository**: Connect your GitHub repo to Render
+2. **Auto-Deploy**: Render will automatically detect and deploy services using `render.yaml`
+3. **Environment Variables**: Set required environment variables in Render dashboard
+4. **Database**: PostgreSQL and Redis will be automatically provisioned
+
+```bash
+# Manual deployment via Render CLI
+render deploy
+```
+
+**Services created:**
+- `quantenergx-backend` - Node.js API service
+- `quantenergx-frontend` - Static site with CDN
+- `quantenergx-postgres` - PostgreSQL database
+- `quantenergx-redis` - Redis cache
+
+### Vercel (Frontend Only)
+
+Deploy the React frontend with automatic builds:
+
+1. **Connect Repository**: Import your repo in Vercel dashboard
+2. **Configure Build**: Set build command to `cd frontend && npm run build`
+3. **Auto-Deploy**: Every push to main branch triggers deployment
+4. **Custom Domain**: Configure custom domain in Vercel settings
+
+```bash
+# Manual deployment via Vercel CLI
+npx vercel --cwd frontend
+```
+
+**Features:**
+- Automatic HTTPS and CDN
+- Zero-config deployment
+- Preview deployments for PRs
+- Custom domains and analytics
+
+### Railway
+
+Deploy full-stack application with databases:
+
+1. **Connect Repository**: Link your GitHub repo to Railway
+2. **Service Detection**: Railway automatically detects services from `railway.json`
+3. **Environment Setup**: Configure environment variables in Railway dashboard
+4. **Database Provisioning**: PostgreSQL and Redis are automatically set up
+
+```bash
+# Manual deployment via Railway CLI
+railway up
+```
+
+**Services created:**
+- Backend API service
+- Frontend static hosting
+- PostgreSQL database plugin
+- Redis cache plugin
+
+### Docker & Docker Compose
+
+For any Docker-compatible cloud platform:
+
+```bash
+# Local development
+docker-compose up -d
+
+# Production deployment
+docker-compose -f docker-compose.yml up -d
+
+# Individual services
+docker build -t quantenergx-backend ./backend
+docker build -t quantenergx-frontend ./frontend
+
+# Run with custom environment
+docker run -p 3001:3001 --env-file .env quantenergx-backend
+docker run -p 3000:80 quantenergx-frontend
+```
+
+### Other Cloud Platforms
+
+The provided Docker configurations work with:
+
+- **AWS ECS/Fargate**: Use the Dockerfiles with ECS task definitions
+- **Google Cloud Run**: Deploy containers directly from Docker images
+- **Azure Container Instances**: Use the docker-compose.yml for multi-container deployments
+- **DigitalOcean App Platform**: Connect repo and use Docker build pack
+- **Heroku**: Use the Dockerfiles with heroku.yml (create heroku.yml if needed)
+
+### Environment Variables
+
+Required environment variables for production deployment:
+
+**Backend:**
+```bash
+NODE_ENV=production
+PORT=3001
+DATABASE_URL=postgresql://user:pass@host:5432/db
+REDIS_URL=redis://host:6379
+JWT_SECRET=your-secret-key-min-32-chars
+JWT_REFRESH_SECRET=your-refresh-secret-key
+ENFORCE_HTTPS=true
+```
+
+**Frontend:**
+```bash
+REACT_APP_API_URL=https://your-backend-api.com
+```
+
+### Health Checks
+
+All services include health check endpoints:
+
+- **Backend**: `GET /health` - Returns service status and version
+- **Frontend**: `GET /health` - Simple health check for load balancers
+
+### CI/CD Integration
+
+The deployment configurations work with standard CI/CD workflows:
+
+- **GitHub Actions**: Use the workflows in `.github/workflows/`
+- **GitLab CI**: Compatible with Docker-based pipelines
+- **Jenkins**: Use Docker build and deploy stages
+- **CircleCI**: Standard Docker orb integration
+
 ## 📚 Documentation
 
 Comprehensive documentation is available in the `/docs` directory:
