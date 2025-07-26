@@ -215,3 +215,19 @@ frontend/uploads/
 # Redis dump files
 *.rdb
 *storybook.log
+# Ignore comparison and temp files
+local_files.txt
+remote_files.txt
+remote_paths.txt
+remote_paths_clean.txt
+remote_paths_clean_final.txt
+
+# Ignore local and temp comparison files
+local_files.txt
+remote_files.txt
+remote_paths.txt
+remote_paths_clean.txt
+remote_paths_clean_final.txt
+
+# Ignore Windows environment script if not needed in repo
+backend/set_node_env.bat
