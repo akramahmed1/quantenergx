@@ -1,0 +1,15 @@
+name: Railway Deploy
+
+on:
+  push:
+    branches: ["main", "master", "develop"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Railway
+        run: |
+          curl -X POST https://backboard.railway.app/project/${{ secrets.RAILWAY_PROJECT_ID }}/deploy
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
