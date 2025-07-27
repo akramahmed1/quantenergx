@@ -97,7 +97,7 @@ class UserManagementService {
       {
         username: 'admin',
         email: 'admin@quantenergx.com',
-        password: 'Admin123!',
+        password: 'Admin!2025Demo',
         role: 'admin',
         firstName: 'System',
         lastName: 'Administrator',
