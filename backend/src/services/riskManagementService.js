@@ -361,14 +361,14 @@ class RiskManagementService {
 
   _getMetricScore(metric) {
     switch (metric.severity) {
-      case 'low':
-        return 0.9;
-      case 'medium':
-        return 0.6;
-      case 'high':
-        return 0.3;
-      default:
-        return 0.5;
+    case 'low':
+      return 0.9;
+    case 'medium':
+      return 0.6;
+    case 'high':
+      return 0.3;
+    default:
+      return 0.5;
     }
   }
 
@@ -400,35 +400,35 @@ class RiskManagementService {
 
   _getAlertMessage(metric) {
     switch (metric.metric) {
-      case 'value_at_risk':
-        return `VaR limits exceeded. Daily VaR: $${metric.dailyVaR.toLocaleString()}`;
-      case 'concentration_risk':
-        return `Concentration risk in ${metric.mostConcentratedCommodity}: ${(metric.maxCommodityConcentration * 100).toFixed(1)}%`;
-      case 'credit_risk':
-        return `Credit limit violations detected for ${metric.violations.length} counterparties`;
-      case 'market_risk':
-        return `Portfolio beta elevated at ${metric.portfolioBeta.toFixed(2)}`;
-      case 'liquidity_risk':
-        return `Illiquid positions represent ${metric.illiquidPercentage.toFixed(1)}% of portfolio`;
-      default:
-        return `Risk threshold exceeded for ${metric.metric}`;
+    case 'value_at_risk':
+      return `VaR limits exceeded. Daily VaR: $${metric.dailyVaR.toLocaleString()}`;
+    case 'concentration_risk':
+      return `Concentration risk in ${metric.mostConcentratedCommodity}: ${(metric.maxCommodityConcentration * 100).toFixed(1)}%`;
+    case 'credit_risk':
+      return `Credit limit violations detected for ${metric.violations.length} counterparties`;
+    case 'market_risk':
+      return `Portfolio beta elevated at ${metric.portfolioBeta.toFixed(2)}`;
+    case 'liquidity_risk':
+      return `Illiquid positions represent ${metric.illiquidPercentage.toFixed(1)}% of portfolio`;
+    default:
+      return `Risk threshold exceeded for ${metric.metric}`;
     }
   }
 
   _getRequiredAction(metric) {
     switch (metric.metric) {
-      case 'value_at_risk':
-        return 'Reduce position sizes or hedge exposure';
-      case 'concentration_risk':
-        return 'Diversify commodity exposure';
-      case 'credit_risk':
-        return 'Reduce counterparty exposure or increase collateral';
-      case 'market_risk':
-        return 'Consider hedging strategies';
-      case 'liquidity_risk':
-        return 'Increase liquid asset allocation';
-      default:
-        return 'Review and mitigate risk exposure';
+    case 'value_at_risk':
+      return 'Reduce position sizes or hedge exposure';
+    case 'concentration_risk':
+      return 'Diversify commodity exposure';
+    case 'credit_risk':
+      return 'Reduce counterparty exposure or increase collateral';
+    case 'market_risk':
+      return 'Consider hedging strategies';
+    case 'liquidity_risk':
+      return 'Increase liquid asset allocation';
+    default:
+      return 'Review and mitigate risk exposure';
     }
   }
 

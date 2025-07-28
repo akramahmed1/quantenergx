@@ -538,14 +538,14 @@ class CloudCostManagementService {
 
   async evaluateAlertRule(rule, costData) {
     switch (rule.type) {
-      case 'threshold':
-        return await this.evaluateThresholdRule(rule, costData);
-      case 'anomaly':
-        return await this.evaluateAnomalyRule(rule, costData);
-      case 'optimization':
-        return await this.evaluateOptimizationRule(rule, costData);
-      default:
-        return false;
+    case 'threshold':
+      return await this.evaluateThresholdRule(rule, costData);
+    case 'anomaly':
+      return await this.evaluateAnomalyRule(rule, costData);
+    case 'optimization':
+      return await this.evaluateOptimizationRule(rule, costData);
+    default:
+      return false;
     }
   }
 
@@ -564,21 +564,21 @@ class CloudCostManagementService {
   async executeAlertActions(rule, costData) {
     for (const action of rule.actions) {
       switch (action) {
-        case 'email':
-          await this.sendEmailAlert(rule, costData);
-          break;
-        case 'slack':
-          await this.sendSlackAlert(rule, costData);
-          break;
-        case 'dashboard_alert':
-          await this.createDashboardAlert(rule, costData);
-          break;
-        case 'auto_optimize':
-          await this.performAutoOptimization(rule.severity);
-          break;
-        case 'emergency_review':
-          await this.triggerEmergencyReview(rule, costData);
-          break;
+      case 'email':
+        await this.sendEmailAlert(rule, costData);
+        break;
+      case 'slack':
+        await this.sendSlackAlert(rule, costData);
+        break;
+      case 'dashboard_alert':
+        await this.createDashboardAlert(rule, costData);
+        break;
+      case 'auto_optimize':
+        await this.performAutoOptimization(rule.severity);
+        break;
+      case 'emergency_review':
+        await this.triggerEmergencyReview(rule, costData);
+        break;
       }
     }
   }

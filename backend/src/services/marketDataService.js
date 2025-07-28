@@ -124,16 +124,16 @@ class MarketDataService {
     const provider = this.dataProviders[providerName];
 
     switch (providerName) {
-      case 'bloomberg':
-        return await this._fetchFromBloomberg(provider, commodity, symbol, timeframe);
-      case 'refinitiv':
-        return await this._fetchFromRefinitiv(provider, commodity, symbol, timeframe);
-      case 'ice':
-        return await this._fetchFromICE(provider, commodity, symbol, timeframe);
-      case 'nymex':
-        return await this._fetchFromNYMEX(provider, commodity, symbol, timeframe);
-      default:
-        throw new Error(`Unknown provider: ${providerName}`);
+    case 'bloomberg':
+      return await this._fetchFromBloomberg(provider, commodity, symbol, timeframe);
+    case 'refinitiv':
+      return await this._fetchFromRefinitiv(provider, commodity, symbol, timeframe);
+    case 'ice':
+      return await this._fetchFromICE(provider, commodity, symbol, timeframe);
+    case 'nymex':
+      return await this._fetchFromNYMEX(provider, commodity, symbol, timeframe);
+    default:
+      throw new Error(`Unknown provider: ${providerName}`);
     }
   }
 

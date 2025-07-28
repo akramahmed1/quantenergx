@@ -336,33 +336,33 @@ class ComplianceService {
 
     violations.forEach(violation => {
       switch (violation.check) {
-        case 'position_limits':
-          actions.push({
-            action: 'reduce_position',
-            priority: 'high',
-            deadline: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-          });
-          break;
-        case 'kyc_aml':
-          actions.push({
-            action: 'complete_verification',
-            priority: 'critical',
-            deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-          });
-          break;
-        case 'environmental_standards':
-          actions.push({
-            action: 'obtain_certifications',
-            priority: 'medium',
-            deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-          });
-          break;
-        default:
-          actions.push({
-            action: 'review_compliance',
-            priority: 'medium',
-            deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-          });
+      case 'position_limits':
+        actions.push({
+          action: 'reduce_position',
+          priority: 'high',
+          deadline: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+        });
+        break;
+      case 'kyc_aml':
+        actions.push({
+          action: 'complete_verification',
+          priority: 'critical',
+          deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        });
+        break;
+      case 'environmental_standards':
+        actions.push({
+          action: 'obtain_certifications',
+          priority: 'medium',
+          deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        });
+        break;
+      default:
+        actions.push({
+          action: 'review_compliance',
+          priority: 'medium',
+          deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        });
       }
     });
 

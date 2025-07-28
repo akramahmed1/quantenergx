@@ -161,6 +161,55 @@ npm run lint:frontend
 
 QuantEnergx supports one-click deployment on multiple cloud platforms with zero configuration.
 
+### 🚀 Automated Deployment (Recommended)
+
+**Comprehensive CI/CD Pipeline**: Every push to `main` branch automatically:
+- Builds and tests the application
+- Runs security scans and linting
+- Deploys to Vercel, Render, and Railway simultaneously
+- Performs health checks and reports status
+- Comments deployment URLs on PRs
+
+**Required GitHub Secrets:**
+```bash
+# Vercel
+VERCEL_TOKEN=your_vercel_token
+VERCEL_ORG_ID=your_org_id
+VERCEL_PROJECT_ID=your_project_id
+
+# Render
+RENDER_DEPLOY_HOOK_URL=your_webhook_url
+RENDER_API_KEY=your_api_key
+RENDER_APP_URL=your_app_url
+
+# Railway
+RAILWAY_TOKEN=your_token
+RAILWAY_APP_URL=your_app_url
+
+# Application Environment
+JWT_SECRET=your_jwt_secret
+JWT_REFRESH_SECRET=your_refresh_secret
+DATABASE_URL=your_db_url
+REDIS_URL=your_redis_url
+API_KEY=your_api_key
+ENCRYPTION_KEY=your_encryption_key
+```
+
+**Zero-Touch Commands:**
+```bash
+# Install dependencies and build
+npm install
+npm run build
+
+# Start development
+npm start
+
+# Deploy (automatic on push to main)
+git push origin main
+```
+
+For detailed deployment setup, see [DEPLOYMENT.md](./DEPLOYMENT.md).
+
 ### Render.com
 
 Deploy both backend and frontend services automatically:
