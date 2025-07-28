@@ -28,25 +28,8 @@ jobs:
       - name: Run tests
         run: npm test
 
-  auto-fix:
-    needs: ci
-    runs-on: ubuntu-latest
-    if: ${{ failure() }}
-    steps:
-      - name: Analyze and Fix Build Failures with Copilot
-        uses: github/copilot-actions/fix@latest
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Commit and Push Fixes
-        run: |
-          git config --global user.name "Copilot[bot]"
-          git config --global user.email "copilot[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "Auto-fix: Build/test/lint failures resolved by Copilot"
-          git push
-
   automerge:
-    needs: [ci, auto-fix]
+    needs: [ci]
     runs-on: ubuntu-latest
     if: ${{ success() }}
     steps:
