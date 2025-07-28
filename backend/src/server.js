@@ -56,14 +56,14 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-        fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-        imgSrc: ["'self'", 'data:', 'https:'],
-        scriptSrc: ["'self'"],
-        connectSrc: ["'self'"],
-        frameSrc: ["'none'"],
-        objectSrc: ["'none'"],
+        defaultSrc: ['\'self\''],
+        styleSrc: ['\'self\'', '\'unsafe-inline\'', 'https://fonts.googleapis.com'],
+        fontSrc: ['\'self\'', 'https://fonts.gstatic.com'],
+        imgSrc: ['\'self\'', 'data:', 'https:'],
+        scriptSrc: ['\'self\''],
+        connectSrc: ['\'self\''],
+        frameSrc: ['\'none\''],
+        objectSrc: ['\'none\''],
         upgradeInsecureRequests: [],
       },
     },
@@ -166,6 +166,20 @@ app.get('/health', (req, res) => {
       rest_api: 'online',
       grpc_service: 'online',
     },
+  });
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    version: '1.0.0',
+    services: {
+      http: 'running',
+      grpc: 'running'
+    }
   });
 });
 

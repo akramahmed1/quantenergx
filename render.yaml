@@ -28,17 +28,21 @@ services:
           name: quantenergx-redis
           property: connectionString
       - key: JWT_SECRET
-        generateValue: true
+        sync: false
       - key: JWT_EXPIRES_IN
         value: 24h
       - key: JWT_REFRESH_SECRET
-        generateValue: true
+        sync: false
       - key: JWT_REFRESH_EXPIRES_IN
         value: 7d
       - key: ENFORCE_HTTPS
         value: true
       - key: LOG_LEVEL
         value: info
+      - key: API_KEY
+        sync: false
+      - key: ENCRYPTION_KEY
+        sync: false
 
   # Frontend Static Site
   - type: web
