@@ -37,18 +37,9 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children, defaultLan
 
   const t = (key: TranslationKey): string => {
     const keys = key.split('.');
-    let value: any = translations[language];
+    // Use fallback to English if language is missing
+    let value: any = translations[language] || translations['en'];
 
-    for (const k of keys) {
-      value = value?.[k];
-    }
-
-    if (typeof value === 'string') {
-      return value;
-    }
-
-    // Fallback to English
-    value = translations.en;
     for (const k of keys) {
       value = value?.[k];
     }
