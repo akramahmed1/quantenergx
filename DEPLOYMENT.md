@@ -2,51 +2,358 @@
 
 ## Overview
 
-This guide covers the comprehensive automated deployment setup for QuantEnergx across multiple cloud platforms: Vercel, Render, and Railway.
+This guide covers the **separated frontend and backend deployment** strategy for QuantEnergx, following industry best practices. The frontend and backend are deployed independently on different platforms optimized for their specific needs.
 
-## Prerequisites
+## 🏗️ Deployment Architecture
+
+### Frontend Deployment (Vercel)
+- **Platform**: Vercel (optimized for React SPAs)
+- **Repository**: `frontend/` directory only
+- **Build**: Static assets served via CDN
+- **Security**: CSP headers, HTTPS enforced
+- **Health Check**: `/health` endpoint
+
+### Backend Deployment (Render + Railway)
+- **Platforms**: Render.com and Railway (redundancy + load distribution)
+- **Repository**: `backend/` directory only  
+- **Services**: Node.js API, PostgreSQL, Redis
+- **Security**: Rate limiting, secure headers, secret management
+- **Health Check**: `/health` API endpoint
+
+## 🔧 Prerequisites
 
 ### Required GitHub Secrets
 
-Add the following secrets to your GitHub repository (Settings → Secrets and variables → Actions):
+Configure these secrets in your GitHub repository (Settings → Secrets and variables → Actions):
 
-#### Vercel Deployment
-- `VERCEL_TOKEN`: Your Vercel authentication token
-- `VERCEL_ORG_ID`: Your Vercel organization ID
-- `VERCEL_PROJECT_ID`: Your Vercel project ID
+#### Frontend Deployment (Vercel)
+```
+VERCEL_TOKEN=your-vercel-auth-token
+VERCEL_ORG_ID=your-vercel-org-id
+VERCEL_PROJECT_ID=your-vercel-project-id
+VERCEL_APP_URL=https://your-app.vercel.app
+```
 
-#### Render Deployment
-- `RENDER_DEPLOY_HOOK_URL`: Webhook URL for triggering deployments
-- `RENDER_API_KEY`: Render API key for authentication
-- `RENDER_APP_URL`: Your Render application URL (for health checks)
+#### Backend Deployment (Render)
+```
+RENDER_DEPLOY_HOOK_URL=https://api.render.com/deploy/your-service-id
+RENDER_API_KEY=your-render-api-key
+RENDER_APP_URL=https://your-backend.onrender.com
+```
 
-#### Railway Deployment
-- `RAILWAY_TOKEN`: Railway authentication token
-- `RAILWAY_APP_URL`: Your Railway application URL (for health checks)
+#### Backend Deployment (Railway)
+```
+RAILWAY_TOKEN=your-railway-token
+RAILWAY_APP_URL=https://your-backend.railway.app
+```
 
 #### Application Environment Variables
-- `JWT_SECRET`: Secret key for JWT token signing
-- `JWT_REFRESH_SECRET`: Secret key for JWT refresh tokens
-- `DATABASE_URL`: PostgreSQL database connection string
-- `REDIS_URL`: Redis connection string
-- `API_KEY`: Application API key
-- `ENCRYPTION_KEY`: Data encryption key
+```
+# JWT Configuration
+JWT_SECRET=your-super-secret-jwt-key-32-chars-minimum
+JWT_REFRESH_SECRET=your-super-secret-refresh-key-32-chars-minimum
+
+# Database
+DATABASE_URL=postgresql://user:password@host:port/database
+REDIS_URL=redis://user:password@host:port
+
+# API Security
+API_KEY=your-api-key
+ENCRYPTION_KEY=your-32-character-encryption-key
+
+# Frontend Configuration
+REACT_APP_API_URL=https://your-backend.onrender.com
+```
 
 #### Optional Integrations
-- `SLACK_WEBHOOK_URL`: Slack webhook for deployment notifications
+```
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/your/webhook/url
+SNYK_TOKEN=your-snyk-token-for-security-scanning
+```
 
-## Local Development
+## 🚀 Deployment Workflows
 
-### Setup Commands
+### Automated CI/CD Pipeline
+
+The project uses **separate CI/CD workflows** for frontend and backend:
+
+#### Frontend Pipeline (`.github/workflows/frontend.yml`)
+1. **Lint & Security**: ESLint, Prettier, TypeScript checks, security audit
+2. **Test**: Unit tests with coverage reporting  
+3. **Build**: Production React build with optimizations
+4. **Deploy**: Automatic deployment to Vercel on main branch
+5. **Security Check**: Validate security headers post-deployment
+
+#### Backend Pipeline (`.github/workflows/backend.yml`)
+1. **Security Scan**: Semgrep, TruffleHog, ESLint security rules
+2. **Lint & Test**: ESLint, unit tests, integration tests, coverage
+3. **Advanced Testing**: Contract tests, fuzz testing, mutation testing
+4. **Build**: Create deployment package
+5. **Deploy**: Parallel deployment to Render and Railway
+6. **Security Tests**: Rate limiting, security headers, HTTPS enforcement
+
+### Manual Deployment
+
+#### Frontend (Vercel)
 ```bash
-# Install all dependencies
-npm install
+# Install Vercel CLI
+npm i -g vercel
 
-# Build the application
-npm run build
+# Deploy from frontend directory
+cd frontend
+vercel --prod
+```
 
-# Start development servers
+#### Backend (Render)
+```bash
+# Trigger deployment via webhook
+curl -X POST "$RENDER_DEPLOY_HOOK_URL" \
+  -H "Authorization: Bearer $RENDER_API_KEY"
+```
+
+#### Backend (Railway)
+```bash
+# Install Railway CLI
+npm i -g @railway/cli
+
+# Deploy from backend directory  
+cd backend
+railway deploy
+```
+
+## 💻 Local Development
+
+### Quick Start
+```bash
+# Method 1: Docker Compose (Recommended)
+docker-compose up -d
+
+# Method 2: Manual startup
+npm run install:all
 npm start
+```
+
+### Environment Setup
+```bash
+# Copy and configure environment files
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+
+# Edit .env files with your local configuration
+```
+
+### Development URLs
+- **Frontend**: http://localhost:3000
+- **Backend**: http://localhost:3001  
+- **Health Checks**: 
+  - Frontend: http://localhost:3000/health
+  - Backend: http://localhost:3001/health
+
+## 🔐 Security Management
+
+### Secret Management Best Practices
+
+1. **Never commit secrets** to repository
+2. **Use GitHub Secrets** for CI/CD environment variables
+3. **Rotate secrets regularly** (quarterly minimum)
+4. **Use different secrets** for development, staging, production
+5. **Audit secret access** through GitHub audit logs
+
+### Environment File Security
+```bash
+# ✅ Good - These files are included
+.env.example
+
+# ❌ Never commit these files  
+.env
+.env.local
+.env.production
+secrets.json
+credentials.json
+```
+
+### Security Headers
+The platform implements comprehensive security headers:
+- Content Security Policy (CSP)
+- X-Frame-Options (clickjacking protection)
+- X-Content-Type-Options (MIME sniffing protection)
+- X-XSS-Protection (XSS filtering)
+- Strict-Transport-Security (HTTPS enforcement)
+
+## 🧪 Testing Deployments
+
+### Health Checks
+```bash
+# Frontend health check
+curl https://your-app.vercel.app/health
+
+# Backend health check  
+curl https://your-backend.onrender.com/health
+```
+
+### Admin Login Test
+- **URL**: https://your-app.vercel.app/login
+- **Username**: `admin`
+- **Password**: `Admin!2025Demo`
+
+### Security Validation
+```bash
+# Check security headers
+curl -I https://your-app.vercel.app | grep -E "(X-Frame-Options|Content-Security-Policy)"
+
+# Test rate limiting
+for i in {1..10}; do
+  curl https://your-backend.onrender.com/api/v1/users/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"username":"test","password":"test"}'
+done
+```
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+#### Frontend Build Failures
+```bash
+# Check Node.js version (requires 18+)
+node --version
+
+# Clear build cache
+rm -rf frontend/node_modules frontend/build
+cd frontend && npm ci && npm run build
+```
+
+#### Backend Deployment Issues  
+```bash
+# Check environment variables
+echo $DATABASE_URL
+echo $JWT_SECRET
+
+# Test local backend
+cd backend && npm start
+curl http://localhost:3001/health
+```
+
+#### Database Connection Problems
+```bash
+# Test database connectivity
+psql $DATABASE_URL -c "SELECT 1;"
+
+# Check Redis connectivity  
+redis-cli -u $REDIS_URL ping
+```
+
+### Deployment Status Monitoring
+
+#### Vercel Deployment Logs
+- Visit: https://vercel.com/dashboard
+- Select your project → Deployments tab
+- View real-time logs and build status
+
+#### Render Deployment Logs
+- Visit: https://dashboard.render.com
+- Select your service → Logs tab
+- Monitor deployment progress and errors
+
+#### Railway Deployment Logs
+- Visit: https://railway.app/dashboard
+- Select your project → Service → Logs
+- Real-time deployment monitoring
+
+### Performance Monitoring
+```bash
+# Frontend performance
+curl -w "@curl-format.txt" -o /dev/null -s https://your-app.vercel.app
+
+# Backend performance
+curl -w "@curl-format.txt" -o /dev/null -s https://your-backend.onrender.com/health
+```
+
+## 📞 Support
+
+### Getting Help
+1. **Check deployment logs** first (see monitoring section above)
+2. **Review GitHub Actions** for CI/CD pipeline failures
+3. **Validate environment variables** and secrets configuration
+4. **Test locally** before cloud deployment
+5. **Create GitHub issue** with logs and error details
+
+### Emergency Contacts
+- **Platform Issues**: Check status pages
+  - [Vercel Status](https://vercel-status.com)
+  - [Render Status](https://status.render.com)  
+  - [Railway Status](https://status.railway.app)
+
+### Rollback Procedures
+```bash
+# Rollback frontend (Vercel)
+vercel rollback [deployment-url]
+
+# Rollback backend (via re-deployment)
+# Use previous commit SHA in deployment webhook
+```
+
+## 🔍 Deployment Verification
+
+### Automated Health Check
+Use the provided script to verify your deployments:
+
+```bash
+# Set your deployment URLs
+export FRONTEND_URL="https://your-app.vercel.app"
+export BACKEND_URL="https://your-backend.onrender.com"
+
+# Run health check
+./scripts/check-deployment.sh
+```
+
+### Manual Verification Steps
+
+#### 1. Health Endpoints
+```bash
+# Frontend health check
+curl https://your-app.vercel.app/health
+# Expected: "healthy"
+
+# Backend health check  
+curl https://your-backend.onrender.com/health
+# Expected: JSON with status "healthy"
+```
+
+#### 2. Security Headers
+```bash
+# Check security headers
+curl -I https://your-app.vercel.app | grep -E "(X-Frame-Options|Content-Security-Policy)"
+curl -I https://your-backend.onrender.com | grep -E "(X-Frame-Options|Strict-Transport-Security)"
+```
+
+#### 3. Admin Login Test
+1. Navigate to: `https://your-app.vercel.app/login`
+2. Username: `admin`
+3. Password: `Admin!2025Demo`
+4. Verify successful authentication and dashboard access
+
+#### 4. API Functionality
+```bash
+# Test API info endpoint
+curl https://your-backend.onrender.com/api/v1/info
+
+# Test authentication (should return validation error)
+curl -X POST https://your-backend.onrender.com/api/v1/users/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"wrong"}'
+```
+
+### Post-Deployment Checklist
+- [ ] Frontend health endpoint responds
+- [ ] Backend health endpoint responds  
+- [ ] Security headers are present
+- [ ] Admin login works
+- [ ] API endpoints are accessible
+- [ ] Database connections are stable
+- [ ] Redis cache is working
+- [ ] CI/CD pipelines completed successfully
+- [ ] Monitoring and alerts are configured
 
 # Run tests
 npm test

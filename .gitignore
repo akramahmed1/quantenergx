@@ -64,9 +64,31 @@ jspm_packages/
 # dotenv environment variables file
 .env
 .env.local
+.env.development
 .env.development.local
+.env.test
 .env.test.local
+.env.production
 .env.production.local
+.env.staging
+.env.staging.local
+
+# Additional environment files
+*.env
+.env.*
+!.env.example
+environment.ts
+environment.prod.ts
+
+# Secret and credential files
+secrets.json
+credentials.json
+service-account.json
+private-key.pem
+*.p12
+*.pfx
+config/secrets.js
+config/secrets.ts
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache

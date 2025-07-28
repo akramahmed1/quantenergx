@@ -6,6 +6,134 @@
 
 QuantEnergx is designed to be a market-leading energy trading platform that enables efficient trading of oil, gas, and renewable energy commodities across global markets. Our platform addresses the complex regulatory and operational requirements of energy trading in the US, UK, Europe, and Middle East markets.
 
+## 🏗️ Architecture Overview
+
+### Separated Frontend and Backend Deployments
+
+This project follows industry best practices with **fully separated frontend and backend deployments**:
+
+- **Frontend**: React SPA deployed on **Vercel** (static hosting)
+- **Backend**: Node.js API deployed on **Render** and **Railway** (server hosting)
+- **Databases**: PostgreSQL and Redis hosted on cloud providers
+
+### Project Structure
+```
+quantenergx/
+├── frontend/           # React TypeScript SPA
+│   ├── src/           # Frontend source code
+│   ├── public/        # Static assets
+│   ├── build/         # Production build (generated)
+│   ├── Dockerfile     # Frontend container config
+│   └── vercel.json    # Vercel deployment config
+├── backend/           # Node.js Express API
+│   ├── src/           # Backend source code
+│   ├── test/          # Backend tests
+│   ├── uploads/       # File upload directory
+│   └── Dockerfile     # Backend container config
+├── .github/workflows/ # Separated CI/CD pipelines
+│   ├── frontend.yml   # Frontend deployment pipeline
+│   └── backend.yml    # Backend deployment pipeline
+├── render.yaml        # Render.com deployment config
+├── railway.json       # Railway deployment config
+└── docker-compose.yml # Local development setup
+```
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+ and npm 8+
+- Docker and Docker Compose (for local development)
+- Git
+
+### Local Development Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/akramahmed1/quantenergx.git
+   cd quantenergx
+   ```
+
+2. **Environment Configuration**
+   ```bash
+   # Copy environment files
+   cp backend/.env.example backend/.env
+   cp frontend/.env.example frontend/.env
+   
+   # Edit the .env files with your local configuration
+   ```
+
+3. **Start with Docker Compose (Recommended)**
+   ```bash
+   # Start all services (frontend, backend, database, redis)
+   docker-compose up -d
+   
+   # View logs
+   docker-compose logs -f
+   
+   # Stop services
+   docker-compose down
+   ```
+
+4. **Or start manually**
+   ```bash
+   # Install dependencies for all packages
+   npm run install:all
+   
+   # Start development servers
+   npm start
+   ```
+
+5. **Access the application**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:3001
+   - Health checks: 
+     - Frontend: http://localhost:3000/health
+     - Backend: http://localhost:3001/health
+
+### Admin Access
+- **Username**: `admin`
+- **Password**: `Admin!2025Demo`
+- **Login URL**: 
+  - Local: http://localhost:3000/login
+  - Production: https://your-app.vercel.app/login
+
+### Default Test Users
+For development and testing purposes:
+```
+Admin User:
+- Username: admin
+- Password: Admin!2025Demo
+- Role: Administrator
+
+Test Trader:
+- Username: trader1
+- Password: Trader!2025Demo  
+- Role: Trader
+
+Test Risk Manager:
+- Username: risk1
+- Password: Risk!2025Demo
+- Role: Risk Manager
+```
+
+**⚠️ Security Note**: Change default passwords before production deployment!
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run linting
+npm run lint
+
+# Run security audit
+npm run security:audit
+```
+
 ## 🚀 MVP Features
 
 ### Core Trading Engine

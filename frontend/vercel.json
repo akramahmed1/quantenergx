@@ -59,11 +59,7 @@
       ]
     }
   ],
-  "functions": {
-    "src/index.tsx": {
-      "maxDuration": 30
-    }
-  },
+
   "regions": ["iad1"],
   "buildCommand": "npm run build",
   "outputDirectory": "build",

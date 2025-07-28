@@ -1,8 +1,6 @@
 # Docker Compose for QuantEnergx - Local Development and Multi-Service Deployment
 # Compatible with Docker, Render, Railway, and other cloud platforms
 
-version: '3.8'
-
 services:
   # PostgreSQL Database
   postgres:
