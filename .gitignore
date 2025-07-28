@@ -82,7 +82,7 @@ dist
 
 # Gatsby files
 .cache/
-public
+# Note: React's public/ directories should be included, so we don't ignore 'public' here
 
 # Vuepress build output
 .vuepress/dist
