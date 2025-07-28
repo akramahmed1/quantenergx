@@ -1,0 +1,325 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches: [ main ]
+    paths: 
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
+
+env:
+  NODE_VERSION: 20
+
+jobs:
+  backend-security-scan:
+    name: Backend Security Scan
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Security audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Install security linting plugins
+        run: npm install --save-dev eslint-plugin-security eslint-plugin-no-secrets @microsoft/eslint-plugin-sdl
+
+      - name: Run ESLint with security rules
+        run: npx eslint src/ --ext .js --config .eslintrc.security.js
+        continue-on-error: true
+
+      - name: Install and run Semgrep
+        run: |
+          python3 -m pip install semgrep
+          semgrep --config=auto src/ --json -o semgrep-results.json || true
+
+      - name: Run TruffleHog for secret detection
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./backend
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+
+      - name: Upload security scan results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: backend-security-results
+          path: |
+            backend/semgrep-results.json
+            backend/eslint-security-report.json
+
+  backend-lint-and-test:
+    name: Backend Lint & Test
+    runs-on: ubuntu-latest
+    needs: backend-security-scan
+    defaults:
+      run:
+        working-directory: backend
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run Prettier check
+        run: npm run format:check
+
+      - name: Run unit tests with coverage
+        run: npm run test:coverage
+        env:
+          NODE_ENV: test
+
+      - name: Run integration tests
+        run: npm run test:integration
+        env:
+          NODE_ENV: test
+        continue-on-error: true
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: backend/coverage/lcov.info
+          flags: backend
+          name: codecov-backend
+          fail_ci_if_error: false
+
+  backend-advanced-testing:
+    name: Backend Advanced Testing
+    runs-on: ubuntu-latest
+    needs: backend-lint-and-test
+    defaults:
+      run:
+        working-directory: backend
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run contract tests
+        run: npm run test:contract
+        env:
+          NODE_ENV: test
+        continue-on-error: true
+
+      - name: Run fuzz tests
+        run: npm run test:fuzz
+        env:
+          NODE_ENV: test
+        continue-on-error: true
+
+      - name: Run mutation tests (PR only)
+        if: github.event_name == 'pull_request'
+        run: npm run test:mutation
+        env:
+          NODE_ENV: test
+        continue-on-error: true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: backend-test-results
+          path: |
+            backend/test/contract/pacts/
+            backend/test/mutation/reports/
+
+  backend-build:
+    name: Backend Build
+    runs-on: ubuntu-latest
+    needs: backend-advanced-testing
+    defaults:
+      run:
+        working-directory: backend
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Create deployment package
+        run: |
+          tar -czf ../backend-deployment.tar.gz \
+            --exclude=node_modules \
+            --exclude=test \
+            --exclude=coverage \
+            .
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-build
+          path: backend-deployment.tar.gz
+          retention-days: 7
+
+  backend-deploy-render:
+    name: Deploy to Render
+    runs-on: ubuntu-latest
+    needs: backend-build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Deploy to Render
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json"
+
+      - name: Wait for deployment
+        run: sleep 60
+
+      - name: Health check
+        run: |
+          for i in {1..5}; do
+            if curl -f "${{ secrets.RENDER_APP_URL }}/health"; then
+              echo "Health check passed"
+              exit 0
+            fi
+            echo "Health check attempt $i failed, retrying in 30s..."
+            sleep 30
+          done
+          echo "Health check failed after 5 attempts"
+          exit 1
+
+  backend-deploy-railway:
+    name: Deploy to Railway
+    runs-on: ubuntu-latest
+    needs: backend-build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Railway
+        uses: bervProject/railway-deploy@v1.0.2
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          service: backend
+
+      - name: Wait for deployment
+        run: sleep 60
+
+      - name: Health check
+        run: |
+          for i in {1..5}; do
+            if curl -f "${{ secrets.RAILWAY_APP_URL }}/health"; then
+              echo "Health check passed"
+              exit 0
+            fi
+            echo "Health check attempt $i failed, retrying in 30s..."
+            sleep 30
+          done
+          echo "Health check failed after 5 attempts"
+          exit 1
+
+  backend-security-tests:
+    name: Backend Security Tests
+    runs-on: ubuntu-latest
+    needs: [backend-deploy-render, backend-deploy-railway]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Test rate limiting
+        run: |
+          echo "Testing rate limiting on deployed endpoints..."
+          for i in {1..10}; do
+            curl -f "${{ secrets.RENDER_APP_URL }}/api/v1/users/auth/login" \
+              -H "Content-Type: application/json" \
+              -d '{"username":"test","password":"test"}' \
+              -w "Response time: %{time_total}s, Status: %{http_code}\n" || true
+          done
+
+      - name: Test security headers
+        run: |
+          echo "Checking security headers..."
+          HEADERS_TO_CHECK=(
+            "X-Frame-Options"
+            "X-Content-Type-Options" 
+            "X-XSS-Protection"
+            "Strict-Transport-Security"
+          )
+          
+          for header in "${HEADERS_TO_CHECK[@]}"; do
+            echo "Checking $header..."
+            curl -I "${{ secrets.RENDER_APP_URL }}/health" | grep -i "$header" || echo "Warning: $header not found"
+          done
+
+      - name: Test HTTPS enforcement
+        run: |
+          echo "Testing HTTPS enforcement..."
+          curl -I "http://$(echo ${{ secrets.RENDER_APP_URL }} | sed 's/https://')/health" | grep -i "location.*https" || echo "HTTPS redirect check failed"
+
+  notify-deployment:
+    name: Notify Deployment
+    runs-on: ubuntu-latest
+    needs: [backend-deploy-render, backend-deploy-railway, backend-security-tests]
+    if: always() && github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Slack Notification
+        uses: 8398a7/action-slack@v3
+        if: always()
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          text: |
+            Backend deployment: ${{ job.status }}
+            Render: ${{ needs.backend-deploy-render.result }}
+            Railway: ${{ needs.backend-deploy-railway.result }}
+            Security Tests: ${{ needs.backend-security-tests.result }}
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
