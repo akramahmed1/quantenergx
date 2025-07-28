@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { translations } from './translations';
+import { translations, Language } from './translations';
 
-type Language = 'en' | 'es' | 'fr';
 type TranslationKey = string;
 
 interface I18nContextType {
@@ -37,7 +36,6 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children, defaultLan
 
   const t = (key: TranslationKey): string => {
     const keys = key.split('.');
-    // Use fallback to English if language is missing
     let value: any = translations[language] || translations['en'];
 
     for (const k of keys) {
