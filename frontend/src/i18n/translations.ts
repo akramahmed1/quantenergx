@@ -1,4 +1,15 @@
-export const translations = {
+type Language = 'en' | 'es' | 'fr';
+
+interface Translations {
+  [key in Language]: {
+    common: { [key: string]: string };
+    navigation: { [key: string]: string };
+    trading: { [key: string]: string };
+    market: { [key: string]: string };
+  };
+}
+
+export const translations: Translations = {
   en: {
     common: {
       loading: 'Loading...',
