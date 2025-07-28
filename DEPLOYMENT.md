@@ -293,6 +293,68 @@ vercel rollback [deployment-url]
 # Use previous commit SHA in deployment webhook
 ```
 
+## 🔍 Deployment Verification
+
+### Automated Health Check
+Use the provided script to verify your deployments:
+
+```bash
+# Set your deployment URLs
+export FRONTEND_URL="https://your-app.vercel.app"
+export BACKEND_URL="https://your-backend.onrender.com"
+
+# Run health check
+./scripts/check-deployment.sh
+```
+
+### Manual Verification Steps
+
+#### 1. Health Endpoints
+```bash
+# Frontend health check
+curl https://your-app.vercel.app/health
+# Expected: "healthy"
+
+# Backend health check  
+curl https://your-backend.onrender.com/health
+# Expected: JSON with status "healthy"
+```
+
+#### 2. Security Headers
+```bash
+# Check security headers
+curl -I https://your-app.vercel.app | grep -E "(X-Frame-Options|Content-Security-Policy)"
+curl -I https://your-backend.onrender.com | grep -E "(X-Frame-Options|Strict-Transport-Security)"
+```
+
+#### 3. Admin Login Test
+1. Navigate to: `https://your-app.vercel.app/login`
+2. Username: `admin`
+3. Password: `Admin!2025Demo`
+4. Verify successful authentication and dashboard access
+
+#### 4. API Functionality
+```bash
+# Test API info endpoint
+curl https://your-backend.onrender.com/api/v1/info
+
+# Test authentication (should return validation error)
+curl -X POST https://your-backend.onrender.com/api/v1/users/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"wrong"}'
+```
+
+### Post-Deployment Checklist
+- [ ] Frontend health endpoint responds
+- [ ] Backend health endpoint responds  
+- [ ] Security headers are present
+- [ ] Admin login works
+- [ ] API endpoints are accessible
+- [ ] Database connections are stable
+- [ ] Redis cache is working
+- [ ] CI/CD pipelines completed successfully
+- [ ] Monitoring and alerts are configured
+
 # Run tests
 npm test
 

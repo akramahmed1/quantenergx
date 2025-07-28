@@ -93,6 +93,30 @@ quantenergx/
 ### Admin Access
 - **Username**: `admin`
 - **Password**: `Admin!2025Demo`
+- **Login URL**: 
+  - Local: http://localhost:3000/login
+  - Production: https://your-app.vercel.app/login
+
+### Default Test Users
+For development and testing purposes:
+```
+Admin User:
+- Username: admin
+- Password: Admin!2025Demo
+- Role: Administrator
+
+Test Trader:
+- Username: trader1
+- Password: Trader!2025Demo  
+- Role: Trader
+
+Test Risk Manager:
+- Username: risk1
+- Password: Risk!2025Demo
+- Role: Risk Manager
+```
+
+**⚠️ Security Note**: Change default passwords before production deployment!
 
 ## 🧪 Testing
 
