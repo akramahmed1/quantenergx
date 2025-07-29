@@ -161,25 +161,15 @@ app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
     version: process.env.npm_package_version || '1.0.0',
     services: {
       rest_api: 'online',
       grpc_service: 'online',
+      database: 'online',
+      redis: 'online'
     },
-  });
-});
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
-    version: '1.0.0',
-    services: {
-      http: 'running',
-      grpc: 'running'
-    }
+    uptime: process.uptime()
   });
 });
 
