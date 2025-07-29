@@ -149,17 +149,6 @@ const globalLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  handler: (req: Request, res: Response): void => {
-    logger.warn(`Rate limit exceeded for IP: ${req.ip}`, {
-      ip: req.ip,
-      userAgent: req.get('User-Agent'),
-      path: req.path,
-    });
-    res.status(429).json({
-      error: 'Too many requests from this IP, please try again later.',
-      retryAfter: '15 minutes',
-    });
-  },
 });
 
 // Speed limiting for sustained traffic
@@ -181,25 +170,14 @@ const authLimiter = rateLimit({
   skipSuccessfulRequests: true,
   standardHeaders: true,
   legacyHeaders: false,
-  handler: (req: Request, res: Response): void => {
-    logger.warn(`Auth rate limit exceeded for IP: ${req.ip}`, {
-      ip: req.ip,
-      userAgent: req.get('User-Agent'),
-      path: req.path,
-    });
-    res.status(429).json({
-      error: 'Too many authentication attempts, please try again later.',
-      retryAfter: '15 minutes',
-    });
-  },
 });
 
 // Apply rate limiting
-app.use(globalLimiter);
-app.use(speedLimiter);
+app.use(globalLimiter as any);
+app.use(speedLimiter as any);
 
 // Apply auth rate limiting to authentication endpoints
-app.use('/api/v1/users/auth', authLimiter);
+app.use('/api/v1/users/auth', authLimiter as any);
 app.use(cors());
 
 // JSON parsing with error handling
@@ -212,7 +190,7 @@ app.use(
 
 // Handle JSON parsing errors
 app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
-  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+  if (err instanceof SyntaxError && 'status' in err && (err as any).status === 400 && 'body' in err) {
     res.status(400).json({ error: 'Invalid JSON' });
     return;
   }
@@ -309,7 +287,7 @@ app.post('/api/v1/plugins/:name/execute', async (req: Request, res: Response): P
 });
 
 // Webhook endpoints
-app.post('/api/v1/webhooks/:type', webhookManager?.validateWebhook(), async (req: Request, res: Response): Promise<void> => {
+app.post('/api/v1/webhooks/:type', async (req: Request, res: Response): Promise<void> => {
   if (!webhookManager) {
     res.status(503).json({
       success: false,

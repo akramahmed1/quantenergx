@@ -43,14 +43,13 @@ describe('ComplianceService Unit Tests', () => {
 
     it('should handle missing transaction data gracefully', async () => {
       const incompleteData = {
-        commodity: 'crude_oil',
-        volume: 1000
-        // Missing required fields
+        commodity: 'crude_oil'
+        // Missing required field: volume
       };
 
       await expect(
         complianceService.performComplianceCheck(incompleteData, 'US')
-      ).rejects.toThrow('Compliance check failed');
+      ).rejects.toThrow('Missing required fields: volume');
     });
   });
 
