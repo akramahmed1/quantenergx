@@ -179,6 +179,22 @@ router.get('/', (req, res) => {
   });
 });
 
+// API Info endpoint (alias for easier testing)
+router.get('/info', (req, res) => {
+  res.json({
+    name: 'QuantEnergx API',
+    version: '2.0.0',
+    status: 'operational',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    endpoints: {
+      health: '/health',
+      info: '/api/v1/info',
+      docs: '/api/v1',
+    }
+  });
+});
+
 // Mount route modules
 router.use('/ocr', ocrRoutes);
 router.use('/documents', documentsRoutes);

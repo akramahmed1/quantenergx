@@ -2,27 +2,74 @@
 
 ## Overview
 
-This guide covers the **separated frontend and backend deployment** strategy for QuantEnergx, following industry best practices. The frontend and backend are deployed independently on different platforms optimized for their specific needs.
+This guide covers the **automated CI/CD deployment** strategy for QuantEnergx, following modern DevOps best practices. The frontend and backend are deployed independently using a streamlined, zero-touch CI/CD pipeline.
 
-## 🏗️ Deployment Architecture
+## 🚀 Quick Start
+
+### Automated Deployment (Recommended)
+
+All deployments are handled automatically through GitHub Actions:
+
+1. **Push to main branch** → Automatic deployment to production
+2. **Create pull request** → Preview deployments with status comments
+3. **Emergency deployments** → Use the emergency workflow for critical fixes
+
+### Manual Verification
+
+```bash
+# Verify all deployments quickly
+./scripts/deployment-verification.sh
+
+# Validate local setup before pushing
+./scripts/validate-local-ci.sh
+```
+
+## 🏗️ Architecture Overview
 
 ### Frontend Deployment (Vercel)
 - **Platform**: Vercel (optimized for React SPAs)
-- **Repository**: `frontend/` directory only
-- **Build**: Static assets served via CDN
+- **Source**: `frontend/` directory
+- **Build**: Static assets with CDN delivery
 - **Security**: CSP headers, HTTPS enforced
-- **Health Check**: `/health` endpoint
+- **Health Check**: `/health` endpoint via nginx configuration
 
 ### Backend Deployment (Render + Railway)
-- **Platforms**: Render.com and Railway (redundancy + load distribution)
-- **Repository**: `backend/` directory only  
+- **Platforms**: Render.com and Railway (redundancy + load balancing)
+- **Source**: `backend/` directory  
 - **Services**: Node.js API, PostgreSQL, Redis
 - **Security**: Rate limiting, secure headers, secret management
-- **Health Check**: `/health` API endpoint
+- **Health Check**: `/health` and `/api/v1/info` endpoints
 
-## 🔧 Prerequisites
+## 🔧 CI/CD Workflow Architecture
 
-### Required GitHub Secrets
+### Main Workflow (`main-ci-cd.yml`)
+
+The primary deployment pipeline that runs on every push to main and pull requests:
+
+1. **Setup & Pre-checks**: Detects changed files and determines deployment strategy
+2. **Security Scan**: CodeQL analysis and dependency auditing
+3. **Parallel Build & Test**: 
+   - Backend: Lint, test, coverage reporting
+   - Frontend: Lint, type-check, build, test
+4. **Conditional Deployment**: Only deploys changed components
+5. **Health Verification**: Post-deployment health checks with retry logic
+6. **Status Reporting**: PR comments with deployment URLs and coverage
+
+### Emergency Workflow (`emergency-deploy.yml`)
+
+For critical hotfixes requiring immediate deployment:
+
+```bash
+# Trigger via GitHub Actions UI
+# Requires: environment, reason, optional skip-tests flag
+```
+
+### Standalone Workflows
+
+- **Frontend/Backend**: Weekly maintenance runs and manual testing
+- **Legacy Workflows**: Preserved for reference but disabled
+
+## 🔑 Required GitHub Secrets
 
 Configure these secrets in your GitHub repository (Settings → Secrets and variables → Actions):
 
@@ -65,17 +112,37 @@ ENCRYPTION_KEY=your-32-character-encryption-key
 REACT_APP_API_URL=https://your-backend.onrender.com
 ```
 
-#### Optional Integrations
+#### Additional Secrets
 ```
+CODECOV_TOKEN=your-codecov-token
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/your/webhook/url
 SNYK_TOKEN=your-snyk-token-for-security-scanning
 ```
 
-## 🚀 Deployment Workflows
+## 🚀 Deployment Process
 
-### Automated CI/CD Pipeline
+### Automatic Deployment (Primary Method)
 
-The project uses **separate CI/CD workflows** for frontend and backend:
+1. **Code Changes**: Push to main branch or create PR
+2. **Automatic Trigger**: GitHub Actions detects changes
+3. **Intelligent Building**: Only builds changed components (frontend/backend)
+4. **Parallel Deployment**: Simultaneous deployment to all platforms
+5. **Health Verification**: Automated health checks with retries
+6. **Status Reporting**: PR comments with deployment status
+
+### Deployment Targets
+
+| Platform | Component | URL Pattern | Purpose |
+|----------|-----------|-------------|---------|
+| Vercel | Frontend | `https://your-app.vercel.app` | React SPA hosting |
+| Render | Backend | `https://your-backend.onrender.com` | API + Database |
+| Railway | Backend | `https://your-backend.railway.app` | Container deployment |
+
+### Health Check Endpoints
+
+- **Frontend**: `GET /health` → Returns "healthy"
+- **Backend**: `GET /health` → Returns JSON with service status
+- **Backend**: `GET /api/v1/info` → Returns API information
 
 #### Frontend Pipeline (`.github/workflows/frontend.yml`)
 1. **Lint & Security**: ESLint, Prettier, TypeScript checks, security audit
@@ -180,34 +247,61 @@ The platform implements comprehensive security headers:
 - X-XSS-Protection (XSS filtering)
 - Strict-Transport-Security (HTTPS enforcement)
 
-## 🧪 Testing Deployments
+## 🧪 Testing and Verification
 
-### Health Checks
+### Automated Testing Pipeline
+
+The CI/CD pipeline includes comprehensive testing:
+
+1. **Code Quality**: ESLint, Prettier, TypeScript checks
+2. **Unit Tests**: Jest with coverage reporting
+3. **Security Audits**: npm audit, CodeQL, dependency scanning
+4. **Health Checks**: Post-deployment endpoint verification
+
+### Local Development Testing
+
 ```bash
-# Frontend health check
+# Complete local validation (recommended before pushing)
+./scripts/validate-local-ci.sh
+
+# Quick build and test
+npm run build
+npm run test
+
+# Local development
+npm run install:all
+npm start  # Starts both frontend and backend
+```
+
+### Manual Verification
+
+```bash
+# Verify deployments
+./scripts/deployment-verification.sh
+
+# Test specific endpoints
 curl https://your-app.vercel.app/health
-
-# Backend health check  
 curl https://your-backend.onrender.com/health
+curl https://your-backend.onrender.com/api/v1/info
 ```
 
-### Admin Login Test
-- **URL**: https://your-app.vercel.app/login
-- **Username**: `admin`
-- **Password**: `Admin!2025Demo`
+### Development URLs (Local)
+- **Frontend**: http://localhost:3000
+- **Backend**: http://localhost:3001  
+- **Health Checks**: 
+  - Frontend: http://localhost:3000/health
+  - Backend: http://localhost:3001/health
 
-### Security Validation
-```bash
-# Check security headers
-curl -I https://your-app.vercel.app | grep -E "(X-Frame-Options|Content-Security-Policy)"
+## 🔐 Security Features
 
-# Test rate limiting
-for i in {1..10}; do
-  curl https://your-backend.onrender.com/api/v1/users/auth/login \
-    -H "Content-Type: application/json" \
-    -d '{"username":"test","password":"test"}'
-done
-```
+### Implemented Security Measures
+
+1. **Headers**: CSP, X-Frame-Options, X-Content-Type-Options, HSTS
+2. **Rate Limiting**: API endpoint protection
+3. **Secret Management**: GitHub Secrets for sensitive data
+4. **HTTPS Enforcement**: All production traffic encrypted
+5. **Dependency Scanning**: Automated vulnerability detection
+6. **Code Analysis**: Static analysis with CodeQL
 
 ## 🚨 Troubleshooting
 
