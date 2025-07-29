@@ -24,7 +24,7 @@
     "security:audit": "npm audit && npm audit --prefix backend && npm audit --prefix frontend",
     "security:fix": "npm audit fix && npm audit fix --prefix backend && npm audit fix --prefix frontend",
     "quality:check": "npm run lint && npm run format:check && npm run test:coverage",
-    "prepare": "husky install",
+    "prepare": "husky install || echo 'Husky not available, skipping git hooks setup'",
     "precommit": "lint-staged",
     "postinstall": "npm run prepare"
   },
@@ -32,7 +32,7 @@
     "energy-trading",
     "commodities",
     "oil",
-    "gas", 
+    "gas",
     "renewable-energy",
     "trading-platform"
   ],

@@ -219,7 +219,13 @@ jobs:
       - name: Health check
         run: |
           sleep 30
-          curl -f "${{ steps.deploy.outputs.preview-url }}/health" || echo "::warning::Vercel health check failed"
+          echo "🏥 Checking Vercel deployment health..."
+          if curl -f -s "${{ steps.deploy.outputs.preview-url }}/health.txt" | grep -q "healthy"; then
+            echo "✅ Vercel health check passed"
+          else
+            echo "⚠️ Vercel health check failed, but deployment may still be working"
+            curl -I "${{ steps.deploy.outputs.preview-url }}" || true
+          fi
 
   # Deploy to Render
   deploy-render:
@@ -238,8 +244,9 @@ jobs:
       - name: Wait and health check
         run: |
           sleep 60
+          echo "🏥 Checking Render deployment health..."
           for i in {1..5}; do
-            if curl -f "${{ secrets.RENDER_APP_URL }}/health"; then
+            if curl -f -s "${{ secrets.RENDER_APP_URL }}/health" | grep -q "healthy"; then
               echo "✅ Render health check passed"
               exit 0
             fi
@@ -273,8 +280,9 @@ jobs:
       - name: Wait and health check
         run: |
           sleep 60
+          echo "🏥 Checking Railway deployment health..."
           for i in {1..5}; do
-            if curl -f "${{ secrets.RAILWAY_APP_URL }}/health"; then
+            if curl -f -s "${{ secrets.RAILWAY_APP_URL }}/health" | grep -q "healthy"; then
               echo "✅ Railway health check passed"
               exit 0
             fi

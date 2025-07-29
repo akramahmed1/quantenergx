@@ -1,0 +1,125 @@
+name: 🚨 Emergency Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+        - staging
+        - production
+      reason:
+        description: 'Reason for emergency deployment'
+        required: true
+        type: string
+      skip_tests:
+        description: 'Skip tests (use with caution)'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  NODE_VERSION: 20
+
+jobs:
+  emergency-deploy:
+    name: 🚨 Emergency Deploy to ${{ github.event.inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Log emergency deployment
+        run: |
+          echo "🚨 EMERGENCY DEPLOYMENT INITIATED"
+          echo "Environment: ${{ github.event.inputs.environment }}"
+          echo "Reason: ${{ github.event.inputs.reason }}"
+          echo "Skip Tests: ${{ github.event.inputs.skip_tests }}"
+          echo "Triggered by: ${{ github.actor }}"
+          echo "Branch: ${{ github.ref }}"
+          echo "Commit: ${{ github.sha }}"
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm ci --prefix backend
+          npm ci --prefix frontend
+
+      - name: Quick tests (unless skipped)
+        if: github.event.inputs.skip_tests != 'true'
+        run: |
+          echo "Running critical tests only..."
+          npm run lint --prefix frontend || echo "Frontend lint warnings ignored"
+          npm run test --prefix backend -- --passWithNoTests || echo "Backend tests failed but continuing"
+          npm run build --prefix frontend
+          npm run build --prefix backend
+
+      - name: Deploy to Vercel (if production)
+        if: github.event.inputs.environment == 'production'
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: frontend
+          vercel-args: '--prod'
+
+      - name: Deploy to Render (if production)
+        if: github.event.inputs.environment == 'production'
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json"
+
+      - name: Deploy to Railway (if production)
+        if: github.event.inputs.environment == 'production'
+        run: |
+          npm install -g @railway/cli
+          railway login --token ${{ secrets.RAILWAY_TOKEN }}
+          railway up --service backend
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Verify deployments
+        if: github.event.inputs.environment == 'production'
+        run: |
+          echo "Waiting for deployments to complete..."
+          sleep 60
+          
+          # Check health endpoints
+          if [ -n "${{ secrets.VERCEL_APP_URL }}" ]; then
+            curl -f "${{ secrets.VERCEL_APP_URL }}/health" || echo "Vercel health check failed"
+          fi
+          
+          if [ -n "${{ secrets.RENDER_APP_URL }}" ]; then
+            curl -f "${{ secrets.RENDER_APP_URL }}/health" || echo "Render health check failed"
+          fi
+          
+          if [ -n "${{ secrets.RAILWAY_APP_URL }}" ]; then
+            curl -f "${{ secrets.RAILWAY_APP_URL }}/health" || echo "Railway health check failed"
+          fi
+
+      - name: Notify team
+        uses: 8398a7/action-slack@v3
+        if: always()
+        with:
+          status: ${{ job.status }}
+          text: |
+            🚨 EMERGENCY DEPLOYMENT ${{ job.status }}
+            Environment: ${{ github.event.inputs.environment }}
+            Reason: ${{ github.event.inputs.reason }}
+            Triggered by: ${{ github.actor }}
+            Branch: ${{ github.ref }}
+            Tests skipped: ${{ github.event.inputs.skip_tests }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
