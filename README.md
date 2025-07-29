@@ -522,6 +522,7 @@ curl -X PUT http://localhost:3001/api/v1/users/profile \
 Comprehensive documentation is available in the `/docs` directory:
 
 - [Documentation Index](./docs/README.md) - Complete documentation overview and organization
+- [Deployment Diagnostics](./docs/DEPLOYMENT_DIAGNOSTICS.md) - CI/CD error tracking, solutions, and best practices for troubleshooting deployment issues
 
 ## 🤝 Contributing
 
