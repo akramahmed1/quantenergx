@@ -1,0 +1,40 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": "order-123",
+      "userId": "test-user-123",
+      "commodity": "crude_oil",
+      "quantity": 1000,
+      "price": 75.50,
+      "side": "buy",
+      "status": "pending",
+      "timestamp": "2024-07-29T22:00:00.000Z",
+      "region": "US"
+    },
+    {
+      "id": "order-124",
+      "userId": "test-user-123",
+      "commodity": "natural_gas",
+      "quantity": 5000,
+      "price": 3.25,
+      "side": "sell",
+      "status": "executed",
+      "timestamp": "2024-07-29T21:30:00.000Z",
+      "executionTime": "2024-07-29T21:35:00.000Z",
+      "region": "US"
+    },
+    {
+      "id": "order-125",
+      "userId": "test-user-123",
+      "commodity": "heating_oil",
+      "quantity": 2000,
+      "price": 2.15,
+      "side": "buy",
+      "status": "cancelled",
+      "timestamp": "2024-07-29T21:00:00.000Z",
+      "region": "US"
+    }
+  ],
+  "timestamp": "2024-07-29T22:00:00.000Z"
+}
