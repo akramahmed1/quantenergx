@@ -1,0 +1,39 @@
+{
+  "insights": {
+    "totalPredictions": 1247,
+    "accuracy": 87.3,
+    "lastUpdated": "2024-01-15T10:00:00Z"
+  },
+  "models": [
+    {
+      "id": "lstm-oil-prices",
+      "name": "LSTM Oil Price Predictor", 
+      "accuracy": 89.2,
+      "status": "active"
+    },
+    {
+      "id": "rf-volatility",
+      "name": "Random Forest Volatility Model",
+      "accuracy": 84.7,
+      "status": "active"
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "rec-1",
+      "commodity": "Crude Oil",
+      "action": "buy",
+      "confidence": 87,
+      "riskRating": "medium",
+      "reason": "Technical indicators suggest upward momentum"
+    },
+    {
+      "id": "rec-2", 
+      "commodity": "Natural Gas",
+      "action": "sell",
+      "confidence": 92,
+      "riskRating": "low",
+      "reason": "Weather patterns indicate reduced demand"
+    }
+  ]
+}

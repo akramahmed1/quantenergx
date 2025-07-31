@@ -1,0 +1,56 @@
+{
+  "stats": {
+    "suites": 8,
+    "tests": 42,
+    "passes": 39,
+    "pending": 1,
+    "failures": 2,
+    "start": "2024-01-15T10:30:00.000Z",
+    "end": "2024-01-15T10:45:22.000Z",
+    "duration": 922000
+  },
+  "tests": [
+    {
+      "title": "should login successfully with valid credentials",
+      "fullTitle": "Authentication Flow should login successfully with valid credentials",
+      "file": "cypress/e2e/auth.cy.ts",
+      "duration": 2341,
+      "state": "passed"
+    },
+    {
+      "title": "should complete full trading workflow",
+      "fullTitle": "Real-time Trading Flow should complete full trading workflow",
+      "file": "cypress/e2e/trading-flow.cy.ts", 
+      "duration": 4127,
+      "state": "passed"
+    },
+    {
+      "title": "should display mobile-specific navigation",
+      "fullTitle": "Mobile Components should display mobile-specific navigation",
+      "file": "cypress/e2e/mobile-components.cy.ts",
+      "duration": 1823,
+      "state": "passed"
+    },
+    {
+      "title": "should handle WebSocket connection failures",
+      "fullTitle": "Real-time Trading Flow should handle WebSocket connection failures",
+      "file": "cypress/e2e/trading-flow.cy.ts",
+      "duration": 5234,
+      "state": "failed",
+      "error": "Timeout waiting for WebSocket connection",
+      "screenshot": "test-logs/screenshots/websocket-failure.png"
+    }
+  ],
+  "environment": {
+    "browser": "Chrome 120.0.6099.109",
+    "os": "Ubuntu 20.04",
+    "viewport": "1280x720",
+    "baseUrl": "http://localhost:3000"
+  },
+  "coverage": {
+    "statements": 87.3,
+    "branches": 82.1,
+    "functions": 89.7,
+    "lines": 86.8
+  }
+}

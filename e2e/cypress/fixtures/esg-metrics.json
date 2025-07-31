@@ -1,0 +1,33 @@
+{
+  "overallScore": 78,
+  "environmental": {
+    "score": 82,
+    "carbonFootprint": 245.7,
+    "renewableEnergyPercentage": 65,
+    "waterUsage": 15.2,
+    "wasteReduction": 23
+  },
+  "social": {
+    "score": 74,
+    "communityInvestment": 2.3,
+    "employeeDiversity": 67,
+    "safetyScore": 9.2,
+    "humanRightsScore": 85
+  },
+  "governance": {
+    "score": 79,
+    "boardDiversity": 45,
+    "transparencyScore": 88,
+    "ethicsCompliance": 96,
+    "riskManagement": 82
+  },
+  "targets": [
+    {
+      "category": "environmental",
+      "metric": "carbon_reduction",
+      "target": 25,
+      "current": 18.5,
+      "deadline": "2024-12-31"
+    }
+  ]
+}
