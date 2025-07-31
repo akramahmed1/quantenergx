@@ -36,10 +36,12 @@ class MarginService extends EventEmitter {
         electricity: 0.50,
         coal: 0.28
       },
-      correlationMatrix: this.initializeCorrelationMatrix(),
       lookbackPeriod: 252, // trading days
       confidenceLevel: 0.99
     };
+
+    // Initialize correlation matrix after volatilities are defined
+    this.riskParameters.correlationMatrix = this.initializeCorrelationMatrix();
 
     // Start real-time margin monitoring
     this.startMarginMonitoring();
