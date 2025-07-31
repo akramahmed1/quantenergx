@@ -1,0 +1,61 @@
+# Global code owners for QuantEnergx platform
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for all files
+* @security-team @tech-lead
+
+# Security-related files require security team review
+SECURITY.md @security-team
+.github/workflows/ @security-team @devops-team
+.github/dependabot.yml @security-team @devops-team
+audit-ci.json @security-team
+.snyk @security-team
+
+# Infrastructure and deployment files
+docker-compose.yml @devops-team @security-team
+**/Dockerfile @devops-team @security-team
+**/docker-compose*.yml @devops-team @security-team
+deployment/ @devops-team @security-team
+render.yaml @devops-team
+railway.json @devops-team
+vercel.json @devops-team
+
+# Backend code and configuration
+backend/ @backend-team
+backend/src/auth/ @backend-team @security-team
+backend/src/security/ @backend-team @security-team
+backend/.env.example @backend-team @security-team
+backend/.eslintrc.security.js @backend-team @security-team
+
+# Frontend code and configuration
+frontend/ @frontend-team
+frontend/src/components/auth/ @frontend-team @security-team
+frontend/.eslintrc.security.js @frontend-team @security-team
+
+# Testing and quality assurance
+TESTING.md @qa-team
+e2e/ @qa-team
+test-suite/ @qa-team
+**/test/ @qa-team
+
+# Python code and configuration
+pyproject.toml @backend-team
+requirements*.txt @backend-team
+*.py @backend-team
+
+# Documentation
+README.md @tech-lead @documentation-team
+docs/ @documentation-team
+CONTRIBUTING.md @tech-lead
+DEPLOYMENT*.md @devops-team
+
+# Package management
+package.json @tech-lead
+package-lock.json @tech-lead
+**/package.json @backend-team @frontend-team
+**/package-lock.json @backend-team @frontend-team
+
+# Configuration files
+nx.json @tech-lead
+.prettierrc @tech-lead
+.gitignore @tech-lead
