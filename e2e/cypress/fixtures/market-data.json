@@ -1,0 +1,18 @@
+{
+  "success": true,
+  "data": {
+    "commodity": "crude_oil",
+    "price": 75.25,
+    "change": 0.75,
+    "changePercent": 1.01,
+    "volume": 125000,
+    "timestamp": "2024-07-29T22:00:00.000Z",
+    "region": "US",
+    "bid": 75.20,
+    "ask": 75.30,
+    "high": 76.10,
+    "low": 74.80,
+    "open": 75.00
+  },
+  "timestamp": "2024-07-29T22:00:00.000Z"
+}
