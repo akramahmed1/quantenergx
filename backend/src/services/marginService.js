@@ -406,13 +406,20 @@ class MarginService extends EventEmitter {
 
   startMarginMonitoring() {
     // Real-time margin monitoring (every minute)
-    setInterval(async () => {
+    this.marginMonitoringInterval = setInterval(async () => {
       try {
         await this.performMarginSweep();
       } catch (error) {
         console.error('Margin monitoring error:', error);
       }
     }, 60000); // 1 minute
+  }
+
+  stopMarginMonitoring() {
+    if (this.marginMonitoringInterval) {
+      clearInterval(this.marginMonitoringInterval);
+      this.marginMonitoringInterval = null;
+    }
   }
 
   async performMarginSweep() {

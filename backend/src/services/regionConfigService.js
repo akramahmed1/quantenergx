@@ -413,7 +413,6 @@ class RegionConfigService extends EventEmitter {
         backupTimestamp: new Date()
       });
 
-      // Apply updates
       const updatedConfig = {
         ...existingConfig,
         ...updates,
@@ -580,9 +579,9 @@ class RegionConfigService extends EventEmitter {
 
     const tradingHours = config.tradingHours;
     const dayOfWeek = currentTime.toLocaleDateString('en-US', { 
-      weekday: 'lowercase',
+      weekday: 'long',
       timeZone: config.timezone 
-    });
+    }).toLowerCase();
 
     if (!tradingHours.tradingDays.includes(dayOfWeek)) {
       return false;

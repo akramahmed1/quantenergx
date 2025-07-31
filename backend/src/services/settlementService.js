@@ -514,7 +514,7 @@ class SettlementService extends EventEmitter {
 
   startSettlementMonitoring() {
     // Monitor settlements every 5 minutes
-    setInterval(async () => {
+    this.settlementMonitoringInterval = setInterval(async () => {
       try {
         await this.processScheduledSettlements();
         await this.checkOverdueSettlements();
@@ -522,6 +522,13 @@ class SettlementService extends EventEmitter {
         console.error('Settlement monitoring error:', error);
       }
     }, 5 * 60 * 1000); // 5 minutes
+  }
+
+  stopSettlementMonitoring() {
+    if (this.settlementMonitoringInterval) {
+      clearInterval(this.settlementMonitoringInterval);
+      this.settlementMonitoringInterval = null;
+    }
   }
 
   async processScheduledSettlements() {
