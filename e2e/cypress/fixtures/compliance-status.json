@@ -1,0 +1,41 @@
+{
+  "overallScore": 94,
+  "regulations": [
+    {
+      "framework": "CFTC",
+      "status": "compliant", 
+      "lastAudit": "2024-01-01",
+      "nextAudit": "2024-07-01"
+    },
+    {
+      "framework": "SEC",
+      "status": "compliant",
+      "lastAudit": "2023-12-15", 
+      "nextAudit": "2024-06-15"
+    },
+    {
+      "framework": "MiFID II",
+      "status": "compliant",
+      "lastAudit": "2024-01-10",
+      "nextAudit": "2024-07-10"
+    }
+  ],
+  "alerts": [
+    {
+      "id": "alert-1",
+      "type": "position_limit",
+      "severity": "medium",
+      "message": "Position approaching 80% of limit",
+      "timestamp": "2024-01-15T09:30:00Z"
+    }
+  ],
+  "auditTrail": [
+    {
+      "id": "audit-1",
+      "timestamp": "2024-01-15T10:15:00Z",
+      "action": "TRADE_EXECUTED",
+      "user": "trader1",
+      "details": "Crude oil trade executed for 1000 barrels"
+    }
+  ]
+}
