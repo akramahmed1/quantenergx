@@ -1,0 +1,56 @@
+{
+  "extends": [
+    "eslint:recommended"
+  ],
+  "plugins": [
+    "security"
+  ],
+  "env": {
+    "browser": true,
+    "es2022": true,
+    "jest": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "rules": {
+    "security/detect-buffer-noassert": "error",
+    "security/detect-child-process": "off",
+    "security/detect-disable-mustache-escape": "error",
+    "security/detect-eval-with-expression": "error",
+    "security/detect-new-buffer": "error",
+    "security/detect-no-csrf-before-method-override": "error",
+    "security/detect-non-literal-fs-filename": "off",
+    "security/detect-non-literal-regexp": "warn",
+    "security/detect-non-literal-require": "off",
+    "security/detect-object-injection": "warn",
+    "security/detect-possible-timing-attacks": "warn",
+    "security/detect-pseudoRandomBytes": "error",
+    "security/detect-unsafe-regex": "error",
+    
+    "no-console": "warn",
+    "no-eval": "error",
+    "no-implied-eval": "error",
+    "no-new-func": "error",
+    "no-script-url": "error",
+    "prefer-const": "error",
+    "no-var": "error",
+    
+    "eqeqeq": ["error", "always"],
+    "no-eq-null": "error",
+    "radix": "error",
+    "guard-for-in": "error"
+  },
+  "overrides": [
+    {
+      "files": ["*.test.tsx", "*.test.ts", "src/__tests__/**/*", "src/**/*.test.*"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
+}

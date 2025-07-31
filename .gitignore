@@ -52,6 +52,9 @@ jspm_packages/
 # Optional eslint cache
 .eslintcache
 
+# ESLint security scan results
+eslint-security-results.json
+
 # Optional REPL history
 .node_repl_history
 
