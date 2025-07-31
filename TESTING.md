@@ -1,528 +1,254 @@
-# QuantEnergX Testing Guide
-
-This document provides comprehensive instructions for running, extending, and understanding the testing framework for the QuantEnergX energy trading platform.
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Testing Architecture](#testing-architecture)
-- [Quick Start](#quick-start)
-- [Test Types](#test-types)
-- [Running Tests](#running-tests)
-- [Writing Tests](#writing-tests)
-- [CI/CD Integration](#cicd-integration)
-- [Coverage Reports](#coverage-reports)
-- [Best Practices](#best-practices)
-- [Troubleshooting](#troubleshooting)
+# Testing Documentation for QuantEnergx Platform
 
 ## Overview
 
-QuantEnergX uses a comprehensive testing strategy that includes:
-- **Unit Tests**: Test individual functions and components in isolation
-- **Integration Tests**: Test interactions between modules and services
-- **Functional Tests**: Test complete user workflows and business logic
-- **Smoke Tests**: Quick tests to verify basic functionality
-- **E2E Tests**: End-to-end testing using Cypress and Playwright
-- **Security Tests**: Specialized tests for security vulnerabilities
-- **Performance Tests**: Load and stress testing
-- **Contract Tests**: API contract verification using Pact
+This document provides comprehensive information about the testing strategy, tools, and procedures for the QuantEnergx energy trading platform, including component, integration, E2E, security, performance, and automation practices across both backend and frontend.
 
-## Testing Architecture
+## Table of Contents
 
-```
-quantenergx/
-├── backend/               # Backend Node.js/TypeScript tests
-│   ├── test/
-│   │   ├── unit/         # Unit tests for individual modules
-│   │   ├── integration/  # Integration tests
-│   │   ├── contract/     # API contract tests (Pact)
-│   │   ├── security/     # Security-specific tests
-│   │   ├── performance/  # Load and performance tests
-│   │   ├── fuzz/         # Fuzz testing for input validation
-│   │   └── fixtures/     # Test data and mocks
-│   └── jest.config.js    # Jest configuration
-├── frontend/             # React/TypeScript tests
-│   ├── src/__tests__/    # Component and Redux tests
-│   └── package.json      # React Testing Library config
-├── e2e/                  # End-to-end tests
-│   ├── cypress/          # Cypress test files
-│   ├── playwright/       # Playwright test files
-│   └── tests/            # Shared E2E test utilities
-├── test-suite/           # Cross-language test utilities
-└── pyproject.toml        # Python testing configuration
-```
+- [Testing Strategy](#testing-strategy)
+- [Test Types](#test-types)
+- [Tools and Frameworks](#tools-and-frameworks)
+- [Running Tests](#running-tests)
+- [Load and Stress Testing](#load-and-stress-testing)
+- [Security Testing](#security-testing)
+- [Fuzz Testing](#fuzz-testing)
+- [Reliability and Regression Testing](#reliability-and-regression-testing)
+- [Continuous Integration](#continuous-integration)
+- [Test Results and Reporting](#test-results-and-reporting)
+- [Best Practices](#best-practices)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
 
-## Quick Start
+---
 
-### Install Dependencies
+## Testing Strategy
 
-```bash
-# Install all dependencies
-npm run install:all
+QuantEnergx employs a comprehensive, layered testing strategy that includes:
 
-# Or install individually
-npm install                    # Root dependencies
-npm install --prefix backend   # Backend dependencies
-npm install --prefix frontend  # Frontend dependencies
-npm install --prefix e2e       # E2E test dependencies
-```
+- **Unit Tests:** Testing individual components and functions for correctness
+- **Integration Tests:** Testing component/service interactions and workflows
+- **End-to-End (E2E) Tests:** Testing full user and system flows
+- **Load/Stress Tests:** Verifying system performance under load
+- **Security Tests:** Identifying vulnerabilities and ensuring compliance
+- **Fuzz Tests:** Testing with random or invalid inputs for robustness
+- **Regression Tests:** Ensuring new changes do not break existing functionality
 
-### Run All Tests
-
-```bash
-# Run all tests across backend and frontend
-npm test
-
-# Run all tests with coverage
-npm run test:coverage
-
-# Run quality checks (lint + format + test)
-npm run quality:check
-```
+---
 
 ## Test Types
 
-### Unit Tests
-
-**Purpose**: Test individual functions, classes, and components in isolation.
-
-**Backend Examples**:
-- Service layer functions
-- Utility functions
-- Database models
-- API route handlers
-
-**Frontend Examples**:
-- React components
-- Redux reducers/actions
-- Utility functions
-- Custom hooks
-
-### Integration Tests
-
-**Purpose**: Test interactions between multiple modules or services.
-
-**Examples**:
-- API endpoint integration
-- Database operations
-- External service integrations
-- Service-to-service communication
-
-### Functional Tests
-
-**Purpose**: Test complete business workflows and user scenarios.
-
-**Examples**:
-- User registration and login flow
-- Trading operations end-to-end
-- Order processing workflows
-- Payment processing
-
-### Smoke Tests
-
-**Purpose**: Quick verification that critical functionality works.
-
-**Examples**:
-- Application startup
-- Database connectivity
-- External API availability
-- Basic UI rendering
-
-### Security Tests
-
-**Purpose**: Verify security measures and identify vulnerabilities.
-
-**Examples**:
-- Input validation
-- Authentication/authorization
-- Rate limiting
-- SQL injection prevention
-- XSS protection
-
-## Running Tests
-
-### Backend Tests
-
-```bash
-cd backend
-
-# Run all tests
-npm test
-
-# Run specific test types
-npm run test:unit           # Unit tests only
-npm run test:integration    # Integration tests only
-npm run test:security       # Security tests only
-npm run test:fuzz          # Fuzz tests only
-npm run test:contract      # Contract tests only
-
-# Run with coverage
-npm run test:coverage
-
-# Run specific test file
-npm test -- test/unit/core-functions.test.js
-
-# Run tests in watch mode
-npm test -- --watch
-
-# Run tests with specific pattern
-npm test -- --testNamePattern="should validate"
-```
-
-### Frontend Tests
-
-```bash
-cd frontend
-
-# Run all tests
-npm test
-
-# Run with coverage
-npm run test:coverage
-
-# Run specific test file
-npm test -- src/__tests__/App.test.tsx
-
-# Run tests in CI mode (no watch)
-npm test -- --watchAll=false
-
-# Run tests with coverage threshold
-npm run test:coverage -- --coverageThreshold='{"global":{"branches":80,"functions":80,"lines":80,"statements":80}}'
-```
-
-### E2E Tests
-
-```bash
-cd e2e
-
-# Run Cypress tests
-npm run cy:run              # Headless mode
-npm run cy:open             # Interactive mode
-npm run cy:run:chrome       # Specific browser
-
-# Run Playwright tests
-npm run pw:test             # Headless mode
-npm run pw:test:headed      # With browser UI
-npm run pw:test:debug       # Debug mode
-
-# Run both E2E frameworks
-npm run test:e2e
-```
-
-### Python Tests (if applicable)
-
-```bash
-# Run pytest
-pytest tests/
-
-# Run with coverage
-pytest --cov=backend tests/
-
-# Run specific test file
-pytest tests/test_example.py
-
-# Run with markers
-pytest -m "unit"           # Run only unit tests
-pytest -m "not slow"       # Skip slow tests
-```
-
-## Writing Tests
-
-### Backend Unit Test Example
-
-```javascript
-// test/unit/userService.test.js
-const { UserService } = require('../../src/services/UserService');
-const { User } = require('../../src/models/User');
-
-describe('UserService', () => {
-  let userService;
-
-  beforeEach(() => {
-    userService = new UserService();
-  });
-
-  describe('createUser', () => {
-    test('should create user with valid data', async () => {
-      const userData = {
-        email: 'test@example.com',
-        password: 'SecurePassword123!',
-        name: 'Test User'
-      };
-
-      const user = await userService.createUser(userData);
-
-      expect(user).toBeDefined();
-      expect(user.email).toBe(userData.email);
-      expect(user.password).not.toBe(userData.password); // Should be hashed
-    });
-
-    test('should throw error with invalid email', async () => {
-      const userData = {
-        email: 'invalid-email',
-        password: 'SecurePassword123!',
-        name: 'Test User'
-      };
-
-      await expect(userService.createUser(userData))
-        .rejects
-        .toThrow('Invalid email format');
-    });
-  });
-});
-```
-
-### Frontend Component Test Example
-
-```typescript
-// src/__tests__/UserProfile.test.tsx
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { Provider } from 'react-redux';
-import { UserProfile } from '../components/UserProfile';
-import { createMockStore } from '../test-utils/mockStore';
-
-describe('UserProfile', () => {
-  const renderWithStore = (initialState = {}) => {
-    const store = createMockStore(initialState);
-    return render(
-      <Provider store={store}>
-        <UserProfile />
-      </Provider>
-    );
-  };
-
-  test('renders user information correctly', () => {
-    const mockUser = {
-      name: 'John Doe',
-      email: 'john@example.com',
-      role: 'trader'
-    };
-
-    renderWithStore({ auth: { user: mockUser } });
-
-    expect(screen.getByText('John Doe')).toBeInTheDocument();
-    expect(screen.getByText('john@example.com')).toBeInTheDocument();
-    expect(screen.getByText('trader')).toBeInTheDocument();
-  });
-
-  test('handles edit button click', () => {
-    renderWithStore({ auth: { user: { name: 'John Doe' } } });
-
-    const editButton = screen.getByRole('button', { name: /edit/i });
-    fireEvent.click(editButton);
-
-    expect(screen.getByRole('form')).toBeInTheDocument();
-  });
-});
-```
-
-### E2E Test Example (Cypress)
-
-```javascript
-// e2e/cypress/e2e/user-login.cy.js
-describe('User Login Flow', () => {
-  beforeEach(() => {
-    cy.visit('/login');
-  });
-
-  it('should login successfully with valid credentials', () => {
-    cy.get('[data-testid="email-input"]').type('user@example.com');
-    cy.get('[data-testid="password-input"]').type('password123');
-    cy.get('[data-testid="login-button"]').click();
-
-    cy.url().should('include', '/dashboard');
-    cy.get('[data-testid="user-menu"]').should('be.visible');
-  });
-
-  it('should show error with invalid credentials', () => {
-    cy.get('[data-testid="email-input"]').type('user@example.com');
-    cy.get('[data-testid="password-input"]').type('wrongpassword');
-    cy.get('[data-testid="login-button"]').click();
-
-    cy.get('[data-testid="error-message"]')
-      .should('be.visible')
-      .and('contain', 'Invalid credentials');
-  });
-});
-```
-
-## CI/CD Integration
-
-### GitHub Actions Workflows
-
-Tests are automatically run in CI/CD through several workflows:
-
-1. **`ci.yml`**: Main CI workflow with comprehensive testing
-2. **`backend.yml`**: Backend-specific testing and deployment
-3. **`frontend.yml`**: Frontend testing and deployment
-4. **`code_quality.yml`**: Code quality and security checks
-
-### Test Execution Order
-
-1. **Security Scan**: Vulnerability and secret detection
-2. **Lint & Format**: Code style and syntax checking
-3. **Unit Tests**: Fast, isolated tests
-4. **Integration Tests**: Service interaction tests
-5. **E2E Tests**: Full application workflows
-6. **Performance Tests**: Load and stress testing
-
-### Coverage Requirements
-
-- **Backend**: Minimum 80% code coverage
-- **Frontend**: Minimum 75% code coverage
-- **Critical paths**: 95% coverage required
-
-## Coverage Reports
-
-### Viewing Coverage
-
-```bash
-# Backend coverage
-cd backend && npm run test:coverage
-open coverage/lcov-report/index.html
-
-# Frontend coverage
-cd frontend && npm run test:coverage
-open coverage/lcov-report/index.html
-```
-
-### Coverage Configuration
-
-Backend coverage is configured in `jest.config.js`:
-```javascript
-coverageThreshold: {
-  global: {
-    branches: 80,
-    functions: 80,
-    lines: 80,
-    statements: 80
-  }
-}
-```
-
-## Best Practices
-
-### General Guidelines
-
-1. **Test Naming**: Use descriptive test names that explain the expected behavior
-2. **Test Structure**: Follow AAA pattern (Arrange, Act, Assert)
-3. **Test Isolation**: Each test should be independent and not rely on others
-4. **Mock External Dependencies**: Use mocks for external services and APIs
-5. **Test Data**: Use factories or fixtures for consistent test data
-
 ### Backend Testing
 
-1. **Unit Tests**: Test business logic without external dependencies
-2. **Integration Tests**: Use test databases and real service instances
-3. **API Tests**: Test complete request/response cycles
-4. **Error Handling**: Test both success and failure scenarios
-5. **Security**: Include tests for authentication, authorization, and input validation
+- **Unit Tests:** `backend/test/unit/`
+- **Integration Tests:** `backend/test/integration/`
+- **Security Tests:** `backend/test/security/`
+- **Fuzz Tests:** `backend/test/fuzz/`
+- **Performance Tests:** `backend/test/performance/`
+- **Contract Tests:** `backend/test/contract/`
 
 ### Frontend Testing
 
-1. **Component Tests**: Test components in isolation with mocked dependencies
-2. **Integration Tests**: Test component interactions and data flow
-3. **User Interaction**: Test user workflows and event handling
-4. **Accessibility**: Include accessibility testing with tools like jest-axe
-5. **Responsive Design**: Test components across different screen sizes
+- **Unit Tests:** `frontend/src/__tests__/`
+- **Component Tests:** React Testing Library
+- **Performance Tests:** Lighthouse audits
+- **Security Tests:** Dependency audits and static analysis
 
-### E2E Testing
+### End-to-End (E2E) Testing
 
-1. **User Journeys**: Focus on critical user workflows
-2. **Data Independence**: Use test data that doesn't conflict with other tests
-3. **Wait Strategies**: Use proper waiting strategies for async operations
-4. **Error Recovery**: Test error states and recovery scenarios
-5. **Cross-Browser**: Test on multiple browsers and devices
+- **Cypress Tests:** `e2e/cypress/`
+- **Playwright Tests:** `e2e/tests/`
+
+---
+
+## Tools and Frameworks
+
+- **Jest:** JavaScript/TypeScript unit and integration testing
+- **React Testing Library:** Frontend component/unit testing
+- **Cypress:** E2E testing for user flows
+- **Playwright:** Cross-browser and advanced E2E testing
+- **fast-check:** Property-based and fuzz testing
+- **k6:** Backend API load testing
+- **Lighthouse CI:** Frontend performance and accessibility auditing
+- **OWASP ZAP:** Web app security scanning
+- **Snyk, npm audit, Bandit, Safety, Trivy:** Dependency and container security
+- **ESLint, Prettier, SonarQube:** Code quality, static analysis, formatting
+
+---
+
+## Running Tests
+
+### Root Level Commands
+
+```bash
+npm run install:all           # Install all dependencies
+npm test                      # Run all tests
+npm run test:coverage         # Run tests with coverage
+npm run lint                  # Lint codebase
+npm run security:audit        # Security audits
+npm run e2e                   # Run all E2E tests
+npm run quality:check         # Run complete quality check
+```
+
+### Backend Commands
+
+```bash
+cd backend
+npm run test:unit
+npm run test:integration
+npm run test:security
+npm run test:fuzz
+npm run test:performance
+npm run test:contract
+npm run test:all
+npm run test:regression
+```
+
+### Frontend Commands
+
+```bash
+cd frontend
+npm test
+npm run test:coverage
+npm run test:lighthouse
+npm run test:security
+npm run analyze
+npm run test:visual
+```
+
+### E2E Commands
+
+```bash
+cd e2e
+npm run cy:run              # Cypress (headless)
+npm run cy:open             # Cypress (headed)
+npm run pw:test             # Playwright tests
+npm run pw:test:headed      # Playwright (headed)
+npm run test:a11y           # Accessibility tests
+npm run test:performance    # Performance E2E
+```
+
+---
+
+## Load and Stress Testing
+
+- **k6:** Backend load tests (see `backend/test/performance/load/`)
+- **Lighthouse:** Frontend performance audits
+- **Scenarios:** Authentication, trading, real-time data, file upload, search endpoints
+
+```bash
+npm run test:load
+npm run test:stress
+npm run test:spike
+npm run test:volume
+npm run test:lighthouse
+```
+
+---
+
+## Security Testing
+
+- **Automated Security Scans:** `npm run security:scan`, `npm run security:zap`, `trivy image backend:latest`
+- **SAST:** CodeQL, ESLint security, Semgrep, Bandit
+- **DAST:** OWASP ZAP, API security scans
+- **SCA:** npm audit, Snyk, Dependabot
+- **Secrets Scanning:** TruffleHog, GitLeaks, GitHub secret scanning
+- **Container Security:** Trivy (image, fs, config, repo)
+
+Security tests run:
+- On every PR and push (CI)
+- As daily scheduled scans
+- Before deployment
+
+---
+
+## Fuzz Testing
+
+- **fast-check:** JS/TS property-based fuzz tests
+- **Hypothesis, Atheris:** Python fuzzing
+- Categories: Input validation, data processing, config, protocol handling
+
+```bash
+npm run test:fuzz
+npm run test:fuzz:extended
+```
+
+---
+
+## Reliability and Regression Testing
+
+- **Regression Tests:** Automated suite on every commit/PR
+- **Visual Regression:** Cypress, Chromatic, Storybook
+- **Chaos Engineering:** Fault injection, recovery testing
+- **Performance Regression:** Baseline performance comparisons
+
+```bash
+npm run test:regression
+npm run test:performance-regression
+npm run test:visual-regression
+```
+
+---
+
+## Continuous Integration
+
+- **Pre-commit Hooks:** Lint, type, security checks, secret scanning, fast unit tests
+- **Pre-push Hooks:** Full test suite, coverage, security, container scan
+- **GitHub Actions Workflows:**
+  - CI (all PRs/pushes): full test suite, scans, static analysis, container validation
+  - Trivy Security: PR/push/daily container and repo scanning
+  - Dependabot: Automated dependency updates with security prioritization
+  - Scheduled Scans: Daily/weekly comprehensive security/performance audits
+
+---
+
+## Test Results and Reporting
+
+- **Coverage Reports:** Jest, Cypress, Lighthouse (targets: backend >90%, frontend >85%)
+- **Performance Reports:** Lighthouse, k6, bundle analysis
+- **Security Reports:** OWASP ZAP, dependency audit, static analysis
+- **Visual Reports:** Cypress, Chromatic, accessibility testing
+
+**Report Locations:**
+- Test results: `test-results/`
+- Coverage: `coverage/`
+- Performance: `performance-reports/`
+- Security: `security-reports/`
+- Visual: `visual-reports/`
+
+---
+
+## Best Practices
+
+- **AAA Pattern:** Arrange, Act, Assert in all tests
+- **Descriptive Names:** Explain test purpose
+- **Edge Cases:** Include boundary and negative scenarios
+- **Mocking:** Use mocks/factories for external dependencies
+- **Isolation:** Keep tests independent and stateless
+- **Test Data:** Use factories/fixtures; clean up after tests
+- **Performance:** Monitor and baseline; test realistic loads
+- **Security:** Test early/often; keep dependencies up to date
+
+---
 
 ## Troubleshooting
 
-### Common Issues
+- **Timeouts:** Increase timeouts for slow tests
+- **Flaky Tests:** Use proper waits, retry logic, and stable selectors
+- **Debugging:**
+  - `npm run test:debug` (Jest)
+  - `npm run cy:debug` (Cypress)
+  - `npm run pw:debug` (Playwright)
+  - Verbose output: `npm run test:verbose`
+- **Artifacts:** Screenshots, videos, and reports are auto-saved for failures
 
-#### Backend Tests
-
-```bash
-# Database connection issues
-export NODE_ENV=test
-export DATABASE_URL=postgresql://test_user:test_pass@localhost:5432/test_db
-
-# Memory issues with large test suites
-npm test -- --maxWorkers=4 --forceExit
-
-# Mock issues
-# Clear all mocks between tests
-afterEach(() => {
-  jest.clearAllMocks();
-});
-```
-
-#### Frontend Tests
-
-```bash
-# Memory issues
-npm test -- --watchAll=false --maxWorkers=4
-
-# Module resolution issues
-# Add to package.json:
-"jest": {
-  "moduleNameMapping": {
-    "^@/(.*)$": "<rootDir>/src/$1"
-  }
-}
-
-# Async component issues
-# Use waitFor for async operations
-await waitFor(() => {
-  expect(screen.getByText('Loading...')).not.toBeInTheDocument();
-});
-```
-
-#### E2E Tests
-
-```bash
-# Browser issues
-npx cypress install
-npx playwright install
-
-# Timeout issues
-# Increase timeout in cypress.config.js or playwright.config.js
-defaultCommandTimeout: 10000
-
-# Element not found
-# Use proper waiting strategies
-cy.get('[data-testid="element"]', { timeout: 10000 }).should('be.visible');
-```
-
-### Debug Mode
-
-```bash
-# Backend debug
-node --inspect-brk node_modules/.bin/jest --runInBand
-
-# Frontend debug
-npm test -- --no-watch --runInBand
-
-# E2E debug
-npm run cy:open      # Cypress interactive mode
-npm run pw:test:debug # Playwright debug mode
-```
-
-## Additional Resources
-
-- [Jest Documentation](https://jestjs.io/docs/getting-started)
-- [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
-- [Cypress Documentation](https://docs.cypress.io/)
-- [Playwright Documentation](https://playwright.dev/)
-- [Pact Contract Testing](https://docs.pact.io/)
+---
 
 ## Contributing
 
-When adding new tests:
+- Follow existing test structure and add documentation/comments
+- Update this guide with new test types or workflows
+- Ensure all tests pass in CI before merging
+- Include security and performance tests as applicable
 
-1. Follow the existing test structure and naming conventions
-2. Include both positive and negative test cases
-3. Add appropriate test documentation
-4. Ensure tests pass in CI/CD pipeline
-5. Update this documentation if needed
-
-For questions or issues with testing, please create an issue in the repository or contact the development team.
+For questions, see the issue tracker or contact the QA team.

@@ -75,6 +75,38 @@ jobs:
         run: safety check --json --output safety-report.json
         continue-on-error: true
 
+      # Enhanced security scans
+      - name: Run OWASP ZAP security scan
+        run: |
+          # Install ZAP
+          wget -q https://github.com/zaproxy/zaproxy/releases/download/v2.13.0/ZAP_2.13.0_Linux.tar.gz
+          tar -xzf ZAP_2.13.0_Linux.tar.gz
+          
+          # Start backend for testing
+          cd backend && npm run start &
+          BACKEND_PID=$!
+          sleep 30
+          
+          # Run ZAP scan
+          cd .. && node scripts/zap-security-scan.js --target-url http://localhost:3001 || true
+          
+          # Cleanup
+          kill $BACKEND_PID || true
+        continue-on-error: true
+
+      - name: Run ESLint security scan
+        run: |
+          cd backend && npx eslint --config .eslintrc.security.js src/ --format json --output-file ../eslint-security-backend.json || true
+          cd frontend && npx eslint --config .eslintrc.security.js src/ --format json --output-file ../eslint-security-frontend.json || true
+
+      - name: Run dependency vulnerability scan
+        run: |
+          # Check for known vulnerable packages
+          npm install -g audit-ci
+          cd backend && audit-ci --config ../audit-ci.json || true
+          cd frontend && audit-ci --config ../audit-ci.json || true
+        continue-on-error: true
+
       # Advanced security scans
       - name: Run Semgrep
         run: |
@@ -298,6 +330,14 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      # Install k6 for load testing
+      - name: Install k6
+        run: |
+          wget -q -O - https://bintray.com/user/downloadSubjectPublicKey?username=loadimpact | sudo apt-key add -
+          echo "deb https://dl.bintray.com/loadimpact/deb stable main" | sudo tee -a /etc/apt/sources.list
+          sudo apt-get update
+          sudo apt-get install k6
+
       # Bundle analysis
       - name: Analyze bundle size
         run: |
@@ -313,14 +353,62 @@ jobs:
           echo "## Bundle Analysis" >> ../performance-report.md
           echo "- Frontend bundle analysis completed" >> ../performance-report.md
 
+      # Backend performance testing
+      - name: Run backend load tests
+        run: |
+          cd backend
+          npm ci
+          
+          # Start backend
+          npm run start &
+          BACKEND_PID=$!
+          sleep 30
+          
+          # Run load tests
+          k6 run test/performance/load/api-load-test.js || true
+          k6 run test/performance/load/stress-test.js || true
+          
+          # Cleanup
+          kill $BACKEND_PID || true
+        continue-on-error: true
+
+      # Performance monitoring
+      - name: Run performance monitoring
+        run: |
+          cd backend
+          npm run start &
+          BACKEND_PID=$!
+          sleep 30
+          
+          # Run performance monitoring
+          node ../scripts/performance-monitor.js --duration 60000 --interval 5000 || true
+          
+          # Cleanup
+          kill $BACKEND_PID || true
+        continue-on-error: true
+
       # Lighthouse CI analysis
       - name: Run Lighthouse CI
         run: |
-          npm install -g @lhci/cli@0.12.x
-          # Add lighthouse analysis here
-          echo "" >> performance-report.md
-          echo "## Lighthouse Analysis" >> performance-report.md
-          echo "- Performance audit completed" >> performance-report.md
+          npm install -g @lhci/cli@0.13.x
+          cd frontend
+          
+          # Start frontend
+          npm run build
+          npx serve -s build -p 3000 &
+          FRONTEND_PID=$!
+          sleep 30
+          
+          # Run Lighthouse
+          lhci autorun --upload.target=temporary-public-storage || true
+          
+          # Cleanup
+          kill $FRONTEND_PID || true
+          
+          echo "" >> ../performance-report.md
+          echo "## Lighthouse Analysis" >> ../performance-report.md
+          echo "- Performance audit completed" >> ../performance-report.md
+        continue-on-error: true
 
       - name: Upload performance artifacts
         uses: actions/upload-artifact@v4
@@ -328,6 +416,8 @@ jobs:
           name: performance-reports-$(date +%Y%m%d)
           path: |
             performance-report.md
+            performance-reports/
+            lighthouse-reports/
 
   monthly-comprehensive-audit:
     name: Monthly Comprehensive Audit

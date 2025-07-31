@@ -1,0 +1,38 @@
+[
+  {
+    "id": "notif-1",
+    "type": "trade",
+    "title": "Trade Executed",
+    "message": "Your crude oil trade for 1000 barrels has been executed at $75.50/barrel",
+    "timestamp": "2024-01-15T10:30:00Z",
+    "priority": "medium",
+    "read": false
+  },
+  {
+    "id": "notif-2", 
+    "type": "price-alert",
+    "title": "Price Alert",
+    "message": "Natural gas price has crossed your alert threshold of $3.50/MMBtu",
+    "timestamp": "2024-01-15T09:15:00Z",
+    "priority": "high",
+    "read": false
+  },
+  {
+    "id": "notif-3",
+    "type": "system",
+    "title": "System Maintenance",
+    "message": "Scheduled maintenance will occur tonight from 2-4 AM EST",
+    "timestamp": "2024-01-15T08:00:00Z",
+    "priority": "low",
+    "read": true
+  },
+  {
+    "id": "notif-4",
+    "type": "security",
+    "title": "New Login Detected",
+    "message": "New login from Chrome on Windows detected",
+    "timestamp": "2024-01-15T07:45:00Z",
+    "priority": "medium",
+    "read": false
+  }
+]

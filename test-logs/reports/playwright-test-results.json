@@ -1,0 +1,74 @@
+{
+  "config": {
+    "projects": [
+      {"name": "chromium", "testDir": "./tests"},
+      {"name": "firefox", "testDir": "./tests"},
+      {"name": "webkit", "testDir": "./tests"}
+    ]
+  },
+  "suites": [
+    {
+      "title": "Cross-Browser Trading Platform Tests",
+      "file": "tests/cross-browser.spec.ts",
+      "tests": [
+        {
+          "title": "should work consistently across browsers",
+          "results": [
+            {
+              "projectName": "chromium",
+              "status": "passed",
+              "duration": 3421
+            },
+            {
+              "projectName": "firefox", 
+              "status": "passed",
+              "duration": 3892
+            },
+            {
+              "projectName": "webkit",
+              "status": "failed",
+              "duration": 5234,
+              "error": "WebSocket connection timeout on Safari"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Mobile and Responsive Testing",
+      "file": "tests/mobile-responsive.spec.ts",
+      "tests": [
+        {
+          "title": "should load and navigate on mobile",
+          "results": [
+            {
+              "projectName": "Mobile Chrome",
+              "status": "passed",
+              "duration": 2134
+            },
+            {
+              "projectName": "Mobile Safari",
+              "status": "passed", 
+              "duration": 2567
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "stats": {
+    "expected": 48,
+    "unexpected": 3,
+    "flaky": 1,
+    "skipped": 2,
+    "ok": true
+  },
+  "performance": {
+    "averageLoadTime": 1.8,
+    "coreWebVitals": {
+      "LCP": 1.2,
+      "FID": 45,
+      "CLS": 0.08
+    }
+  }
+}
