@@ -11,13 +11,23 @@
     "cy:run:edge": "cypress run --browser edge",
     "cy:run:record": "cypress run --record",
     "cy:verify": "cypress verify",
+    "cy:debug": "cypress run --headed --no-exit",
     "pw:test": "playwright test",
     "pw:test:headed": "playwright test --headed",
     "pw:test:debug": "playwright test --debug",
     "pw:codegen": "playwright codegen",
+    "pw:test:chromium": "playwright test --project=chromium",
+    "pw:test:firefox": "playwright test --project=firefox",
+    "pw:test:webkit": "playwright test --project=webkit",
     "test:e2e": "npm run cy:run",
     "test:e2e:headed": "npm run cy:run -- --headed",
-    "test:playwright": "npm run pw:test"
+    "test:playwright": "npm run pw:test",
+    "test:a11y": "cypress run --spec 'cypress/e2e/accessibility/**/*.cy.js'",
+    "test:performance": "lighthouse-ci autorun",
+    "test:visual": "cypress run --spec 'cypress/e2e/visual/**/*.cy.js'",
+    "test:security": "cypress run --spec 'cypress/e2e/security/**/*.cy.js'",
+    "test:load": "k6 run tests/load/e2e-load-test.js",
+    "test:all": "npm run test:e2e && npm run test:playwright && npm run test:a11y && npm run test:performance"
   },
   "keywords": ["e2e", "testing", "cypress", "playwright"],
   "author": "QuantEnergx Team",
@@ -28,6 +38,11 @@
     "@cypress/code-coverage": "^3.12.0",
     "cypress-real-events": "^1.11.0",
     "cypress-axe": "^1.5.0",
-    "cypress-file-upload": "^5.0.8"
+    "cypress-file-upload": "^5.0.8",
+    "cypress-image-diff-js": "^2.0.0",
+    "cypress-visual-regression": "^5.0.0",
+    "@lhci/cli": "^0.13.0",
+    "lighthouse": "^11.0.0",
+    "k6": "^0.0.0"
   }
 }
