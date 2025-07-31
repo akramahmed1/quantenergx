@@ -8,6 +8,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "test:coverage": "react-scripts test --coverage --watchAll=false",
+    "test:smoke": "react-scripts test --testPathPattern=smoke --watchAll=false",
+    "test:functional": "react-scripts test --testPathPattern=functional --watchAll=false",
     "eject": "react-scripts eject",
     "lint": "eslint src/ --ext .ts,.tsx",
     "lint:fix": "eslint src/ --ext .ts,.tsx --fix",
