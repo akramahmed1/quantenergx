@@ -229,6 +229,24 @@ class EnhancedRegulatoryService {
         headers: true
       }
     });
+
+    // Add template for SEC regulation
+    this.reportingTemplates.set('SEC', {
+      securitiesReport: {
+        fields: [
+          'transaction_reference_number',
+          'securities_type',
+          'quantity',
+          'price',
+          'currency',
+          'transaction_time',
+          'buy_sell_indicator',
+          'client_identification'
+        ],
+        format: 'XML',
+        schema: 'SEC_v1.0.xsd'
+      }
+    });
   }
 
   /**
@@ -644,7 +662,7 @@ class EnhancedRegulatoryService {
     
     // Add data row
     const values = fields.map(field => {
-      const value = reportData[field] || '';
+      const value = reportData[field] !== undefined ? reportData[field] : '';
       // Escape commas and quotes in CSV
       return typeof value === 'string' && (value.includes(',') || value.includes('"'))
         ? `"${value.replace(/"/g, '""')}"`

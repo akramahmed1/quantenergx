@@ -202,6 +202,7 @@ describe('Enhanced Regulatory Service', () => {
 
   test('should generate regulatory reports', async () => {
     const transactionData = {
+      // Basic transaction fields
       transaction_reference_number: 'TXN_001',
       quantity: 1000,
       price: 75.50,
@@ -210,6 +211,21 @@ describe('Enhanced Regulatory Service', () => {
       commodity: 'crude_oil',
       volume: 1000,
       localContentPercentage: 35,
+      
+      // CFTC-specific fields
+      trader_id: 'TRADER_001',
+      commodity_code: 'CRUDE_OIL',
+      contract_month: '202507',
+      long_positions: 1000,
+      short_positions: 0,
+      position_delta: 1000,
+      trading_venue: 'NYMEX',
+      reporting_date: new Date().toISOString().split('T')[0],
+      
+      // SEC-specific fields
+      securities_type: 'ENERGY_DERIVATIVE',
+      buy_sell_indicator: 'B',
+      client_identification: 'CLIENT_001',
     };
     
     const regulations = ['CFTC', 'SEC'];
@@ -333,7 +349,9 @@ describe('Guyana Connector', () => {
     expect(connector.environmentalStandards.renewableTarget).toBe(50);
   });
 
-  test('should validate Guyana-specific order requirements', () => {
+  test('should validate Guyana-specific order requirements', async () => {
+    await connector.initialize(); // Ensure initialization before validation
+    
     const validOrder = {
       symbol: 'crude_oil',
       quantity: 100,
