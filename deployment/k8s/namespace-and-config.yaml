@@ -1,0 +1,137 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: quantenergx
+  labels:
+    name: quantenergx
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: quantenergx-secrets
+  namespace: quantenergx
+type: Opaque
+data:
+  # Base64 encoded values - replace with actual values
+  database-url: cG9zdGdyZXNxbDovL3VzZXI6cGFzc3dvcmRAcG9zdGdyZXMtc2VydmljZTo1NDMyL3F1YW50ZW5lcmd4
+  redis-url: cmVkaXM6Ly9yZWRpcy1zZXJ2aWNlOjYzNzk=
+  jwt-secret: c3VwZXItc2VjcmV0LWp3dC1rZXktY2hhbmdlLWluLXByb2R1Y3Rpb24=
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: quantenergx-config
+  namespace: quantenergx
+data:
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+  RATE_LIMIT_WINDOW: "15"
+  RATE_LIMIT_MAX: "100"
+  SESSION_TIMEOUT: "3600"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: quantenergx-logs-pvc
+  namespace: quantenergx
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: fast-ssd
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: quantenergx-backup
+  namespace: quantenergx
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            image: postgres:13
+            env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: quantenergx-secrets
+                  key: database-password
+            command:
+            - /bin/bash
+            - -c
+            - |
+              pg_dump -h postgres-service -U postgres quantenergx > /backup/quantenergx_$(date +%Y%m%d_%H%M%S).sql
+              # Upload to cloud storage (implement based on your cloud provider)
+              # aws s3 cp /backup/quantenergx_$(date +%Y%m%d_%H%M%S).sql s3://quantenergx-backups/
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backup
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: quantenergx-backup-pvc
+          restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: quantenergx-backup-pvc
+  namespace: quantenergx
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: standard
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: quantenergx-network-policy
+  namespace: quantenergx
+spec:
+  podSelector:
+    matchLabels:
+      app: quantenergx-backend
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: quantenergx-frontend
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 3000
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: postgres
+    ports:
+    - protocol: TCP
+      port: 5432
+  - to:
+    - podSelector:
+        matchLabels:
+          app: redis
+    ports:
+    - protocol: TCP
+      port: 6379
+  - to: []  # Allow external API calls
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 80
