@@ -114,6 +114,34 @@ repos:
         files: ^requirements.*\.txt$
         pass_filenames: false
 
+      - id: security-lint-backend
+        name: Security ESLint (Backend)
+        entry: bash -c 'cd backend && npx eslint --config .eslintrc.security.js src/'
+        language: system
+        files: ^backend/src/.*\.(js|ts)$
+        pass_filenames: false
+
+      - id: security-lint-frontend
+        name: Security ESLint (Frontend)
+        entry: bash -c 'cd frontend && npx eslint --config .eslintrc.security.js src/'
+        language: system
+        files: ^frontend/src/.*\.(ts|tsx)$
+        pass_filenames: false
+
+      - id: fast-unit-tests-backend
+        name: Fast unit tests (Backend)
+        entry: bash -c 'cd backend && npm run test:unit -- --passWithNoTests --bail'
+        language: system
+        files: ^backend/(src|test)/.*\.(js|ts)$
+        pass_filenames: false
+
+      - id: fast-security-tests
+        name: Fast security tests
+        entry: bash -c 'cd backend && npm run test:security -- --passWithNoTests --bail'
+        language: system
+        files: ^backend/(src|test)/.*\.(js|ts)$
+        pass_filenames: false
+
   # Type checking
   - repo: local
     hooks:
@@ -159,6 +187,31 @@ repos:
     hooks:
       - id: check-hooks-apply
       - id: check-useless-excludes
+
+  - repo: local
+    hooks:
+      - id: comprehensive-tests
+        name: Comprehensive tests before push
+        entry: bash -c 'npm run test:coverage && npm run test:security && npm run test:regression'
+        language: system
+        stages: [push]
+        pass_filenames: false
+        
+      - id: performance-regression-check
+        name: Performance regression check
+        entry: bash -c 'cd backend && npm run test:performance-regression -- --passWithNoTests'
+        language: system
+        stages: [push]
+        files: ^backend/(src|test)/.*\.(js|ts)$
+        pass_filenames: false
+
+      - id: security-regression-check
+        name: Security regression check
+        entry: bash -c 'cd backend && npm run test:security:all -- --passWithNoTests'
+        language: system
+        stages: [push]
+        files: ^backend/(src|test)/.*\.(js|ts)$
+        pass_filenames: false
 
 ci:
   autofix_commit_msg: |
