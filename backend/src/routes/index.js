@@ -18,6 +18,13 @@ const regulatoryRoutes = require('./regulatory');
 const aiRoutes = require('./ai');
 const marketplaceRoutes = require('./marketplace');
 
+// Import new advanced feature routes
+const shariaRoutes = require('./sharia');
+const esgRoutes = require('./esg');
+const carbonRoutes = require('./carbon');
+const renewableCertificatesRoutes = require('./renewable-certificates');
+const iotRoutes = require('./iot');
+
 // API Documentation route
 router.get('/', (req, res) => {
   res.json({
@@ -44,6 +51,11 @@ router.get('/', (req, res) => {
       grid: '/api/v1/grid',
       'cloud-cost': '/api/v1/cloud-cost',
       iot: '/api/v1/iot',
+      // New advanced features
+      sharia: '/api/v1/sharia',
+      esg: '/api/v1/esg',
+      carbon: '/api/v1/carbon',
+      'renewable-certificates': '/api/v1/renewable-certificates'
     },
     features: {
       streaming_engine: [
@@ -148,6 +160,41 @@ router.get('/', (req, res) => {
         'Compliance Reports',
         'Performance Dashboards',
       ],
+      sharia_compliance: [
+        'Islamic finance compliance checking',
+        'Sharia-compliant product recommendations',
+        'Halal trading instruments verification',
+        'Arabic UI localization support',
+        'Middle East regulatory frameworks',
+      ],
+      esg_scoring: [
+        'Environmental, Social, Governance scoring',
+        'ESG benchmark comparisons',
+        'Sustainability performance tracking',
+        'ESG trend analysis and reporting',
+        'Industry-specific ESG factors',
+      ],
+      carbon_tracking: [
+        'Transaction carbon footprint calculation',
+        'Blockchain-based carbon credit tracking',
+        'Carbon offset requirement analysis',
+        'Real-time carbon market prices',
+        'Carbon compliance reporting',
+      ],
+      renewable_certificates: [
+        'REC/REGO/GO certificate issuance',
+        'Blockchain-transparent trading',
+        'Certificate lifecycle tracking',
+        'Green claims validation',
+        'Renewable energy marketplace',
+      ],
+      iot_integration: [
+        'Smart meter data ingestion',
+        'Real-time grid analytics',
+        'Renewable production monitoring',
+        'IoT anomaly detection',
+        'Multiple protocol support (MQTT, MODBUS, OPC-UA)',
+      ],
     },
     supported_commodities: [
       'Crude Oil (WTI, Brent)',
@@ -214,5 +261,12 @@ router.use('/marketplace', marketplaceRoutes);
 
 // Mount advanced feature routes
 router.use('/', advancedRoutes);
+
+// Mount new advanced feature routes
+router.use('/sharia', shariaRoutes);
+router.use('/esg', esgRoutes);
+router.use('/carbon', carbonRoutes);
+router.use('/renewable-certificates', renewableCertificatesRoutes);
+router.use('/iot', iotRoutes);
 
 module.exports = router;
