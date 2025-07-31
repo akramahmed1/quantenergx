@@ -13,6 +13,9 @@ const usersRoutes = require('./users');
 const analyticsRoutes = require('./analytics');
 const integrationRoutes = require('./integration');
 const advancedRoutes = require('./advanced');
+const derivativesRoutes = require('./derivatives');
+const marginRoutes = require('./margin');
+const settlementRoutes = require('./settlement');
 
 // API Documentation route
 router.get('/', (req, res) => {
@@ -32,6 +35,9 @@ router.get('/', (req, res) => {
       users: '/api/v1/users',
       analytics: '/api/v1/analytics',
       integration: '/api/v1/integration',
+      derivatives: '/api/v1/derivatives',
+      margin: '/api/v1/margin',
+      settlement: '/api/v1/settlement',
       streaming: '/api/v1/streaming',
       exchanges: '/api/v1/exchanges',
       grid: '/api/v1/grid',
@@ -39,6 +45,30 @@ router.get('/', (req, res) => {
       iot: '/api/v1/iot',
     },
     features: {
+      derivatives_trading: [
+        'Futures contracts with physical/cash settlement',
+        'Options (Call/Put) with Greeks calculation',
+        'Commodity swaps (fixed/floating)',
+        'Structured notes with custom payoffs',
+        'Real-time margin calculations',
+        'Multi-region settlement workflows'
+      ],
+      margin_management: [
+        'SPAN-like margin calculations',
+        'Portfolio margining with netting',
+        'Real-time margin monitoring',
+        'Automated margin calls',
+        'Cross-margining across commodities',
+        'Region-specific margin rules'
+      ],
+      settlement_processing: [
+        'Multi-type settlements (cash/physical/net)',
+        'Workflow-based processing',
+        'Real-time settlement monitoring',
+        'Region-specific settlement rules',
+        'Automated settlement execution',
+        'Settlement history and reporting'
+      ],
       streaming_engine: [
         'Millisecond-level tick processing',
         'Real-time order execution',
@@ -150,6 +180,12 @@ router.get('/', (req, res) => {
       'Coal',
       'Refined Products',
     ],
+    supported_derivatives: [
+      'Futures (Cash/Physical Settlement)',
+      'Options (Call/Put, American/European/Bermudan)',
+      'Swaps (Commodity/Basis/Calendar)',
+      'Structured Notes (Autocall/Barrier/Range Accrual)'
+    ],
     supported_exchanges: [
       'ICE (Intercontinental Exchange)',
       'EEX (European Energy Exchange)',
@@ -175,7 +211,7 @@ router.get('/', (req, res) => {
       'MENA Regional Regulations',
       'Guyana Petroleum Act',
     ],
-    regions: ['US', 'EU', 'UK', 'Middle East', 'Guyana', 'Global'],
+    regions: ['US', 'EU', 'UK', 'APAC', 'CA', 'Middle East', 'Guyana', 'Global'],
   });
 });
 
@@ -190,6 +226,9 @@ router.use('/market', marketRoutes);
 router.use('/users', usersRoutes);
 router.use('/analytics', analyticsRoutes);
 router.use('/integration', integrationRoutes);
+router.use('/derivatives', derivativesRoutes);
+router.use('/margin', marginRoutes);
+router.use('/settlement', settlementRoutes);
 
 // Mount advanced feature routes
 router.use('/', advancedRoutes);
