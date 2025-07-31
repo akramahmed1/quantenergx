@@ -13,6 +13,8 @@ const usersRoutes = require('./users');
 const analyticsRoutes = require('./analytics');
 const integrationRoutes = require('./integration');
 const advancedRoutes = require('./advanced');
+const exchangesRoutes = require('./exchanges');
+const regulatoryRoutes = require('./regulatory');
 const aiRoutes = require('./ai');
 const marketplaceRoutes = require('./marketplace');
 
@@ -38,6 +40,7 @@ router.get('/', (req, res) => {
       marketplace: '/api/v1/marketplace',
       streaming: '/api/v1/streaming',
       exchanges: '/api/v1/exchanges',
+      regulatory: '/api/v1/regulatory',
       grid: '/api/v1/grid',
       'cloud-cost': '/api/v1/cloud-cost',
       iot: '/api/v1/iot',
@@ -59,7 +62,8 @@ router.get('/', (req, res) => {
         'Real-time risk dashboard',
       ],
       multi_exchange: [
-        'ICE, EEX, CME, APX, MEPEX integration',
+        'ICE, EEX, CME, NYMEX, DME, OPEC, Guyana NDR integration',
+        'Modular plug-and-play connector architecture',
         'Unified margin management',
         'Cross-market arbitrage detection',
         'Clearing and reconciliation',
@@ -76,7 +80,9 @@ router.get('/', (req, res) => {
         'Chat/email/voice logging',
         'Trade intent reconstruction',
         'Blockchain notarization',
-        'REMIT II, FERC, SOC2, ISO27001, NERC CIP',
+        'MiFID II, REMIT, Dodd-Frank, EMIR, CFTC, MAR, SEC, FCA',
+        'Automated regulatory reporting with XML/XBRL/CSV export',
+        'Region-specific compliance (Guyana local)',
         'Tamper-proof audit trails',
       ],
       cloud_cost_management: [
@@ -158,10 +164,12 @@ router.get('/', (req, res) => {
       'ICE (Intercontinental Exchange)',
       'EEX (European Energy Exchange)',
       'CME (Chicago Mercantile Exchange)',
+      'NYMEX (New York Mercantile Exchange)',
+      'DME (Dubai Mercantile Exchange)',
+      'OPEC (Reference Basket)',
+      'Guyana NDR (National Data Repository)',
       'APX (Power Exchange)',
       'MEPEX (Middle East Power Exchange)',
-      'Guyana Energy Exchange',
-      'Regional MENA Exchanges',
     ],
     supported_protocols: [
       'IEC 61850 (Power Utility Automation)',
@@ -171,13 +179,18 @@ router.get('/', (req, res) => {
       'MQTT (IoT Messaging)',
     ],
     compliance_standards: [
-      'REMIT II (EU Energy Market Integrity)',
-      'FERC Order 760 (US Federal Energy)',
+      'MiFID II (EU Markets in Financial Instruments)',
+      'REMIT (EU Energy Market Integrity)',
+      'Dodd-Frank (US Wall Street Reform)',
+      'EMIR (EU Market Infrastructure)',
+      'CFTC Rules (US Commodity Futures)',
+      'MAR (EU Market Abuse Regulation)',
+      'SEC Rules (US Securities)',
+      'FCA Rules (UK Financial Conduct)',
+      'Guyana Local Energy Regulations',
       'SOC 2 Type II',
       'ISO 27001',
       'NERC CIP (Critical Infrastructure)',
-      'MENA Regional Regulations',
-      'Guyana Petroleum Act',
     ],
     regions: ['US', 'EU', 'UK', 'Middle East', 'Guyana', 'Global'],
   });
@@ -194,6 +207,8 @@ router.use('/market', marketRoutes);
 router.use('/users', usersRoutes);
 router.use('/analytics', analyticsRoutes);
 router.use('/integration', integrationRoutes);
+router.use('/exchanges', exchangesRoutes);
+router.use('/regulatory', regulatoryRoutes);
 router.use('/ai', aiRoutes);
 router.use('/marketplace', marketplaceRoutes);
 
