@@ -15,6 +15,8 @@ const integrationRoutes = require('./integration');
 const advancedRoutes = require('./advanced');
 const exchangesRoutes = require('./exchanges');
 const regulatoryRoutes = require('./regulatory');
+const aiRoutes = require('./ai');
+const marketplaceRoutes = require('./marketplace');
 
 // API Documentation route
 router.get('/', (req, res) => {
@@ -34,6 +36,8 @@ router.get('/', (req, res) => {
       users: '/api/v1/users',
       analytics: '/api/v1/analytics',
       integration: '/api/v1/integration',
+      ai: '/api/v1/ai',
+      marketplace: '/api/v1/marketplace',
       streaming: '/api/v1/streaming',
       exchanges: '/api/v1/exchanges',
       regulatory: '/api/v1/regulatory',
@@ -205,6 +209,8 @@ router.use('/analytics', analyticsRoutes);
 router.use('/integration', integrationRoutes);
 router.use('/exchanges', exchangesRoutes);
 router.use('/regulatory', regulatoryRoutes);
+router.use('/ai', aiRoutes);
+router.use('/marketplace', marketplaceRoutes);
 
 // Mount advanced feature routes
 router.use('/', advancedRoutes);
