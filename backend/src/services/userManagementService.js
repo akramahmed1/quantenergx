@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
+const validationUtils = require('../utils/validationUtils');
 
 class UserManagementService {
   constructor() {
@@ -568,8 +569,8 @@ class UserManagementService {
 
   // Validate email format
   isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    const validation = validationUtils.validateEmail(email);
+    return validation.valid;
   }
 
   // Get roles
