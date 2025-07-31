@@ -1,0 +1,94 @@
+name: ESLint Security Scanning
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+jobs:
+  eslint-security:
+    name: ESLint Security Scan
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        workspace: [backend, frontend]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+
+      - name: Install root dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Install workspace dependencies
+        run: npm ci --ignore-scripts
+        working-directory: ./${{ matrix.workspace }}
+
+      - name: Check if ESLint and security plugin are installed
+        run: |
+          if [ ! -f node_modules/.bin/eslint ] || [ ! -d node_modules/eslint-plugin-security ]; then
+            echo "Installing ESLint and security plugin..."
+            npm install --save-dev eslint eslint-plugin-security
+          fi
+        working-directory: ./${{ matrix.workspace }}
+
+      - name: Run ESLint security scan
+        run: |
+          echo "Running ESLint security scanning for ${{ matrix.workspace }}..."
+          
+          # Set environment variable to use legacy config
+          export ESLINT_USE_FLAT_CONFIG=false
+          
+          # Run the security linting
+          if [ "${{ matrix.workspace }}" = "backend" ]; then
+            npm run lint:security
+          else
+            npm run lint:security
+          fi
+          
+          echo "ESLint security scan completed for ${{ matrix.workspace }}"
+        working-directory: ./${{ matrix.workspace }}
+
+      - name: Upload ESLint results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eslint-security-results-${{ matrix.workspace }}
+          path: ${{ matrix.workspace }}/eslint-security-results.json
+          retention-days: 30
+        continue-on-error: true
+
+  summary:
+    name: Security Scan Summary
+    needs: eslint-security
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Security Scan Summary
+        run: |
+          echo "# ESLint Security Scanning Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "This workflow ran ESLint security scanning on both backend and frontend directories." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Security Rules Checked:" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔍 Object injection detection" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔍 Unsafe regex patterns" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔍 Non-literal filesystem operations" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔍 Eval usage detection" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔍 Pseudo-random bytes usage" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔍 Possible timing attacks" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔍 Buffer operations without assertions" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔍 Child process usage" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔍 CSRF vulnerability checks" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The workflow will fail if any security errors are detected." >> $GITHUB_STEP_SUMMARY

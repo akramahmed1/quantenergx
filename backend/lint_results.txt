@@ -1,0 +1,626 @@
+
+> quantenergx-backend@1.0.0 lint:security
+> ESLINT_USE_FLAT_CONFIG=false eslint src/ --config .eslintrc.security.json
+
+
+/home/runner/work/quantenergx/quantenergx/backend/src/grpc/services/ocrGrpcService.js
+   49:13  error  Found writeFile from package "fs" with non literal argument at index 0  security/detect-non-literal-fs-filename
+   64:11  error  Generic Object Injection Sink                                           security/detect-object-injection
+   91:15  error  Found unlink from package "fs" with non literal argument at index 0     security/detect-non-literal-fs-filename
+  210:11  error  Generic Object Injection Sink                                           security/detect-object-injection
+  257:28  error  Generic Object Injection Sink                                           security/detect-object-injection
+  295:12  error  Generic Object Injection Sink                                           security/detect-object-injection
+  305:12  error  Generic Object Injection Sink                                           security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/routes/advanced.js
+  177:7  error  Missing radix parameter  radix
+
+/home/runner/work/quantenergx/quantenergx/backend/src/routes/ai.js
+   63:79  error  Missing radix parameter                                 radix
+  163:58  error  Missing radix parameter                                 radix
+  251:57  error  Missing radix parameter                                 radix
+  313:13  error  'timeframe' is assigned a value but never used          no-unused-vars
+  414:40  error  'simulation_params' is assigned a value but never used  no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/routes/analytics.js
+  580:56  error  Generic Object Injection Sink               security/detect-object-injection
+  638:7   error  Generic Object Injection Sink               security/detect-object-injection
+  798:10  error  Generic Object Injection Sink               security/detect-object-injection
+  804:5   error  Generic Object Injection Sink               security/detect-object-injection
+  807:9   error  Generic Object Injection Sink               security/detect-object-injection
+  807:9   error  Generic Object Injection Sink               security/detect-object-injection
+  809:9   error  Generic Object Injection Sink               security/detect-object-injection
+  809:9   error  Generic Object Injection Sink               security/detect-object-injection
+  822:10  error  Generic Object Injection Sink               security/detect-object-injection
+  833:21  error  Variable Assigned to Object Injection Sink  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/routes/compliance.js
+  103:13  error  Missing radix parameter  radix
+  104:14  error  Missing radix parameter  radix
+
+/home/runner/work/quantenergx/quantenergx/backend/src/routes/derivatives.js
+  356:37  error  Missing radix parameter                                                 radix
+  364:19  error  Missing radix parameter                                                 radix
+  365:20  error  Missing radix parameter                                                 radix
+  608:30  error  'next' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/routes/exchanges.js
+    8:7   error  'regulatoryService' is assigned a value but never used  no-unused-vars
+  242:59  error  Generic Object Injection Sink                           security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/routes/margin.js
+  215:37  error  Missing radix parameter                                                 radix
+  223:19  error  Missing radix parameter                                                 radix
+  224:20  error  Missing radix parameter                                                 radix
+  649:30  error  'next' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/routes/market.js
+   72:12  error  Generic Object Injection Sink  security/detect-object-injection
+   79:37  error  Generic Object Injection Sink  security/detect-object-injection
+  111:12  error  Generic Object Injection Sink  security/detect-object-injection
+  153:46  error  Generic Object Injection Sink  security/detect-object-injection
+  198:15  error  Generic Object Injection Sink  security/detect-object-injection
+  252:12  error  Generic Object Injection Sink  security/detect-object-injection
+  269:19  error  Missing radix parameter        radix
+  300:12  error  Generic Object Injection Sink  security/detect-object-injection
+  313:11  error  Generic Object Injection Sink  security/detect-object-injection
+  313:37  error  Generic Object Injection Sink  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/routes/marketplace.js
+    7:7   error  'path' is assigned a value but never used  no-unused-vars
+   43:24  error  Missing radix parameter                    radix
+   44:35  error  Missing radix parameter                    radix
+   52:16  error  Missing radix parameter                    radix
+   53:17  error  Missing radix parameter                    radix
+  201:24  error  Missing radix parameter                    radix
+  202:35  error  Missing radix parameter                    radix
+  210:16  error  Missing radix parameter                    radix
+  211:17  error  Missing radix parameter                    radix
+  253:15  error  Missing radix parameter                    radix
+  425:55  error  Missing radix parameter                    radix
+  529:24  error  Missing radix parameter                    radix
+  530:35  error  Missing radix parameter                    radix
+  548:16  error  Missing radix parameter                    radix
+  549:17  error  Missing radix parameter                    radix
+
+/home/runner/work/quantenergx/quantenergx/backend/src/routes/ocr.js
+  186:18  error  Missing radix parameter  radix
+  187:19  error  Missing radix parameter  radix
+
+/home/runner/work/quantenergx/quantenergx/backend/src/routes/regulatory.js
+   16:10  error  Generic Object Injection Sink               security/detect-object-injection
+   41:23  error  Variable Assigned to Object Injection Sink  security/detect-object-injection
+  206:19  error  Generic Object Injection Sink               security/detect-object-injection
+  207:19  error  Generic Object Injection Sink               security/detect-object-injection
+  208:19  error  Generic Object Injection Sink               security/detect-object-injection
+  247:15  error  Generic Object Injection Sink               security/detect-object-injection
+  248:15  error  Generic Object Injection Sink               security/detect-object-injection
+  249:15  error  Generic Object Injection Sink               security/detect-object-injection
+  288:10  error  Generic Object Injection Sink               security/detect-object-injection
+  333:23  error  Variable Assigned to Object Injection Sink  security/detect-object-injection
+  371:25  error  Variable Assigned to Object Injection Sink  security/detect-object-injection
+  372:7   error  Generic Object Injection Sink               security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/routes/renewable-certificates.js
+  72:36  error  Missing radix parameter  radix
+  74:46  error  Missing radix parameter  radix
+
+/home/runner/work/quantenergx/quantenergx/backend/src/routes/settlement.js
+  157:37  error  Missing radix parameter                                                 radix
+  165:19  error  Missing radix parameter                                                 radix
+  166:20  error  Missing radix parameter                                                 radix
+  505:37  error  Missing radix parameter                                                 radix
+  531:19  error  Missing radix parameter                                                 radix
+  532:20  error  Missing radix parameter                                                 radix
+  652:37  error  Missing radix parameter                                                 radix
+  660:19  error  Missing radix parameter                                                 radix
+  661:20  error  Missing radix parameter                                                 radix
+  679:30  error  'next' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/routes/trading.js
+  133:32  error  Missing radix parameter  radix
+  412:77  error  Missing radix parameter  radix
+  464:64  error  Missing radix parameter  radix
+
+/home/runner/work/quantenergx/quantenergx/backend/src/routes/users.js
+  426:21  error  Missing radix parameter  radix
+  562:21  error  Missing radix parameter  radix
+  626:21  error  Missing radix parameter  radix
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/anomalyDetectionService.js
+  196:28  error  Variable Assigned to Object Injection Sink                               security/detect-object-injection
+  197:28  error  Variable Assigned to Object Injection Sink                               security/detect-object-injection
+  244:26  error  'index' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  355:29  error  Variable Assigned to Object Injection Sink                               security/detect-object-injection
+  387:28  error  Variable Assigned to Object Injection Sink                               security/detect-object-injection
+  433:22  error  Generic Object Injection Sink                                            security/detect-object-injection
+  468:22  error  Generic Object Injection Sink                                            security/detect-object-injection
+  522:13  error  'recentData' is assigned a value but never used                          no-unused-vars
+  523:28  error  Generic Object Injection Sink                                            security/detect-object-injection
+  524:30  error  Generic Object Injection Sink                                            security/detect-object-injection
+  533:24  error  Generic Object Injection Sink                                            security/detect-object-injection
+  557:26  error  'index' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  643:27  error  Generic Object Injection Sink                                            security/detect-object-injection
+  643:48  error  Generic Object Injection Sink                                            security/detect-object-injection
+  719:7   error  Generic Object Injection Sink                                            security/detect-object-injection
+  719:34  error  Generic Object Injection Sink                                            security/detect-object-injection
+  719:88  error  Generic Object Injection Sink                                            security/detect-object-injection
+  730:7   error  Generic Object Injection Sink                                            security/detect-object-injection
+  730:30  error  Generic Object Injection Sink                                            security/detect-object-injection
+  730:80  error  Generic Object Injection Sink                                            security/detect-object-injection
+  745:32  error  Generic Object Injection Sink                                            security/detect-object-injection
+  745:65  error  Generic Object Injection Sink                                            security/detect-object-injection
+  764:14  error  Generic Object Injection Sink                                            security/detect-object-injection
+  768:12  error  Generic Object Injection Sink                                            security/detect-object-injection
+  768:49  error  Generic Object Injection Sink                                            security/detect-object-injection
+  775:55  error  Generic Object Injection Sink                                            security/detect-object-injection
+  797:21  error  Generic Object Injection Sink                                            security/detect-object-injection
+  808:12  error  Generic Object Injection Sink                                            security/detect-object-injection
+  808:32  error  Generic Object Injection Sink                                            security/detect-object-injection
+  809:7   error  Generic Object Injection Sink                                            security/detect-object-injection
+  818:7   error  Generic Object Injection Sink                                            security/detect-object-injection
+  818:42  error  Function Call Object Injection Sink                                      security/detect-object-injection
+  831:12  error  Generic Object Injection Sink                                            security/detect-object-injection
+  845:12  error  Generic Object Injection Sink                                            security/detect-object-injection
+  845:34  error  Generic Object Injection Sink                                            security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/automatedSettlementService.js
+   407:13  error  'counterpartyData' is assigned a value but never used                              no-unused-vars
+   726:25  error  Variable Assigned to Object Injection Sink                                         security/detect-object-injection
+   732:24  error  Variable Assigned to Object Injection Sink                                         security/detect-object-injection
+   764:20  error  Missing radix parameter                                                            radix
+   807:31  error  'counterpartyId' is defined but never used. Allowed unused args must match /^_/u   no-unused-vars
+   810:29  error  'instrument' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+   813:28  error  'accountId' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+   816:41  error  'tradeData' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+   816:52  error  'rule' is defined but never used. Allowed unused args must match /^_/u             no-unused-vars
+   819:37  error  'tradeData' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+   819:48  error  'rule' is defined but never used. Allowed unused args must match /^_/u             no-unused-vars
+   822:23  error  'tradeData' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+   822:34  error  'rule' is defined but never used. Allowed unused args must match /^_/u             no-unused-vars
+   825:33  error  'accountId' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+   828:29  error  'accountId' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+   831:35  error  'deficit' is defined but never used. Allowed unused args must match /^_/u          no-unused-vars
+   842:33  error  'accountId' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+   850:30  error  'accountId' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+   858:26  error  'accountId' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+   865:29  error  'accountId' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+   873:28  error  'positionSources' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+   883:31  error  'cashSources' is defined but never used. Allowed unused args must match /^_/u      no-unused-vars
+   892:37  error  'marginSources' is defined but never used. Allowed unused args must match /^_/u    no-unused-vars
+   944:19  error  Generic Object Injection Sink                                                      security/detect-object-injection
+   988:7   error  Generic Object Injection Sink                                                      security/detect-object-injection
+  1142:7   error  Generic Object Injection Sink                                                      security/detect-object-injection
+  1142:33  error  Generic Object Injection Sink                                                      security/detect-object-injection
+  1162:32  error  'batch' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/baseExchangeConnector.js
+  29:17  error  'credentials' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  43:21  error  'orderData' is defined but never used. Allowed unused args must match /^_/u    no-unused-vars
+  50:23  error  'symbol' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+  57:31  error  'symbols' is defined but never used. Allowed unused args must match /^_/u      no-unused-vars
+  57:40  error  'callback' is defined but never used. Allowed unused args must match /^_/u     no-unused-vars
+  78:47  error  Generic Object Injection Sink                                                  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/carbonTrackingService.js
+   90:28  error  Generic Object Injection Sink  security/detect-object-injection
+  113:28  error  Generic Object Injection Sink  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/cloudCostManagementService.js
+  354:11  error  'costData' is assigned a value but never used                                     no-unused-vars
+  515:11  error  'monthlyEstimate' is assigned a value but never used                              no-unused-vars
+  517:17  error  'budgetId' is assigned a value but never used                                     no-unused-vars
+  526:17  error  'ruleId' is assigned a value but never used                                       no-unused-vars
+  552:37  error  'costData' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  616:41  error  'historicalData' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  680:28  error  'timeRange' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+  756:31  error  'incident' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  768:35  error  'incident' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  780:31  error  'incident' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  816:24  error  'rule' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+  816:30  error  'data' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+  819:24  error  'rule' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+  819:30  error  'data' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+  822:30  error  'rule' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+  822:36  error  'data' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+  825:32  error  'rule' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+  825:38  error  'data' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+  831:32  error  'instances' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+  837:32  error  'resources' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+  846:32  error  'service' is defined but never used. Allowed unused args must match /^_/u         no-unused-vars
+  846:41  error  'historical' is defined but never used. Allowed unused args must match /^_/u      no-unused-vars
+  849:29  error  'rule' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+  849:35  error  'data' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+  852:34  error  'rule' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+  852:40  error  'data' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+  856:21  error  'data' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+  860:25  error  'days' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+  864:34  error  'trends' is defined but never used. Allowed unused args must match /^_/u          no-unused-vars
+  868:31  error  'trends' is defined but never used. Allowed unused args must match /^_/u          no-unused-vars
+  872:41  error  'trends' is defined but never used. Allowed unused args must match /^_/u          no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/complianceService.js
+  265:23  error  Generic Object Injection Sink  security/detect-object-injection
+  266:24  error  Generic Object Injection Sink  security/detect-object-injection
+  282:12  error  Generic Object Injection Sink  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/dataGovernanceService.js
+  613:18  error  Generic Object Injection Sink                                                    security/detect-object-injection
+  613:18  error  Generic Object Injection Sink                                                    security/detect-object-injection
+  638:27  error  'requestData' is defined but never used. Allowed unused args must match /^_/u    no-unused-vars
+  660:29  error  'request' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  767:14  error  Missing radix parameter                                                          radix
+  781:7   error  Generic Object Injection Sink                                                    security/detect-object-injection
+  905:32  error  'dataSubjectId' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  931:20  error  'data' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+  935:31  error  'data' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/derivativesService.js
+   62:23  error  Generic Object Injection Sink                      security/detect-object-injection
+  337:12  error  Generic Object Injection Sink                      security/detect-object-injection
+  351:12  error  Generic Object Injection Sink                      security/detect-object-injection
+  378:13  error  'spot' is assigned a value but never used          no-unused-vars
+  379:13  error  'strikePrice' is assigned a value but never used   no-unused-vars
+  380:11  error  'timeToExpiry' is assigned a value but never used  no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/documentProcessingService.js
+  109:21  error  Found non-literal argument to RegExp Constructor  security/detect-non-literal-regexp
+  139:63  error  Generic Object Injection Sink                     security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/enhancedComplianceService.js
+  431:12  error  Generic Object Injection Sink                                                      security/detect-object-injection
+  468:22  error  'data' is defined but never used. Allowed unused args must match /^_/u             no-unused-vars
+  474:19  error  Missing radix parameter                                                            radix
+  493:26  error  'tradeData' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  501:32  error  'tradeData' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  509:25  error  'tradeData' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  517:33  error  'instrument' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+  544:32  error  'instrument' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+  623:31  error  'transactionData' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  643:27  error  'transactionData' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  643:44  error  'regulations' is defined but never used. Allowed unused args must match /^_/u      no-unused-vars
+  653:43  error  'transactionData' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  653:60  error  'regulations' is defined but never used. Allowed unused args must match /^_/u      no-unused-vars
+  688:34  error  'dateRange' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  688:45  error  'region' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+  704:34  error  'dateRange' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  704:45  error  'region' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+  720:32  error  'dateRange' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  720:43  error  'region' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+  731:38  error  'dateRange' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  731:49  error  'region' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+  745:34  error  'dateRange' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  745:45  error  'region' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+  774:35  error  'dateRange' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  785:38  error  'dateRange' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  785:49  error  'region' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+  843:7   error  Generic Object Injection Sink                                                      security/detect-object-injection
+  914:27  error  'dateRange' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  914:38  error  'region' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+  918:29  error  'dateRange' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  918:40  error  'region' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+  922:33  error  'dateRange' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  922:44  error  'region' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+  926:25  error  'dateRange' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  926:36  error  'region' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+  930:45  error  'dateRange' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  938:33  error  'dateRange' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  938:44  error  'region' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+  944:34  error  'dateRange' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  944:45  error  'region' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/enhancedRegulatoryService.js
+  308:11  error  Generic Object Injection Sink                                                      security/detect-object-injection
+  309:27  error  Variable Assigned to Object Injection Sink                                         security/detect-object-injection
+  352:11  error  'framework' is assigned a value but never used                                     no-unused-vars
+  352:23  error  Variable Assigned to Object Injection Sink                                         security/detect-object-injection
+  395:13  error  Found mkdir from package "fs" with non literal argument at index 0                 security/detect-non-literal-fs-filename
+  401:15  error  Found writeFile from package "fs" with non literal argument at index 0             security/detect-non-literal-fs-filename
+  439:12  error  Generic Object Injection Sink                                                      security/detect-object-injection
+  445:64  error  'exchangeId' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+  446:23  error  Variable Assigned to Object Injection Sink                                         security/detect-object-injection
+  505:27  error  Variable Assigned to Object Injection Sink                                         security/detect-object-injection
+  531:59  error  Generic Object Injection Sink                                                      security/detect-object-injection
+  546:13  error  'quantity' is assigned a value but never used                                      no-unused-vars
+  589:55  error  'regulation' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+  612:45  error  'template' is defined but never used. Allowed unused args must match /^_/u         no-unused-vars
+  635:46  error  'template' is defined but never used. Allowed unused args must match /^_/u         no-unused-vars
+  665:21  error  Generic Object Injection Sink                                                      security/detect-object-injection
+  665:55  error  Generic Object Injection Sink                                                      security/detect-object-injection
+  690:7   error  Generic Object Injection Sink                                                      security/detect-object-injection
+  690:27  error  Generic Object Injection Sink                                                      security/detect-object-injection
+  706:29  error  Variable Assigned to Object Injection Sink                                         security/detect-object-injection
+  729:12  error  Generic Object Injection Sink                                                      security/detect-object-injection
+  729:12  error  Generic Object Injection Sink                                                      security/detect-object-injection
+  741:12  error  Generic Object Injection Sink                                                      security/detect-object-injection
+  780:46  error  'transactionData' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  814:50  error  'regulation' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+  838:54  error  'regulation' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+  839:13  error  'traderId' is assigned a value but never used                                      no-unused-vars
+  839:23  error  'counterpartyId' is assigned a value but never used                                no-unused-vars
+  862:47  error  'regulation' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+  868:17  error  Generic Object Injection Sink                                                      security/detect-object-injection
+  882:41  error  'regulation' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+  886:17  error  Generic Object Injection Sink                                                      security/detect-object-injection
+  919:50  error  'regulation' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+  937:31  error  'regulation' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+  945:12  error  Generic Object Injection Sink                                                      security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/exchangeConnectorRegistry.js
+  290:41  error  'minimumVolume' is assigned a value but never used                             no-unused-vars
+  410:21  error  'credentials' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  418:25  error  'orderData' is defined but never used. Allowed unused args must match /^_/u    no-unused-vars
+  424:44  error  'callback' is defined but never used. Allowed unused args must match /^_/u     no-unused-vars
+  448:21  error  'credentials' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  456:25  error  'orderData' is defined but never used. Allowed unused args must match /^_/u    no-unused-vars
+  462:44  error  'callback' is defined but never used. Allowed unused args must match /^_/u     no-unused-vars
+  486:21  error  'credentials' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  494:25  error  'orderData' is defined but never used. Allowed unused args must match /^_/u    no-unused-vars
+  500:44  error  'callback' is defined but never used. Allowed unused args must match /^_/u     no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/exchangeConnectors.js
+  159:47  error  Generic Object Injection Sink                                                security/detect-object-injection
+  198:12  error  Generic Object Injection Sink                                                security/detect-object-injection
+  353:47  error  Generic Object Injection Sink                                                security/detect-object-injection
+  388:12  error  Generic Object Injection Sink                                                security/detect-object-injection
+  472:21  error  'orderData' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  539:12  error  Generic Object Injection Sink                                                security/detect-object-injection
+  676:47  error  Generic Object Injection Sink                                                security/detect-object-injection
+  717:12  error  Generic Object Injection Sink                                                security/detect-object-injection
+  720:23  error  'symbol' is defined but never used. Allowed unused args must match /^_/u     no-unused-vars
+  728:24  error  'symbol' is defined but never used. Allowed unused args must match /^_/u     no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/gridDataIngestionService.js
+  496:19  error  Generic Object Injection Sink                                              security/detect-object-injection
+  513:19  error  Generic Object Injection Sink                                              security/detect-object-injection
+  539:19  error  Generic Object Injection Sink                                              security/detect-object-injection
+  578:14  error  Generic Object Injection Sink                                              security/detect-object-injection
+  580:16  error  Generic Object Injection Sink                                              security/detect-object-injection
+  630:33  error  'context' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  635:31  error  'context' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  640:39  error  'context' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  645:35  error  'context' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  650:35  error  'context' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/iotSCADAIntegrationService.js
+   548:12  error  Generic Object Injection Sink                                                         security/detect-object-injection
+   684:7   error  Generic Object Injection Sink                                                         security/detect-object-injection
+   721:11  error  'device' is assigned a value but never used                                           no-unused-vars
+   723:17  error  'ruleId' is assigned a value but never used                                           no-unused-vars
+   765:17  error  'key' is assigned a value but never used                                              no-unused-vars
+   778:24  error  'deviceId' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+   778:34  error  'data' is defined but never used. Allowed unused args must match /^_/u                no-unused-vars
+   874:7   error  Generic Object Injection Sink                                                         security/detect-object-injection
+   891:7   error  Generic Object Injection Sink                                                         security/detect-object-injection
+   891:28  error  Generic Object Injection Sink                                                         security/detect-object-injection
+   900:7   error  Generic Object Injection Sink                                                         security/detect-object-injection
+   900:28  error  Generic Object Injection Sink                                                         security/detect-object-injection
+   924:40  error  'data' is defined but never used. Allowed unused args must match /^_/u                no-unused-vars
+   927:38  error  'data' is defined but never used. Allowed unused args must match /^_/u                no-unused-vars
+   930:46  error  'data' is defined but never used. Allowed unused args must match /^_/u                no-unused-vars
+   942:43  error  'data' is defined but never used. Allowed unused args must match /^_/u                no-unused-vars
+   973:37  error  'timeRange' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+   977:36  error  'deviceId' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+   977:46  error  'timeRange' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+   986:29  error  'historicalData' is defined but never used. Allowed unused args must match /^_/u      no-unused-vars
+   995:35  error  'deviceId' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+   995:45  error  'timeRange' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+   998:31  error  'deviceId' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+   998:41  error  'timeRange' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+  1001:33  error  'deviceId' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+  1001:43  error  'timeRange' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+  1004:25  error  'historicalData' is defined but never used. Allowed unused args must match /^_/u      no-unused-vars
+  1007:39  error  'deviceId' is defined but never used. Allowed unused args must match /^_/u            no-unused-vars
+  1007:49  error  'performanceMetrics' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/iotSmartMeterService.js
+  158:13  error  'metrics' is assigned a value but never used                                  no-unused-vars
+  361:12  error  Generic Object Injection Sink                                                 security/detect-object-injection
+  377:36  error  'device' is defined but never used. Allowed unused args must match /^_/u      no-unused-vars
+  420:12  error  Generic Object Injection Sink                                                 security/detect-object-injection
+  438:9   error  Generic Object Injection Sink                                                 security/detect-object-injection
+  508:12  error  Generic Object Injection Sink                                                 security/detect-object-injection
+  539:26  error  'deviceId' is defined but never used. Allowed unused args must match /^_/u    no-unused-vars
+  555:26  error  'timeRange' is defined but never used. Allowed unused args must match /^_/u   no-unused-vars
+  611:28  error  'facilityId' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  619:29  error  'deviceId' is defined but never used. Allowed unused args must match /^_/u    no-unused-vars
+  642:20  error  Generic Object Injection Sink                                                 security/detect-object-injection
+  656:11  error  'threshold' is assigned a value but never used                                no-unused-vars
+  656:23  error  Variable Assigned to Object Injection Sink                                    security/detect-object-injection
+  671:26  error  'historical' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  671:38  error  'recent' is defined but never used. Allowed unused args must match /^_/u      no-unused-vars
+  706:21  error  'historical' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  706:33  error  'recent' is defined but never used. Allowed unused args must match /^_/u      no-unused-vars
+  752:27  error  'deviceId' is defined but never used. Allowed unused args must match /^_/u    no-unused-vars
+  752:37  error  'timeWindow' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  761:23  error  'deviceId' is defined but never used. Allowed unused args must match /^_/u    no-unused-vars
+  761:33  error  'timeWindow' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/llmTradeRecommendationService.js
+   51:11  error  'prompt' is assigned a value but never used                                      no-unused-vars
+  294:25  error  'portfolioData' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  294:40  error  'marketContext' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  360:41  error  Generic Object Injection Sink                                                    security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/marginService.js
+   56:7   error  Generic Object Injection Sink                                                  security/detect-object-injection
+   59:11  error  Generic Object Injection Sink                                                  security/detect-object-injection
+   59:11  error  Generic Object Injection Sink                                                  security/detect-object-injection
+   62:11  error  Generic Object Injection Sink                                                  security/detect-object-injection
+   62:11  error  Generic Object Injection Sink                                                  security/detect-object-injection
+  118:24  error  Generic Object Injection Sink                                                  security/detect-object-injection
+  143:13  error  'notionalAmount' is assigned a value but never used                            no-unused-vars
+  143:29  error  'optionType' is assigned a value but never used                                no-unused-vars
+  168:39  error  'marginRules' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  197:24  error  Generic Object Injection Sink                                                  security/detect-object-injection
+  228:45  error  'marginRules' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  247:47  error  'marginRules' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  252:12  error  Generic Object Injection Sink                                                  security/detect-object-injection
+  253:9   error  Generic Object Injection Sink                                                  security/detect-object-injection
+  255:7   error  Generic Object Injection Sink                                                  security/detect-object-injection
+  264:7   error  Generic Object Injection Sink                                                  security/detect-object-injection
+  311:29  error  Generic Object Injection Sink                                                  security/detect-object-injection
+  311:29  error  Generic Object Injection Sink                                                  security/detect-object-injection
+  312:25  error  Generic Object Injection Sink                                                  security/detect-object-injection
+  313:25  error  Generic Object Injection Sink                                                  security/detect-object-injection
+  430:37  error  'margin' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/marketDataService.js
+  124:22  error  Variable Assigned to Object Injection Sink  security/detect-object-injection
+  224:15  error  Generic Object Injection Sink               security/detect-object-injection
+  225:19  error  Generic Object Injection Sink               security/detect-object-injection
+  233:23  error  Generic Object Injection Sink               security/detect-object-injection
+  356:9   error  Generic Object Injection Sink               security/detect-object-injection
+  358:9   error  Generic Object Injection Sink               security/detect-object-injection
+  402:22  error  Generic Object Injection Sink               security/detect-object-injection
+  421:29  error  Generic Object Injection Sink               security/detect-object-injection
+  468:22  error  Generic Object Injection Sink               security/detect-object-injection
+  502:14  error  Generic Object Injection Sink               security/detect-object-injection
+  549:12  error  Generic Object Injection Sink               security/detect-object-injection
+  561:12  error  Generic Object Injection Sink               security/detect-object-injection
+  574:12  error  Generic Object Injection Sink               security/detect-object-injection
+  587:12  error  Generic Object Injection Sink               security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/marketplaceService.js
+  158:33  error  'userPermissions' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/mlPredictionService.js
+  443:14  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  443:38  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  444:9   error  Generic Object Injection Sink                                                       security/detect-object-injection
+  465:12  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  465:38  error  Function Call Object Injection Sink                                                 security/detect-object-injection
+  477:12  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  477:37  error  Function Call Object Injection Sink                                                 security/detect-object-injection
+  480:32  error  'model' is defined but never used. Allowed unused args must match /^_/u             no-unused-vars
+  530:7   error  Generic Object Injection Sink                                                       security/detect-object-injection
+  530:30  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  554:46  error  'model' is defined but never used. Allowed unused args must match /^_/u             no-unused-vars
+  576:72  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  581:73  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  587:30  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  587:50  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  596:40  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  606:29  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  607:31  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  755:14  error  Missing radix parameter                                                             radix
+  779:13  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  780:26  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  780:53  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  781:26  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  787:22  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  802:11  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  803:31  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  803:67  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  804:24  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  815:40  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  829:29  error  'commodity' is defined but never used. Allowed unused args must match /^_/u         no-unused-vars
+  833:31  error  'portfolioData' is defined but never used. Allowed unused args must match /^_/u     no-unused-vars
+  833:46  error  'constraints' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+  841:27  error  'model' is defined but never used. Allowed unused args must match /^_/u             no-unused-vars
+  841:34  error  'state' is defined but never used. Allowed unused args must match /^_/u             no-unused-vars
+  847:42  error  'constraints' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+  853:34  error  'weights' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+  853:43  error  'portfolioData' is defined but never used. Allowed unused args must match /^_/u     no-unused-vars
+  862:33  error  'currentWeights' is defined but never used. Allowed unused args must match /^_/u    no-unused-vars
+  862:49  error  'optimizedWeights' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  862:67  error  'constraints' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/multiExchangeConnector.js
+  238:29  error  '_connection' is assigned a value but never used                               no-unused-vars
+  264:29  error  '_connection' is assigned a value but never used                               no-unused-vars
+  293:29  error  '_connection' is assigned a value but never used                               no-unused-vars
+  323:27  error  Variable Assigned to Object Injection Sink                                     security/detect-object-injection
+  324:27  error  Variable Assigned to Object Injection Sink                                     security/detect-object-injection
+  341:39  error  'credentials' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  349:25  error  'order' is defined but never used. Allowed unused args must match /^_/u        no-unused-vars
+  382:7   error  Generic Object Injection Sink                                                  security/detect-object-injection
+  629:23  error  Generic Object Injection Sink                                                  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/nlpSentimentAnalysisService.js
+   93:13  error  Generic Object Injection Sink                                                       security/detect-object-injection
+   94:11  error  Generic Object Injection Sink                                                       security/detect-object-injection
+  195:9   error  Generic Object Injection Sink                                                       security/detect-object-injection
+  197:9   error  Generic Object Injection Sink                                                       security/detect-object-injection
+  305:9   error  Generic Object Injection Sink                                                       security/detect-object-injection
+  307:9   error  Generic Object Injection Sink                                                       security/detect-object-injection
+  317:33  error  'currentSentiment' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  463:12  error  Generic Object Injection Sink                                                       security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/notificationService.js
+  725:11  error  Generic Object Injection Sink  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/ocrService.js
+  156:32  error  Found readFile from package "fs" with non literal argument at index 0   security/detect-non-literal-fs-filename
+  162:15  error  Found writeFile from package "fs" with non literal argument at index 0  security/detect-non-literal-fs-filename
+  205:28  error  Found readFile from package "fs" with non literal argument at index 0   security/detect-non-literal-fs-filename
+  248:9   error  Generic Object Injection Sink                                           security/detect-object-injection
+  367:15  error  Found unlink from package "fs" with non literal argument at index 0     security/detect-non-literal-fs-filename
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/regionConfigService.js
+  362:12  error  Generic Object Injection Sink  security/detect-object-injection
+  393:12  error  Generic Object Injection Sink  security/detect-object-injection
+  470:12  error  Generic Object Injection Sink  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/renewableCertificateService.js
+  410:12  error  Generic Object Injection Sink  security/detect-object-injection
+  424:12  error  Generic Object Injection Sink  security/detect-object-injection
+  438:12  error  Generic Object Injection Sink  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/riskAnalyticsService.js
+   31:19  error  Variable Assigned to Object Injection Sink                                     security/detect-object-injection
+  125:17  error  'assetId' is assigned a value but never used                                   no-unused-vars
+  354:24  error  Generic Object Injection Sink                                                  security/detect-object-injection
+  354:42  error  Generic Object Injection Sink                                                  security/detect-object-injection
+  355:9   error  Generic Object Injection Sink                                                  security/detect-object-injection
+  370:7   error  Generic Object Injection Sink                                                  security/detect-object-injection
+  450:33  error  'portfolio' is defined but never used. Allowed unused args must match /^_/u    no-unused-vars
+  503:28  error  'portfolioId' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  518:37  error  'portfolioId' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/riskManagementService.js
+  464:12  error  Generic Object Injection Sink  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/settlementService.js
+   94:13  error  'workflow' is assigned a value but never used  no-unused-vars
+  249:20  error  Variable Assigned to Object Injection Sink     security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/streamingEngine.js
+  372:12  error  Generic Object Injection Sink  security/detect-object-injection
+  386:12  error  Generic Object Injection Sink  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/tradingService.js
+  407:30  error  Generic Object Injection Sink  security/detect-object-injection
+  410:30  error  Generic Object Injection Sink  security/detect-object-injection
+  444:23  error  Generic Object Injection Sink  security/detect-object-injection
+  456:12  error  Generic Object Injection Sink  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/services/userManagementService.js
+  181:25  error  '_password' is assigned a value but never used      no-unused-vars
+  312:23  error  '_userPassword' is assigned a value but never used  no-unused-vars
+  374:23  error  '_password' is assigned a value but never used      no-unused-vars
+  416:25  error  '_password' is assigned a value but never used      no-unused-vars
+
+/home/runner/work/quantenergx/quantenergx/backend/src/utils/captchaUtils.js
+  97:21  error  Generic Object Injection Sink  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/utils/passwordUtils.js
+   12:25  error  Missing radix parameter        radix
+  106:19  error  Generic Object Injection Sink  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/utils/securityLogger.js
+  243:23  error  Variable Assigned to Object Injection Sink  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/backend/src/utils/validationUtils.js
+  105:21  error  Generic Object Injection Sink  security/detect-object-injection
+  111:26  error  Generic Object Injection Sink  security/detect-object-injection
+
+✖ 506 problems (506 errors, 0 warnings)
+
+npm error Lifecycle script `lint:security` failed with error:
+npm error code 1
+npm error path /home/runner/work/quantenergx/quantenergx/backend
+npm error workspace quantenergx-backend@1.0.0
+npm error location /home/runner/work/quantenergx/quantenergx/backend
+npm error command failed
+npm error command sh -c ESLINT_USE_FLAT_CONFIG=false eslint src/ --config .eslintrc.security.json
