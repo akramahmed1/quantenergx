@@ -1,0 +1,33 @@
+{
+  "var": {
+    "daily": {
+      "value": 1250000,
+      "confidence": 95,
+      "currency": "USD"
+    },
+    "tenDay": {
+      "value": 3950000,
+      "confidence": 95,
+      "currency": "USD"
+    }
+  },
+  "limits": {
+    "positionLimit": {
+      "current": 35000000,
+      "maximum": 50000000,
+      "utilization": 70
+    },
+    "concentrationLimit": {
+      "current": 22,
+      "maximum": 25,
+      "utilization": 88
+    }
+  },
+  "stressTests": [
+    {
+      "scenario": "Oil Price Shock",
+      "potentialLoss": 5200000,
+      "probability": 0.05
+    }
+  ]
+}

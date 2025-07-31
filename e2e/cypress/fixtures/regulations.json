@@ -1,0 +1,20 @@
+[
+  {
+    "framework": "CFTC",
+    "name": "Commodity Futures Trading Commission",
+    "description": "US derivatives regulation",
+    "requirements": ["Position reporting", "Risk management", "Capital adequacy"]
+  },
+  {
+    "framework": "SEC",
+    "name": "Securities and Exchange Commission", 
+    "description": "US securities regulation",
+    "requirements": ["Financial reporting", "Market conduct", "Insider trading"]
+  },
+  {
+    "framework": "MiFID II",
+    "name": "Markets in Financial Instruments Directive II",
+    "description": "EU financial services regulation",
+    "requirements": ["Best execution", "Transaction reporting", "Product governance"]
+  }
+]

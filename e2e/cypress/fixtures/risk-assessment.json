@@ -1,0 +1,25 @@
+{
+  "overallRiskScore": 68,
+  "riskFactors": [
+    {
+      "type": "market_risk",
+      "score": 72,
+      "description": "Price volatility in energy commodities"
+    },
+    {
+      "type": "credit_risk", 
+      "score": 45,
+      "description": "Counterparty default risk"
+    },
+    {
+      "type": "operational_risk",
+      "score": 35,
+      "description": "System and process risks"
+    }
+  ],
+  "recommendations": [
+    "Increase diversification in natural gas positions",
+    "Review credit limits for high-risk counterparties",
+    "Implement additional operational controls"
+  ]
+}
