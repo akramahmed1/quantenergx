@@ -56,7 +56,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Initialize services
-let kafkaService: KafkaService;
+let kafkaService: KafkaService | undefined;
 let websocketService: WebSocketService;
 let webhookManager: WebhookManager;
 let pluginManager: PluginManager;
@@ -65,11 +65,17 @@ let grpcService: any;
 // Initialize all services
 async function initializeServices(): Promise<void> {
   try {
-    // Initialize Kafka service
-    if (process.env.NODE_ENV !== 'test') {
-      kafkaService = getKafkaService(logger);
-      await kafkaService.initialize();
-      logger.info('Kafka service initialized');
+    // Initialize Kafka service (skip if disabled for local development)
+    if (process.env.NODE_ENV !== 'test' && process.env.KAFKA_ENABLED !== 'false') {
+      try {
+        kafkaService = getKafkaService(logger);
+        await kafkaService.initialize();
+        logger.info('Kafka service initialized');
+      } catch (error) {
+        logger.warn('Failed to initialize Kafka service, continuing without it', { error: error instanceof Error ? error.message : String(error) });
+      }
+    } else {
+      logger.info('Kafka service disabled for this environment');
     }
 
     // Initialize WebSocket service

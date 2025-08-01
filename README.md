@@ -538,6 +538,100 @@ We welcome contributions to QuantEnergx! Please read our [Contributing Guide](./
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 🔧 Troubleshooting
+
+### Common Build and Deployment Issues
+
+#### Frontend TypeScript Errors
+
+**Error: `'new' expression, whose target lacks a construct signature, implicitly has an 'any' type`**
+- **Cause**: MUI icons imported from `@mui/icons-material` are shadowing the global `Error` constructor
+- **Solution**: Rename the Error icon import: `import { Error as ErrorIcon } from '@mui/icons-material'`
+
+**Error: `Module '@mui/icons-material' has no exported member 'Box'`**
+- **Cause**: Layout components (Box, Card, Typography, etc.) incorrectly imported from `@mui/icons-material`
+- **Solution**: Import layout components from `@mui/material` and icons from `@mui/icons-material`
+
+**Error: `Type '"large"' is not assignable to type '"small" | "medium" | undefined'`**
+- **Cause**: Invalid size prop on MUI Chip component
+- **Solution**: Use only "small" or "medium" for Chip size prop
+
+**Error: `Cannot find module '../i18n/I18nProvider'`**
+- **Cause**: Incorrect relative path to i18n provider
+- **Solution**: Ensure correct relative path: `../i18n/I18nProvider` from pages, `../../i18n/I18nProvider` from components/mobile
+
+#### Backend Issues
+
+**Error: `'error' is of type 'unknown'`**
+- **Cause**: TypeScript strict mode requires proper error type handling
+- **Solution**: Use `error instanceof Error ? error.message : String(error)`
+
+**Kafka Connection Errors in Local Development**
+- **Cause**: Kafka server not available locally
+- **Solution**: Set `KAFKA_ENABLED=false` environment variable to disable Kafka for local development
+
+#### Cloud Deployment Issues
+
+**Vercel Frontend Deployment**
+- Ensure build command generates `frontend/build` directory
+- Set `homepage` field in `frontend/package.json` for correct asset paths
+- Use environment variables for API endpoints
+
+**Render/Railway Backend Deployment**
+- Backend must listen on `process.env.PORT` (already configured)
+- Set `NODE_ENV=production` for production builds
+- Configure `KAFKA_ENABLED=false` if Kafka is not available
+- Ensure `dist/server.js` exists after build
+
+### Environment Variables for Local Development
+
+Create `.env` files in backend directory:
+
+```bash
+# Backend .env
+NODE_ENV=development
+PORT=3001
+KAFKA_ENABLED=false
+DATABASE_URL=postgresql://localhost:5432/quantenergx
+REDIS_URL=redis://localhost:6379
+JWT_SECRET=your-secret-key
+```
+
+### Build Commands Reference
+
+```bash
+# Test local builds
+npm run build          # Build both frontend and backend
+npm run test           # Run all tests
+npm run lint           # Check code style
+
+# Frontend only
+cd frontend
+npm run build          # Production build
+npm run type-check     # TypeScript validation
+npm start              # Development server
+
+# Backend only  
+cd backend
+npm run build          # TypeScript compilation
+npm start              # Production server (requires dist/)
+npm run dev            # Development server with hot reload
+KAFKA_ENABLED=false npm start  # Start without Kafka
+```
+
+### Testing Deployment Configurations
+
+```bash
+# Test Render deployment locally
+cd backend && npm ci && npm start
+
+# Test Vercel build locally  
+cd frontend && npm ci && npm run build
+
+# Test with Docker
+docker-compose up --build
+```
+
 ## 🔗 Links
 
 - [Project Board](https://github.com/akramahmed1/quantenergx/projects)

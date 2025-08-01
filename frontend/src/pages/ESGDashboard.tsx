@@ -43,7 +43,7 @@ import {
   Lightbulb
 } from '@mui/icons-material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
-import { useTranslation } from '../../i18n/I18nProvider';
+import { useTranslation } from '../i18n/I18nProvider';
 
 interface ESGScore {
   success: boolean;
@@ -300,7 +300,7 @@ const ESGDashboard: React.FC = () => {
                   <Chip
                     label={esgResults[0].rating}
                     color={getRatingColor(esgResults[0].rating)}
-                    size="large"
+                    size="medium"
                     sx={{ mb: 2 }}
                   />
                   <Typography variant="body2" color="textSecondary">
