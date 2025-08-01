@@ -7,6 +7,11 @@ import rateLimit from 'express-rate-limit';
 import slowDown from 'express-slow-down';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './swagger/config.js';
+import * as yaml from 'yamljs';
+import * as fs from 'fs';
+import * as path from 'path';
 import { APIResponse } from './types/index';
 import { KafkaService, getKafkaService } from './kafka/kafkaService';
 import { WebSocketService } from './websocket/websocketService';
@@ -130,7 +135,7 @@ app.use(
         styleSrc: ['\'self\'', '\'unsafe-inline\'', 'https://fonts.googleapis.com'],
         fontSrc: ['\'self\'', 'https://fonts.gstatic.com'],
         imgSrc: ['\'self\'', 'data:', 'https:'],
-        scriptSrc: ['\'self\''],
+        scriptSrc: ['\'self\'', '\'unsafe-inline\''],
         connectSrc: ['\'self\''],
         frameSrc: ['\'none\''],
         objectSrc: ['\'none\''],
@@ -144,6 +149,62 @@ app.use(
     },
   })
 );
+
+// Configure Swagger UI
+const swaggerUiOptions = {
+  customCss: `
+    .swagger-ui .topbar { display: none }
+    .swagger-ui .info { margin: 50px 0 }
+    .swagger-ui .info .title { color: #1f2937; font-size: 36px; }
+    .swagger-ui .scheme-container { background: #f8fafc; border: 1px solid #e2e8f0; }
+  `,
+  customSiteTitle: 'QuantEnergx API Documentation',
+  customfavIcon: '/favicon.ico',
+  swaggerOptions: {
+    persistAuthorization: true,
+    displayRequestDuration: true,
+    docExpansion: 'list',
+    filter: true,
+    showExtensions: true,
+    showCommonExtensions: true,
+    tryItOutEnabled: true
+  }
+};
+
+// Load OpenAPI spec from YAML
+let openApiSpec;
+try {
+  const yamlPath = path.join(__dirname, 'swagger', 'openapi.yaml');
+  if (fs.existsSync(yamlPath)) {
+    openApiSpec = yaml.load(yamlPath);
+    logger.info('Loaded OpenAPI spec from YAML file');
+  } else {
+    openApiSpec = swaggerSpec;
+    logger.warn('YAML file not found, using JS config');
+  }
+} catch (error) {
+  logger.warn('Failed to load OpenAPI spec from YAML, using JS config:', error);
+  openApiSpec = swaggerSpec;
+}
+
+// Serve Swagger UI at /api-docs
+app.use('/api-docs', swaggerUi.serve as any);
+app.get('/api-docs', (req: Request, res: Response, next: NextFunction) => {
+  const swaggerHandler = swaggerUi.setup(openApiSpec, swaggerUiOptions);
+  (swaggerHandler as any)(req, res, next);
+});
+
+// Serve OpenAPI spec as JSON
+app.get('/api-docs.json', (req: Request, res: Response): void => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(openApiSpec);
+});
+
+// Serve OpenAPI spec as YAML
+app.get('/api-docs.yaml', (req: Request, res: Response): void => {
+  res.setHeader('Content-Type', 'text/yaml');
+  res.send(yaml.stringify(openApiSpec, 2));
+});
 
 // Global rate limiting
 const globalLimiter = rateLimit({
@@ -205,6 +266,60 @@ app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
 
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     tags:
+ *       - System
+ *     summary: Health check
+ *     description: Check system health and service status
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: System is healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     status:
+ *                       type: string
+ *                       example: healthy
+ *                     timestamp:
+ *                       type: string
+ *                       format: date-time
+ *                     version:
+ *                       type: string
+ *                       example: "1.0.0"
+ *                     services:
+ *                       type: object
+ *                       properties:
+ *                         rest_api:
+ *                           type: string
+ *                           example: online
+ *                         grpc_service:
+ *                           type: string
+ *                           example: online
+ *                         websocket:
+ *                           type: string
+ *                           example: online
+ *                         kafka:
+ *                           type: string
+ *                           example: online
+ *                         plugins:
+ *                           type: string
+ *                           example: online
+ *                         webhooks:
+ *                           type: string
+ *                           example: online
+ */
 // Health check endpoint
 app.get('/health', (req: Request, res: Response): void => {
   const healthResponse: APIResponse = {
@@ -227,6 +342,39 @@ app.get('/health', (req: Request, res: Response): void => {
   res.status(200).json(healthResponse);
 });
 
+/**
+ * @swagger
+ * /api/v1/websocket/stats:
+ *   get:
+ *     tags:
+ *       - WebSocket
+ *     summary: Get WebSocket statistics
+ *     description: Get WebSocket connection statistics
+ *     responses:
+ *       200:
+ *         description: WebSocket stats retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/APIResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: object
+ *                       properties:
+ *                         connectedClients:
+ *                           type: integer
+ *                         rooms:
+ *                           type: array
+ *                           items:
+ *                             type: string
+ *                         timestamp:
+ *                           type: string
+ *                           format: date-time
+ *       503:
+ *         $ref: '#/components/responses/ServiceUnavailable'
+ */
 // WebSocket stats endpoint
 app.get('/api/v1/websocket/stats', (req: Request, res: Response): void => {
   if (websocketService) {
@@ -244,6 +392,31 @@ app.get('/api/v1/websocket/stats', (req: Request, res: Response): void => {
   }
 });
 
+/**
+ * @swagger
+ * /api/v1/plugins:
+ *   get:
+ *     tags:
+ *       - Plugins
+ *     summary: List plugins
+ *     description: Get all available plugins and their status
+ *     responses:
+ *       200:
+ *         description: Plugins retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/APIResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Plugin'
+ *       503:
+ *         $ref: '#/components/responses/ServiceUnavailable'
+ */
 // Plugin management endpoints
 app.get('/api/v1/plugins', (req: Request, res: Response): void => {
   if (pluginManager) {
@@ -261,6 +434,58 @@ app.get('/api/v1/plugins', (req: Request, res: Response): void => {
   }
 });
 
+/**
+ * @swagger
+ * /api/v1/plugins/{name}/execute:
+ *   post:
+ *     tags:
+ *       - Plugins
+ *     summary: Execute plugin
+ *     description: Execute a specific plugin with input data
+ *     parameters:
+ *       - name: name
+ *         in: path
+ *         required: true
+ *         description: Plugin name
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               input:
+ *                 type: object
+ *                 description: Plugin-specific input data
+ *             required:
+ *               - input
+ *     responses:
+ *       200:
+ *         description: Plugin executed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/APIResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: object
+ *                       properties:
+ *                         result:
+ *                           type: object
+ *                         executionTime:
+ *                           type: number
+ *                         timestamp:
+ *                           type: string
+ *                           format: date-time
+ *       500:
+ *         $ref: '#/components/responses/InternalError'
+ *       503:
+ *         $ref: '#/components/responses/ServiceUnavailable'
+ */
 app.post('/api/v1/plugins/:name/execute', async (req: Request, res: Response): Promise<void> => {
   if (!pluginManager) {
     res.status(503).json({
@@ -292,6 +517,61 @@ app.post('/api/v1/plugins/:name/execute', async (req: Request, res: Response): P
   }
 });
 
+/**
+ * @swagger
+ * /api/v1/webhooks/{type}:
+ *   post:
+ *     tags:
+ *       - Webhooks
+ *     summary: Process webhook
+ *     description: Process incoming webhook from external service
+ *     parameters:
+ *       - name: type
+ *         in: path
+ *         required: true
+ *         description: Webhook type
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: string
+ *               source:
+ *                 type: string
+ *               data:
+ *                 type: object
+ *               signature:
+ *                 type: string
+ *             required:
+ *               - id
+ *               - data
+ *     responses:
+ *       200:
+ *         description: Webhook processed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/APIResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: object
+ *                       properties:
+ *                         processed:
+ *                           type: boolean
+ *                         webhookId:
+ *                           type: string
+ *       500:
+ *         $ref: '#/components/responses/InternalError'
+ *       503:
+ *         $ref: '#/components/responses/ServiceUnavailable'
+ */
 // Webhook endpoints
 app.post('/api/v1/webhooks/:type', async (req: Request, res: Response): Promise<void> => {
   if (!webhookManager) {
@@ -331,6 +611,34 @@ app.post('/api/v1/webhooks/:type', async (req: Request, res: Response): Promise<
   }
 });
 
+/**
+ * @swagger
+ * /api/v1/webhooks:
+ *   get:
+ *     tags:
+ *       - Webhooks
+ *     summary: List webhook types
+ *     description: Get all registered webhook types
+ *     responses:
+ *       200:
+ *         description: Webhook types retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/APIResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: object
+ *                       properties:
+ *                         registeredTypes:
+ *                           type: array
+ *                           items:
+ *                             type: string
+ *       503:
+ *         $ref: '#/components/responses/ServiceUnavailable'
+ */
 // Get registered webhook types
 app.get('/api/v1/webhooks', (req: Request, res: Response): void => {
   if (webhookManager) {

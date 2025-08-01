@@ -1,0 +1,553 @@
+openapi: 3.0.3
+info:
+  title: QuantEnergx API
+  description: |
+    Industry-disrupting energy trading platform with advanced features across 13 major categories.
+    
+    ## Features
+    - Real-time trading infrastructure
+    - Multi-commodity support (Oil, Gas, Electricity, Renewables, Carbon Credits)
+    - Derivatives trading (Futures, Options, Swaps, Structured Notes)
+    - Advanced risk management with VaR calculations
+    - Multi-exchange connectivity (ICE, EEX, CME, NYMEX, DME, OPEC)
+    - Compliance across multiple jurisdictions (MiFID II, REMIT, Dodd-Frank, EMIR)
+    - Settlement processing (Cash/Physical/Net)
+    - Plugin architecture and webhook integrations
+    - OCR document processing
+    - IoT and SCADA integration
+    
+  version: 2.0.0
+  contact:
+    name: QuantEnergx Team
+    url: https://github.com/akramahmed1/quantenergx
+    email: support@quantenergx.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3001
+    description: Development server
+  - url: https://api.quantenergx.com
+    description: Production server
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
+  schemas:
+    APIResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+        timestamp:
+          type: string
+          format: date-time
+      required:
+        - success
+        - timestamp
+        
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+      required:
+        - success
+        - error
+        - timestamp
+        
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+        commodity:
+          type: string
+          enum: [crude_oil, natural_gas, heating_oil, gasoline, electricity, coal]
+        quantity:
+          type: number
+          minimum: 1
+        price:
+          type: number
+          minimum: 0
+        side:
+          type: string
+          enum: [buy, sell]
+        orderType:
+          type: string
+          enum: [market, limit, stop, stop_limit]
+        status:
+          type: string
+          enum: [pending, executed, cancelled, rejected]
+        timestamp:
+          type: string
+          format: date-time
+      required:
+        - commodity
+        - quantity
+        - side
+        - orderType
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorResponse'
+              - type: object
+                properties:
+                  error:
+                    example: "Unauthorized"
+                  message:
+                    example: "Invalid or expired token"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorResponse'
+              - type: object
+                properties:
+                  error:
+                    example: "Not Found"
+                  message:
+                    example: "Resource not found"
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorResponse'
+              - type: object
+                properties:
+                  error:
+                    example: "Internal Server Error"
+                  message:
+                    example: "An unexpected error occurred"
+
+paths:
+  /health:
+    get:
+      tags:
+        - System
+      summary: Health check
+      description: Check system health and service status
+      security: []
+      responses:
+        '200':
+          description: System is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: healthy
+                      timestamp:
+                        type: string
+                        format: date-time
+                      version:
+                        type: string
+                        example: "1.0.0"
+                      services:
+                        type: object
+                        properties:
+                          rest_api:
+                            type: string
+                            example: online
+                          grpc_service:
+                            type: string
+                            example: online
+                          websocket:
+                            type: string
+                            example: online
+                          kafka:
+                            type: string
+                            example: online
+                          plugins:
+                            type: string
+                            example: online
+                          webhooks:
+                            type: string
+                            example: online
+
+  # Trading Endpoints
+  /api/v1/trading/orders:
+    get:
+      tags:
+        - Trading
+      summary: Get orders
+      description: Retrieve user's trading orders with optional filtering
+      parameters:
+        - name: status
+          in: query
+          description: Filter by order status
+          schema:
+            type: string
+            enum: [pending, executed, cancelled, rejected]
+        - name: commodity
+          in: query
+          description: Filter by commodity
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Number of orders to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Orders retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+          
+    post:
+      tags:
+        - Trading
+      summary: Create order
+      description: Create a new trading order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                commodity:
+                  type: string
+                  enum: [crude_oil, natural_gas, heating_oil, gasoline, electricity, coal]
+                quantity:
+                  type: number
+                  minimum: 1
+                price:
+                  type: number
+                  minimum: 0
+                side:
+                  type: string
+                  enum: [buy, sell]
+                orderType:
+                  type: string
+                  enum: [market, limit, stop, stop_limit]
+                stopPrice:
+                  type: number
+                  minimum: 0
+                timeInForce:
+                  type: string
+                  enum: [GTC, IOC, FOK, DAY]
+                  default: GTC
+              required:
+                - commodity
+                - quantity
+                - side
+                - orderType
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # Market Data Endpoints
+  /api/v1/market/prices/{commodity}:
+    get:
+      tags:
+        - Market Data
+      summary: Get market prices
+      description: Get current market prices for a specific commodity
+      parameters:
+        - name: commodity
+          in: path
+          required: true
+          description: Commodity symbol
+          schema:
+            type: string
+            enum: [crude_oil, natural_gas, heating_oil, gasoline, electricity, coal]
+      responses:
+        '200':
+          description: Market data retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          commodity:
+                            type: string
+                          price:
+                            type: number
+                          change:
+                            type: number
+                          changePercent:
+                            type: number
+                          volume:
+                            type: number
+                          timestamp:
+                            type: string
+                            format: date-time
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Plugin Management Endpoints
+  /api/v1/plugins:
+    get:
+      tags:
+        - Plugins
+      summary: List plugins
+      description: Get all available plugins and their status
+      responses:
+        '200':
+          description: Plugins retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            type:
+                              type: string
+                              enum: [data_source, analytics, risk, compliance, execution]
+                            version:
+                              type: string
+                            enabled:
+                              type: boolean
+                            description:
+                              type: string
+
+  /api/v1/plugins/{name}/execute:
+    post:
+      tags:
+        - Plugins
+      summary: Execute plugin
+      description: Execute a specific plugin with input data
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Plugin name
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                input:
+                  type: object
+                  description: Plugin-specific input data
+              required:
+                - input
+      responses:
+        '200':
+          description: Plugin executed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          result:
+                            type: object
+                          executionTime:
+                            type: number
+                          timestamp:
+                            type: string
+                            format: date-time
+
+  # Webhook Endpoints
+  /api/v1/webhooks:
+    get:
+      tags:
+        - Webhooks
+      summary: List webhook types
+      description: Get all registered webhook types
+      responses:
+        '200':
+          description: Webhook types retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          registeredTypes:
+                            type: array
+                            items:
+                              type: string
+
+  /api/v1/webhooks/{type}:
+    post:
+      tags:
+        - Webhooks
+      summary: Process webhook
+      description: Process incoming webhook from external service
+      parameters:
+        - name: type
+          in: path
+          required: true
+          description: Webhook type
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                source:
+                  type: string
+                data:
+                  type: object
+                signature:
+                  type: string
+              required:
+                - id
+                - data
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          processed:
+                            type: boolean
+                          webhookId:
+                            type: string
+
+  # WebSocket Statistics
+  /api/v1/websocket/stats:
+    get:
+      tags:
+        - WebSocket
+      summary: Get WebSocket statistics
+      description: Get WebSocket connection statistics
+      responses:
+        '200':
+          description: WebSocket stats retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          connectedClients:
+                            type: integer
+                          rooms:
+                            type: array
+                            items:
+                              type: string
+                          timestamp:
+                            type: string
+                            format: date-time
+
+tags:
+  - name: System
+    description: System health and status endpoints
+  - name: Trading
+    description: Order management and trade execution
+  - name: Market Data
+    description: Real-time and historical market data
+  - name: Plugins
+    description: Plugin management and execution
+  - name: Webhooks
+    description: Webhook processing and management
+  - name: WebSocket
+    description: Real-time WebSocket connections
