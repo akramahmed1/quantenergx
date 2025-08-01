@@ -538,6 +538,411 @@ paths:
                             type: string
                             format: date-time
 
+  # Compliance Endpoints
+  /api/v1/compliance/reports:
+    get:
+      tags:
+        - Compliance
+      summary: Get compliance reports
+      description: Retrieve compliance reports for regulatory purposes
+      parameters:
+        - name: type
+          in: query
+          description: Report type
+          schema:
+            type: string
+            enum: [trade_reporting, position_reporting, risk_reporting]
+        - name: jurisdiction
+          in: query
+          description: Regulatory jurisdiction
+          schema:
+            type: string
+            enum: [US, EU, UK, APAC, CA]
+        - name: startDate
+          in: query
+          description: Start date for report
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: End date for report
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Compliance reports retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            type:
+                              type: string
+                            jurisdiction:
+                              type: string
+                            status:
+                              type: string
+                              enum: [draft, submitted, approved, rejected]
+                            timestamp:
+                              type: string
+                              format: date-time
+
+  # Risk Management Endpoints
+  /api/v1/risk/portfolio:
+    get:
+      tags:
+        - Risk Management
+      summary: Get portfolio risk
+      description: Get comprehensive portfolio risk analysis
+      responses:
+        '200':
+          description: Portfolio risk retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          portfolioVaR:
+                            type: number
+                          componentVaR:
+                            type: object
+                          exposures:
+                            type: object
+                          limits:
+                            type: object
+                          breaches:
+                            type: array
+                            items:
+                              type: object
+                          timestamp:
+                            type: string
+                            format: date-time
+
+  /api/v1/risk/var:
+    get:
+      tags:
+        - Risk Management
+      summary: Get Value at Risk (VaR)
+      description: Calculate Value at Risk for portfolio
+      parameters:
+        - name: confidence
+          in: query
+          description: Confidence level (e.g., 95, 99)
+          schema:
+            type: number
+            minimum: 90
+            maximum: 99.9
+            default: 95
+        - name: horizon
+          in: query
+          description: Time horizon in days
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 252
+            default: 1
+      responses:
+        '200':
+          description: VaR calculated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          var:
+                            type: number
+                          expectedShortfall:
+                            type: number
+                          confidence:
+                            type: number
+                          horizon:
+                            type: integer
+                          methodology:
+                            type: string
+                          timestamp:
+                            type: string
+                            format: date-time
+
+  # Derivatives Trading Endpoints
+  /api/v1/derivatives/contracts:
+    get:
+      tags:
+        - Derivatives
+      summary: Get derivative contracts
+      description: Retrieve available derivative contracts
+      parameters:
+        - name: type
+          in: query
+          description: Filter by derivative type
+          schema:
+            type: string
+            enum: [future, option, swap, structured_note]
+        - name: underlying
+          in: query
+          description: Filter by underlying commodity
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Derivative contracts retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            type:
+                              type: string
+                              enum: [future, option, swap, structured_note]
+                            underlying:
+                              type: string
+                            strike:
+                              type: number
+                            expiry:
+                              type: string
+                              format: date
+                            premium:
+                              type: number
+                            delta:
+                              type: number
+                            gamma:
+                              type: number
+                            theta:
+                              type: number
+                            vega:
+                              type: number
+                            rho:
+                              type: number
+                              
+    post:
+      tags:
+        - Derivatives
+      summary: Create derivative contract
+      description: Create a new derivative contract
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum: [future, option, swap, structured_note]
+                underlying:
+                  type: string
+                quantity:
+                  type: number
+                strike:
+                  type: number
+                expiry:
+                  type: string
+                  format: date
+                optionType:
+                  type: string
+                  enum: [call, put]
+                exerciseType:
+                  type: string
+                  enum: [american, european, bermudan]
+              required:
+                - type
+                - underlying
+                - quantity
+                - expiry
+      responses:
+        '201':
+          description: Derivative contract created successfully
+
+  # Settlement Endpoints
+  /api/v1/settlement/instructions:
+    get:
+      tags:
+        - Settlement
+      summary: Get settlement instructions
+      description: Retrieve settlement instructions for trades
+      parameters:
+        - name: status
+          in: query
+          description: Filter by settlement status
+          schema:
+            type: string
+            enum: [pending, processing, completed, failed]
+        - name: type
+          in: query
+          description: Filter by settlement type
+          schema:
+            type: string
+            enum: [cash, physical, net]
+      responses:
+        '200':
+          description: Settlement instructions retrieved successfully
+          
+    post:
+      tags:
+        - Settlement
+      summary: Create settlement instruction
+      description: Create a new settlement instruction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tradeId:
+                  type: string
+                type:
+                  type: string
+                  enum: [cash, physical, net]
+                amount:
+                  type: number
+                currency:
+                  type: string
+                deliveryLocation:
+                  type: string
+                settlementDate:
+                  type: string
+                  format: date
+              required:
+                - tradeId
+                - type
+                - amount
+                - settlementDate
+      responses:
+        '201':
+          description: Settlement instruction created successfully
+
+  # Exchange Connector Endpoints
+  /api/v1/exchanges:
+    get:
+      tags:
+        - Exchange Connectors
+      summary: Get available exchanges
+      description: Retrieve list of available exchange connectors
+      responses:
+        '200':
+          description: Exchanges retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            name:
+                              type: string
+                            status:
+                              type: string
+                              enum: [online, offline, maintenance]
+                            supportedCommodities:
+                              type: array
+                              items:
+                                type: string
+                            region:
+                              type: string
+
+  /api/v1/exchanges/{exchangeId}/status:
+    get:
+      tags:
+        - Exchange Connectors
+      summary: Get exchange status
+      description: Get status and health of specific exchange connector
+      parameters:
+        - name: exchangeId
+          in: path
+          required: true
+          description: Exchange ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Exchange status retrieved successfully
+
+  # OCR Endpoints
+  /api/v1/ocr/process:
+    post:
+      tags:
+        - OCR
+      summary: Process document
+      description: Process document using OCR to extract text and structured data
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Document file to process
+                extractFields:
+                  type: boolean
+                  description: Whether to extract structured fields
+                  default: true
+              required:
+                - file
+      responses:
+        '200':
+          description: Document processed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/APIResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          text:
+                            type: string
+                          confidence:
+                            type: number
+                          extractedFields:
+                            type: object
+                          processingTime:
+                            type: number
+                          timestamp:
+                            type: string
+                            format: date-time
+
 tags:
   - name: System
     description: System health and status endpoints
@@ -545,9 +950,21 @@ tags:
     description: Order management and trade execution
   - name: Market Data
     description: Real-time and historical market data
+  - name: Risk Management
+    description: Portfolio risk analysis and monitoring
+  - name: Derivatives
+    description: Derivative instruments trading
+  - name: Settlement
+    description: Trade settlement processing
+  - name: Exchange Connectors
+    description: Exchange connectivity and status
   - name: Plugins
     description: Plugin management and execution
   - name: Webhooks
     description: Webhook processing and management
+  - name: OCR
+    description: Document processing and text extraction
+  - name: Compliance
+    description: Regulatory compliance and reporting
   - name: WebSocket
     description: Real-time WebSocket connections
