@@ -93,24 +93,34 @@ const initialState: AuthState = {
 // Async thunks
 export const login = createAsyncThunk(
   'auth/login',
-  async ({ email, password }: { email: string; password: string }) => {
-    const response = await fetch('/api/v1/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
+  async ({ username, password, mfaToken }: { username: string; password: string; mfaToken?: string }, { rejectWithValue }) => {
+    try {
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${API_URL}/api/v1/users/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password, mfaToken }),
+      });
 
-    if (!response.ok) {
-      throw new Error('Login failed');
+      const data = await response.json();
+      
+      if (!response.ok || !data.success) {
+        return rejectWithValue(data.error || 'Login failed');
+      }
+
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
+      if (data.refreshToken) {
+        localStorage.setItem('refreshToken', data.refreshToken);
+      }
+
+      return data;
+    } catch (error) {
+      return rejectWithValue('Network error. Please try again.');
     }
-
-    const data = await response.json();
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('refreshToken', data.refreshToken);
-
-    return data;
   }
 );
 
@@ -298,7 +308,7 @@ const authSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.loading.auth = false;
-        state.error = action.error.message || 'Login failed';
+        state.error = (action.payload as string) || action.error.message || 'Login failed';
       })
       // Logout
       .addCase(logout.fulfilled, state => {
@@ -359,4 +369,8 @@ const authSlice = createSlice({
 });
 
 export const { clearError, setToken, clearAuth, updatePreferencesLocal } = authSlice.actions;
+
+// Selectors
+export const selectAuth = (state: any) => state.auth;
+
 export default authSlice.reducer;
