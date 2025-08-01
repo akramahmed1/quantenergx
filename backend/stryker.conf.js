@@ -2,22 +2,22 @@
  * @type {import('@stryker-mutator/api/core').PartialStrykerOptions}
  */
 module.exports = {
-  packageManager: "npm",
+  packageManager: 'npm',
 
-  testRunner: "jest",
+  testRunner: 'jest',
   jest: {
-    projectType: "custom",
-    configFile: "jest.config.js",
+    projectType: 'custom',
+    configFile: 'jest.config.js',
     enableFindRelatedTests: true,
   },
-  coverageAnalysis: "perTest",
+  coverageAnalysis: 'perTest',
   mutate: [
-    "src/**/*.js",
-    "!src/**/*.test.js",
-    "!src/**/*.spec.js",
-    "!src/server.js",        // Don't mutate server startup
-    "!src/config/**",        // Don't mutate configuration
-    "!src/middleware/logger.js"  // Don't mutate logging
+    'src/**/*.js',
+    '!src/**/*.test.js',
+    '!src/**/*.spec.js',
+    '!src/server.js',        // Don't mutate server startup
+    '!src/config/**',        // Don't mutate configuration
+    '!src/middleware/logger.js'  // Don't mutate logging
   ],
   thresholds: {
     high: 80,
@@ -26,21 +26,21 @@ module.exports = {
   },
 
   htmlReporter: {
-    fileName: "test/mutation/reports/mutation-report.html"
+    fileName: 'test/mutation/reports/mutation-report.html'
   },
-  tempDirName: "test/mutation/.stryker-tmp",
+  tempDirName: 'test/mutation/.stryker-tmp',
   cleanTempDir: true,
 
   disableTypeChecking: true,
   ignorePatterns: [
-    "node_modules",
-    "test",
-    "dist",
-    "build",
-    "coverage",
-    ".git"
+    'node_modules',
+    'test',
+    'dist',
+    'build',
+    'coverage',
+    '.git'
   ],
   plugins: [
-    "@stryker-mutator/jest-runner"
+    '@stryker-mutator/jest-runner'
   ]
 };
