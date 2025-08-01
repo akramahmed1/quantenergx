@@ -41,8 +41,8 @@
     "cypress-file-upload": "^5.0.8",
     "cypress-image-diff-js": "^2.0.0",
     "cypress-visual-regression": "^5.0.0",
-    "@lhci/cli": "^0.13.0",
-    "lighthouse": "^11.0.0",
+    "@lhci/cli": "^0.15.1",
+    "lighthouse": "^12.8.0",
     "k6": "^0.0.0"
   }
 }

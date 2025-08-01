@@ -361,26 +361,26 @@ class EnhancedRegulatoryService {
     let content, filename, schema;
 
     switch (exportFormat) {
-      case 'XML':
-        content = this.generateXMLReport(reportData, regulation, template);
-        filename = `${regulation}_${timestamp}.xml`;
-        schema = template.transactionReport?.schema || template.fundamentalData?.schema || template.swapDataReport?.schema;
-        break;
+    case 'XML':
+      content = this.generateXMLReport(reportData, regulation, template);
+      filename = `${regulation}_${timestamp}.xml`;
+      schema = template.transactionReport?.schema || template.fundamentalData?.schema || template.swapDataReport?.schema;
+      break;
         
-      case 'XBRL':
-        content = this.generateXBRLReport(reportData, regulation, template);
-        filename = `${regulation}_${timestamp}.xbrl`;
-        schema = `${regulation}_taxonomy.xsd`;
-        break;
+    case 'XBRL':
+      content = this.generateXBRLReport(reportData, regulation, template);
+      filename = `${regulation}_${timestamp}.xbrl`;
+      schema = `${regulation}_taxonomy.xsd`;
+      break;
         
-      case 'CSV':
-        content = this.generateCSVReport(reportData, regulation, template);
-        filename = `${regulation}_${timestamp}.csv`;
-        schema = null;
-        break;
+    case 'CSV':
+      content = this.generateCSVReport(reportData, regulation, template);
+      filename = `${regulation}_${timestamp}.csv`;
+      schema = null;
+      break;
         
-      default:
-        throw new Error(`Unsupported export format: ${exportFormat}`);
+    default:
+      throw new Error(`Unsupported export format: ${exportFormat}`);
     }
 
     return { content, filename, schema };
@@ -599,8 +599,8 @@ class EnhancedRegulatoryService {
       message: !scoreCompliant 
         ? 'Environmental impact score below minimum'
         : !certCompliant 
-        ? 'Environmental certification missing'
-        : 'Environmental compliance requirements met',
+          ? 'Environmental certification missing'
+          : 'Environmental compliance requirements met',
       currentScore: environmentalImpactScore,
       requiredScore,
       hasCertification: certCompliant,
@@ -615,17 +615,17 @@ class EnhancedRegulatoryService {
     const timestamp = new Date().toISOString();
     
     let xmlContent = xmlHeader + rootElement + '\n';
-    xmlContent += `  <ReportHeader>\n`;
+    xmlContent += '  <ReportHeader>\n';
     xmlContent += `    <ReportID>${uuidv4()}</ReportID>\n`;
     xmlContent += `    <GeneratedAt>${timestamp}</GeneratedAt>\n`;
     xmlContent += `    <Regulation>${regulation}</Regulation>\n`;
-    xmlContent += `  </ReportHeader>\n`;
+    xmlContent += '  </ReportHeader>\n';
     
-    xmlContent += `  <TransactionData>\n`;
+    xmlContent += '  <TransactionData>\n';
     Object.entries(reportData).forEach(([key, value]) => {
       xmlContent += `    <${key}>${this.escapeXml(value)}</${key}>\n`;
     });
-    xmlContent += `  </TransactionData>\n`;
+    xmlContent += '  </TransactionData>\n';
     
     xmlContent += `</${regulation}_Report>`;
     
@@ -745,14 +745,14 @@ class EnhancedRegulatoryService {
     const now = new Date();
     
     switch (deadline) {
-      case 'immediate':
-        return now.toISOString();
-      case 'T+1':
-        return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
-      case 'T+2':
-        return new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString();
-      default:
-        return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
+    case 'immediate':
+      return now.toISOString();
+    case 'T+1':
+      return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
+    case 'T+2':
+      return new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString();
+    default:
+      return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
     }
   }
 

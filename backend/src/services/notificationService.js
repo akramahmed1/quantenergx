@@ -1,9 +1,11 @@
-const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 
 class NotificationService {
   constructor() {
-    this.telegramBot = null;
+    this.telegramConfig = {
+      botToken: process.env.TELEGRAM_BOT_TOKEN,
+      apiUrl: 'https://api.telegram.org/bot'
+    };
     this.whatsappConfig = {
       apiUrl: process.env.WHATSAPP_API_URL || 'https://graph.facebook.com/v18.0',
       token: process.env.WHATSAPP_API_TOKEN,
@@ -24,10 +26,7 @@ class NotificationService {
       fromNumber: process.env.TWILIO_FROM_NUMBER,
     };
 
-    // Initialize Telegram bot if token is provided
-    if (process.env.TELEGRAM_BOT_TOKEN) {
-      this.telegramBot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: false });
-    }
+
   }
 
   async sendNotification(channel, recipient, message, options = {}) {
@@ -51,26 +50,30 @@ class NotificationService {
   }
 
   async sendTelegramMessage(chatId, message, options = {}) {
-    if (!this.telegramBot) {
+    if (!this.telegramConfig.botToken) {
       throw new Error('Telegram bot not configured');
     }
 
     const { keyboard, parseMode = 'Markdown' } = options;
 
     const telegramOptions = {
+      chat_id: chatId,
+      text: message,
       parse_mode: parseMode,
     };
 
     if (keyboard) {
-      telegramOptions.reply_markup = {
+      telegramOptions.reply_markup = JSON.stringify({
         inline_keyboard: keyboard,
-      };
+      });
     }
 
-    const result = await this.telegramBot.sendMessage(chatId, message, telegramOptions);
+    const url = `${this.telegramConfig.apiUrl}${this.telegramConfig.botToken}/sendMessage`;
+    const response = await axios.post(url, telegramOptions);
+    
     return {
       success: true,
-      messageId: result.message_id,
+      messageId: response.data.result.message_id,
       channel: 'telegram',
     };
   }

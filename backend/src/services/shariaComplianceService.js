@@ -242,21 +242,21 @@ class ShariaComplianceService {
     Object.entries(checks).forEach(([checkName, result]) => {
       if (!result.compliant) {
         switch (checkName) {
-          case 'sector_compliance':
-            recommendations.push('Consider alternative energy sectors that are Sharia compliant');
-            break;
-          case 'interest_check':
-            recommendations.push('Structure transaction without interest-based elements');
-            break;
-          case 'speculation_check':
-            recommendations.push('Reduce speculation risk through physical delivery or asset backing');
-            break;
-          case 'asset_backing':
-            recommendations.push('Increase tangible asset backing ratio to minimum 51%');
-            break;
-          case 'contract_structure':
-            recommendations.push('Use approved Islamic contract structures like Murabaha or Ijara');
-            break;
+        case 'sector_compliance':
+          recommendations.push('Consider alternative energy sectors that are Sharia compliant');
+          break;
+        case 'interest_check':
+          recommendations.push('Structure transaction without interest-based elements');
+          break;
+        case 'speculation_check':
+          recommendations.push('Reduce speculation risk through physical delivery or asset backing');
+          break;
+        case 'asset_backing':
+          recommendations.push('Increase tangible asset backing ratio to minimum 51%');
+          break;
+        case 'contract_structure':
+          recommendations.push('Use approved Islamic contract structures like Murabaha or Ijara');
+          break;
         }
       }
     });

@@ -534,7 +534,7 @@ class AnomalyDetectionService {
             price_change: priceChange,
             volume_change: volumeChange,
             method: 'divergence_analysis',
-            description: `Price and volume moving in opposite directions`,
+            description: 'Price and volume moving in opposite directions',
             confidence: 0.7
           }));
         }
