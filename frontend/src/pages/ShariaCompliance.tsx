@@ -32,13 +32,15 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemIcon,
+  ListItemIcon
+} from '@mui/material';
+import {
   CheckCircle,
   Cancel,
   Info,
   Bookmark
 } from '@mui/icons-material';
-import { useTranslation } from '../../i18n/I18nProvider';
+import { useTranslation } from '../i18n/I18nProvider';
 
 interface ShariaComplianceResult {
   success: boolean;

@@ -9,16 +9,20 @@ import winston from 'winston';
  */
 export class WebSocketService {
   private io: SocketIOServer;
-  private kafkaService: KafkaService;
+  private kafkaService: KafkaService | undefined;
   private logger: winston.Logger;
   private connectedClients: Map<string, Socket> = new Map();
 
-  constructor(io: SocketIOServer, kafkaService: KafkaService, logger: winston.Logger) {
+  constructor(io: SocketIOServer, kafkaService: KafkaService | undefined, logger: winston.Logger) {
     this.io = io;
     this.kafkaService = kafkaService;
     this.logger = logger;
     this.initializeWebSocketHandlers();
-    this.subscribeToKafkaTopics();
+    if (this.kafkaService) {
+      this.subscribeToKafkaTopics();
+    } else {
+      this.logger.info('Kafka service not available, WebSocket will work without Kafka integration');
+    }
   }
 
   /**
@@ -195,6 +199,11 @@ export class WebSocketService {
    * Subscribe to Kafka topics for real-time updates
    */
   private async subscribeToKafkaTopics(): Promise<void> {
+    if (!this.kafkaService) {
+      this.logger.warn('Kafka service not available, skipping topic subscriptions');
+      return;
+    }
+    
     try {
       // Subscribe to market data updates
       await this.kafkaService.subscribeToTopic(
