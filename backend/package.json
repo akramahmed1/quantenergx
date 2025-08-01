@@ -91,10 +91,10 @@
     "knex": "^2.5.1",
     "moment": "^2.29.4",
     "multer": "^2.0.0-rc.4",
-    "node-telegram-bot-api": "^0.66.0",
+
     "pdf-parse": "^1.1.1",
     "pg": "^8.11.0",
-    "react-scripts": "0.0.0",
+
     "redis": "^4.6.5",
     "sharp": "^0.32.1",
     "socket.io": "^4.8.1",
@@ -116,7 +116,7 @@
     "@types/multer": "^2.0.0",
     "@types/node": "^24.1.0",
     "@types/uuid": "^10.0.0",
-    "@types/winston": "^2.4.4",
+
     "artillery": "^2.0.0",
     "eslint": "^8.57.1",
     "eslint-plugin-security": "^3.0.1",
