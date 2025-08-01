@@ -360,7 +360,8 @@ class EnhancedPluginManager extends EventEmitter {
       return true;
 
     } catch (error) {
-      this.emit('plugin:install_failed', { pluginId, error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.emit('plugin:install_failed', { pluginId, error: errorMessage });
       throw error;
     }
   }

@@ -1,0 +1,195 @@
+
+> quantenergx-frontend@1.0.0 lint:security
+> ESLINT_USE_FLAT_CONFIG=false eslint src/ --ext .ts,.tsx --config .eslintrc.security.json
+
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/__tests__/App.test.tsx
+  18:41  error  'React' is not defined  no-undef
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/__tests__/MobileComponents.test.tsx
+   86:9   error    Avoid using multiple assertions within `waitFor` callback  testing-library/no-wait-for-multiple-assertions
+  230:32  error    'isMarketOpen' is assigned a value but never used          no-unused-vars
+  230:32  warning  'isMarketOpen' is assigned a value but never used          @typescript-eslint/no-unused-vars
+  254:14  warning  Function Call Object Injection Sink                        security/detect-object-injection
+  256:16  warning  Function Call Object Injection Sink                        security/detect-object-injection
+  256:16  warning  Generic Object Injection Sink                              security/detect-object-injection
+  268:36  warning  Generic Object Injection Sink                              security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/__tests__/performance/performance.test.tsx
+   41:35  error  'React' is not defined                                                                                                                                       no-undef
+   43:9   error  'React' is not defined                                                                                                                                       no-undef
+   64:16  error  Missing radix parameter                                                                                                                                      radix
+   77:34  error  'React' is not defined                                                                                                                                       no-undef
+   83:35  error  'React' is not defined                                                                                                                                       no-undef
+   84:24  error  'React' is not defined                                                                                                                                       no-undef
+   98:13  error  `initialRenderCount` is not a recommended name for `render` returned value. Instead, you should destructure it, or name it using one of: `view`, or `utils`  testing-library/render-result-naming-convention
+  180:33  error  'React' is not defined                                                                                                                                       no-undef
+  181:39  error  'React' is not defined                                                                                                                                       no-undef
+  183:26  error  'React' is not defined                                                                                                                                       no-undef
+  199:9   error  'React' is not defined                                                                                                                                       no-undef
+  236:35  error  'React' is not defined                                                                                                                                       no-undef
+  238:9   error  'React' is not defined                                                                                                                                       no-undef
+  272:33  error  'React' is not defined                                                                                                                                       no-undef
+  274:9   error  'React' is not defined                                                                                                                                       no-undef
+  306:29  error  'React' is not defined                                                                                                                                       no-undef
+  313:10  error  'React' is not defined                                                                                                                                       react/jsx-no-undef
+  313:10  error  'React' is not defined                                                                                                                                       no-undef
+  331:37  error  'React' is not defined                                                                                                                                       no-undef
+  357:61  error  'React' is not defined                                                                                                                                       no-undef
+  358:45  error  'React' is not defined                                                                                                                                       no-undef
+  360:9   error  'React' is not defined                                                                                                                                       no-undef
+  396:7   error  Promise returned from `waitFor` must be handled                                                                                                              testing-library/await-async-utils
+  403:37  error  'React' is not defined                                                                                                                                       no-undef
+  405:9   error  'React' is not defined                                                                                                                                       no-undef
+  436:7   error  Promise returned from `waitFor` must be handled                                                                                                              testing-library/await-async-utils
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/__tests__/security/security.test.tsx
+   11:35  error  'React' is not defined                                                   no-undef
+   75:36  error  Avoid direct Node access. Prefer using the methods from Testing Library  testing-library/no-node-access
+   75:36  error  Avoid direct Node access. Prefer using the methods from Testing Library  testing-library/no-node-access
+  113:35  error  'React' is not defined                                                   no-undef
+  114:35  error  'React' is not defined                                                   no-undef
+  121:34  error  'React' is not defined                                                   no-undef
+  167:35  error  'React' is not defined                                                   no-undef
+  168:39  error  'React' is not defined                                                   no-undef
+  175:34  error  'React' is not defined                                                   no-undef
+  245:31  error  'React' is not defined                                                   no-undef
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/components/mobile/BiometricAuth.tsx
+   38:33  error    'PublicKeyCredential' is not defined  no-undef
+   42:7   warning  Unexpected console statement          no-console
+   90:7   warning  Unexpected console statement          no-console
+  127:7   warning  Unexpected console statement          no-console
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/components/mobile/MobileIntegration.tsx
+   3:3   error    'Box' is defined but never used  no-unused-vars
+   3:3   warning  'Box' is defined but never used  @typescript-eslint/no-unused-vars
+  89:85  error    'EventListener' is not defined   no-undef
+  92:90  error    'EventListener' is not defined   no-undef
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/components/mobile/MobileSettings.tsx
+  115:5  warning  Unexpected console statement  no-console
+  119:5  warning  Unexpected console statement  no-console
+  124:5  warning  Unexpected console statement  no-console
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/components/mobile/OfflineTrading.tsx
+   64:6  warning  React Hook useEffect has a missing dependency: 'syncPendingOrders'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+   82:7  warning  Unexpected console statement                                                                                          no-console
+   90:7  warning  Unexpected console statement                                                                                          no-console
+   99:9  error    'addOfflineOrder' is assigned a value but never used                                                                  no-unused-vars
+   99:9  warning  'addOfflineOrder' is assigned a value but never used                                                                  @typescript-eslint/no-unused-vars
+  143:7  warning  Unexpected console statement                                                                                          no-console
+  329:9  warning  Unexpected console statement                                                                                          no-console
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/components/mobile/PushNotifications.tsx
+   21:3   error    'NotificationsActive' is defined but never used  no-unused-vars
+   21:3   warning  'NotificationsActive' is defined but never used  @typescript-eslint/no-unused-vars
+   22:3   error    'NotificationsOff' is defined but never used     no-unused-vars
+   22:3   warning  'NotificationsOff' is defined but never used     @typescript-eslint/no-unused-vars
+   55:48  error    'NotificationPermission' is not defined          no-undef
+   87:7   warning  Unexpected console statement                     no-console
+   99:7   warning  Unexpected console statement                     no-console
+  108:7   warning  Unexpected console statement                     no-console
+  117:9   warning  Unexpected console statement                     no-console
+  119:9   warning  Unexpected console statement                     no-console
+  147:7   warning  Unexpected console statement                     no-console
+  161:7   warning  Unexpected console statement                     no-console
+  167:7   warning  Unexpected console statement                     no-console
+  221:9   warning  Unexpected console statement                     no-console
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/i18n/I18nProvider.tsx
+  39:22  warning  Generic Object Injection Sink  security/detect-object-injection
+  42:15  warning  Generic Object Injection Sink  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/i18n/regionalConfig.ts
+  165:10  warning  Generic Object Injection Sink  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/pages/AIDashboard.tsx
+  118:7  warning  Unexpected console statement  no-console
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/pages/ESGDashboard.tsx
+    6:27  error    'useEffect' is defined but never used       no-unused-vars
+    6:27  warning  'useEffect' is defined but never used       @typescript-eslint/no-unused-vars
+   16:3   error    'Table' is defined but never used           no-unused-vars
+   16:3   warning  'Table' is defined but never used           @typescript-eslint/no-unused-vars
+   17:3   error    'TableBody' is defined but never used       no-unused-vars
+   17:3   warning  'TableBody' is defined but never used       @typescript-eslint/no-unused-vars
+   18:3   error    'TableCell' is defined but never used       no-unused-vars
+   18:3   warning  'TableCell' is defined but never used       @typescript-eslint/no-unused-vars
+   19:3   error    'TableContainer' is defined but never used  no-unused-vars
+   19:3   warning  'TableContainer' is defined but never used  @typescript-eslint/no-unused-vars
+   20:3   error    'TableHead' is defined but never used       no-unused-vars
+   20:3   warning  'TableHead' is defined but never used       @typescript-eslint/no-unused-vars
+   21:3   error    'TableRow' is defined but never used        no-unused-vars
+   21:3   warning  'TableRow' is defined but never used        @typescript-eslint/no-unused-vars
+   22:3   error    'Paper' is defined but never used           no-unused-vars
+   22:3   warning  'Paper' is defined but never used           @typescript-eslint/no-unused-vars
+   33:3   error    'Rating' is defined but never used          no-unused-vars
+   33:3   warning  'Rating' is defined but never used          @typescript-eslint/no-unused-vars
+   34:3   error    'Divider' is defined but never used         no-unused-vars
+   34:3   warning  'Divider' is defined but never used         @typescript-eslint/no-unused-vars
+   41:3   error    'TrendingUp' is defined but never used      no-unused-vars
+   41:3   warning  'TrendingUp' is defined but never used      @typescript-eslint/no-unused-vars
+   42:3   error    'Star' is defined but never used            no-unused-vars
+   42:3   warning  'Star' is defined but never used            @typescript-eslint/no-unused-vars
+  133:7   warning  Unexpected console statement                no-console
+  147:7   warning  Unexpected console statement                no-console
+  200:22  warning  Generic Object Injection Sink               security/detect-object-injection
+  201:15  warning  Generic Object Injection Sink               security/detect-object-injection
+  202:19  warning  Generic Object Injection Sink               security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/pages/MarketData.tsx
+  111:31  warning  Generic Object Injection Sink               security/detect-object-injection
+  113:28  warning  Variable Assigned to Object Injection Sink  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/pages/Marketplace.tsx
+   19:3   error    'Avatar' is defined but never used                                                                                no-unused-vars
+   19:3   warning  'Avatar' is defined but never used                                                                                @typescript-eslint/no-unused-vars
+   23:3   error    'ListItemAvatar' is defined but never used                                                                        no-unused-vars
+   23:3   warning  'ListItemAvatar' is defined but never used                                                                        @typescript-eslint/no-unused-vars
+   24:3   error    'Divider' is defined but never used                                                                               no-unused-vars
+   24:3   warning  'Divider' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+   40:3   error    'Star' is defined but never used                                                                                  no-unused-vars
+   40:3   warning  'Star' is defined but never used                                                                                  @typescript-eslint/no-unused-vars
+   43:3   error    'AttachMoney' is defined but never used                                                                           no-unused-vars
+   43:3   warning  'AttachMoney' is defined but never used                                                                           @typescript-eslint/no-unused-vars
+   47:3   error    'TrendingUp' is defined but never used                                                                            no-unused-vars
+   47:3   warning  'TrendingUp' is defined but never used                                                                            @typescript-eslint/no-unused-vars
+  147:7   warning  Unexpected console statement                                                                                      no-console
+  162:7   warning  Unexpected console statement                                                                                      no-console
+  176:7   warning  Unexpected console statement                                                                                      no-console
+  202:7   warning  Unexpected console statement                                                                                      no-console
+  234:7   warning  Unexpected console statement                                                                                      no-console
+  253:6   warning  React Hook useEffect has a missing dependency: 'searchPlugins'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  658:20  error    'ListItemIcon' is not defined                                                                                     react/jsx-no-undef
+  658:20  error    'ListItemIcon' is not defined                                                                                     no-undef
+  664:20  error    'ListItemIcon' is not defined                                                                                     react/jsx-no-undef
+  664:20  error    'ListItemIcon' is not defined                                                                                     no-undef
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/pages/MobileFeaturesDemo.tsx
+  88:5  warning  Unexpected console statement  no-console
+  90:5  warning  Unexpected console statement  no-console
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/pages/ShariaCompliance.tsx
+  123:7  warning  Unexpected console statement  no-console
+  135:7  warning  Unexpected console statement  no-console
+  155:7  warning  Unexpected console statement  no-console
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/store/slices/authSlice.ts
+  355:11  warning  Generic Object Injection Sink  security/detect-object-injection
+
+/home/runner/work/quantenergx/quantenergx/frontend/src/store/slices/marketSlice.ts
+  188:11  warning  Generic Object Injection Sink  security/detect-object-injection
+  189:9   warning  Generic Object Injection Sink  security/detect-object-injection
+  190:14  warning  Generic Object Injection Sink  security/detect-object-injection
+  211:9   warning  Generic Object Injection Sink  security/detect-object-injection
+
+✖ 143 problems (69 errors, 74 warnings)
+
+npm error Lifecycle script `lint:security` failed with error:
+npm error code 1
+npm error path /home/runner/work/quantenergx/quantenergx/frontend
+npm error workspace quantenergx-frontend@1.0.0
+npm error location /home/runner/work/quantenergx/quantenergx/frontend
+npm error command failed
+npm error command sh -c ESLINT_USE_FLAT_CONFIG=false eslint src/ --ext .ts,.tsx --config .eslintrc.security.json

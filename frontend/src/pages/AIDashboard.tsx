@@ -30,7 +30,7 @@ import {
   TrendingUp,
   TrendingDown,
   Warning,
-  Error,
+  Error as ErrorIcon,
   CheckCircle,
   Refresh,
   Timeline,
@@ -151,7 +151,7 @@ const AIDashboard: React.FC = () => {
   const getSeverityIcon = (severity: string) => {
     switch (severity.toLowerCase()) {
       case 'severe':
-        return <Error color="error" />;
+        return <ErrorIcon color="error" />;
       case 'moderate':
         return <Warning color="warning" />;
       case 'mild':
