@@ -50,7 +50,7 @@
   "bugs": {
     "url": "https://github.com/akramahmed1/quantenergx/issues"
   },
-  "homepage": "https://github.com/akramahmed1/quantenergx#readme",
+  "homepage": "/",
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",

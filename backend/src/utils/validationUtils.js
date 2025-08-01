@@ -223,7 +223,7 @@ class ValidationUtils {
    * Express validator middleware for user login
    */
   validateLogin() {
-    return [
+    const validations = [
       body('username')
         .notEmpty()
         .withMessage('Username is required')
@@ -239,8 +239,16 @@ class ValidationUtils {
         .isLength({ min: 6, max: 6 })
         .isNumeric()
         .withMessage('MFA token must be 6 digits'),
-      body('hcaptcha_token').notEmpty().withMessage('Captcha verification required'),
     ];
+
+    // Only require captcha if enabled
+    if (process.env.HCAPTCHA_ENABLED !== 'false') {
+      validations.push(
+        body('hcaptcha_token').notEmpty().withMessage('Captcha verification required')
+      );
+    }
+
+    return validations;
   }
 
   /**
