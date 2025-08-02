@@ -4,7 +4,7 @@
  */
 const express = require('express');
 const router = express.Router();
-const path = require('path');
+const _path = require('path');
 
 // Import the enhanced plugin manager
 let EnhancedPluginManager;
