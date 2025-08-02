@@ -91,7 +91,7 @@
     "knex": "^2.5.1",
     "moment": "^2.29.4",
     "multer": "^2.0.0-rc.4",
-    "node-telegram-bot-api": "^0.63.0",
+    "node-telegram-bot-api": "^0.66.0",
     "pdf-parse": "^1.1.1",
     "pg": "^8.11.0",
     "react-scripts": "0.0.0",
