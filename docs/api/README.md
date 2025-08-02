@@ -2,7 +2,35 @@
 
 ## Overview
 
-The QuantEnergx API provides RESTful endpoints for trading operations, real-time data access, plugin management, and webhook integrations.
+The QuantEnergx API provides comprehensive RESTful endpoints for energy trading operations, real-time data access, risk management, derivatives trading, settlement processing, and regulatory compliance. 
+
+## Swagger/OpenAPI Explorer
+
+**🎯 Live Interactive API Documentation**: http://localhost:3001/api-docs
+
+The QuantEnergx API now includes a complete Swagger UI for interactive endpoint testing and documentation. This allows developers to:
+
+- **Test endpoints live** with real API responses
+- **Explore comprehensive documentation** for all 12 major endpoint categories  
+- **View detailed request/response schemas** with examples
+- **Execute API calls directly** from the browser interface
+- **Copy curl commands** for integration testing
+- **Authenticate with JWT tokens** for secure endpoint access
+
+### Available Endpoints via Swagger
+
+✅ **System Health** - Monitor service status and system health  
+✅ **Trading Operations** - Order management and trade execution  
+✅ **Market Data** - Real-time and historical price feeds  
+✅ **Risk Management** - Portfolio VaR analysis and risk monitoring  
+✅ **Derivatives Trading** - Futures, options, swaps, and structured products  
+✅ **Settlement Processing** - Cash, physical, and net settlement workflows  
+✅ **Exchange Connectors** - Multi-exchange connectivity and status monitoring  
+✅ **Plugin Management** - Dynamic plugin execution and management  
+✅ **Webhook Processing** - Third-party integrations and event handling  
+✅ **OCR Document Processing** - Text extraction and document analysis  
+✅ **Compliance Reporting** - Regulatory reporting and audit trails  
+✅ **WebSocket Statistics** - Real-time connection monitoring  
 
 ## Base URL
 
@@ -19,288 +47,149 @@ All API requests require authentication using JWT tokens.
 Authorization: Bearer <your-jwt-token>
 ```
 
+## Quick Start with Swagger
+
+1. **Access Swagger UI**: Navigate to http://localhost:3001/api-docs
+2. **Authorize**: Click the "Authorize" button and enter your JWT token
+3. **Test Endpoints**: Expand any endpoint category and click "Try it out"
+4. **Execute Requests**: Fill in parameters and click "Execute" to test live
+
 ## Core Endpoints
 
-### Health Check
-
+### System Health
 Check system health and service status.
 
 ```http
 GET /health
 ```
 
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "status": "healthy",
-    "timestamp": "2024-07-29T22:00:00.000Z",
-    "version": "1.0.0",
-    "services": {
-      "rest_api": "online",
-      "grpc_service": "online",
-      "websocket": "online",
-      "kafka": "online",
-      "plugins": "online",
-      "webhooks": "online"
-    }
-  },
-  "timestamp": "2024-07-29T22:00:00.000Z"
-}
-```
+**✅ Live Testing Available**: Use Swagger UI to test this endpoint
 
-## Plugin Management
+### Trading Operations
 
-### List Plugins
-
-Get all available plugins and their status.
-
-```http
-GET /api/v1/plugins
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "name": "market-data-provider",
-      "type": "data_source",
-      "version": "1.0.0",
-      "enabled": true
-    },
-    {
-      "name": "moving-average",
-      "type": "analytics",
-      "version": "1.0.0",
-      "enabled": true
-    }
-  ],
-  "timestamp": "2024-07-29T22:00:00.000Z"
-}
-```
-
-### Execute Plugin
-
-Execute a specific plugin with input data.
-
-```http
-POST /api/v1/plugins/{name}/execute
-```
-
-**Parameters:**
-- `name` (path): Plugin name
-
-**Request Body:**
-```json
-{
-  "input": "plugin-specific data"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "result": "plugin-specific output",
-    "executionTime": 150,
-    "timestamp": "2024-07-29T22:00:00.000Z"
-  },
-  "timestamp": "2024-07-29T22:00:00.000Z"
-}
-```
-
-## Webhook Management
-
-### List Webhook Types
-
-Get all registered webhook types.
-
-```http
-GET /api/v1/webhooks
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "registeredTypes": [
-      "market_data_provider",
-      "compliance_service",
-      "payment_processor",
-      "scada_system",
-      "iot_sensor",
-      "ml_prediction_service"
-    ]
-  },
-  "timestamp": "2024-07-29T22:00:00.000Z"
-}
-```
-
-### Process Webhook
-
-Process incoming webhook from external service.
-
-```http
-POST /api/v1/webhooks/{type}
-```
-
-**Parameters:**
-- `type` (path): Webhook type
-
-**Headers:**
-```http
-X-Webhook-Signature: sha256=<signature>
-Content-Type: application/json
-```
-
-**Request Body:**
-```json
-{
-  "id": "webhook-123",
-  "source": "third_party",
-  "data": {
-    "event": "price_update",
-    "commodity": "crude_oil",
-    "price": 75.25
-  }
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Webhook processed successfully",
-  "data": {
-    "processed": true,
-    "webhookId": "webhook-123"
-  },
-  "timestamp": "2024-07-29T22:00:00.000Z"
-}
-```
-
-## WebSocket Statistics
-
-### Connection Stats
-
-Get WebSocket connection statistics.
-
-```http
-GET /api/v1/websocket/stats
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "connectedClients": 25,
-    "rooms": [
-      "trading-user123",
-      "market-crude_oil",
-      "orders-user456"
-    ],
-    "timestamp": "2024-07-29T22:00:00.000Z"
-  },
-  "timestamp": "2024-07-29T22:00:00.000Z"
-}
-```
-
-## Trading Endpoints
-
-### Create Order
-
-Create a new trading order.
-
-```http
-POST /api/v1/trading/orders
-```
-
-**Request Body:**
-```json
-{
-  "commodity": "crude_oil",
-  "quantity": 1000,
-  "price": 75.50,
-  "side": "buy",
-  "orderType": "limit"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": "order-123",
-    "status": "pending",
-    "timestamp": "2024-07-29T22:00:00.000Z"
-  }
-}
-```
-
-### Get Orders
-
-Retrieve user's orders.
-
+#### Get Orders
 ```http
 GET /api/v1/trading/orders
 ```
 
-**Query Parameters:**
-- `status` (optional): Filter by order status
-- `commodity` (optional): Filter by commodity
-- `limit` (optional): Number of orders to return
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "order-123",
-      "commodity": "crude_oil",
-      "quantity": 1000,
-      "price": 75.50,
-      "side": "buy",
-      "status": "executed",
-      "timestamp": "2024-07-29T22:00:00.000Z"
-    }
-  ]
-}
+#### Create Order
+```http
+POST /api/v1/trading/orders
 ```
 
-## Market Data Endpoints
+**✅ Live Testing Available**: Full CRUD operations testable in Swagger UI
 
-### Get Market Prices
+### Market Data
 
-Get current market prices for commodities.
-
+#### Get Market Prices
 ```http
 GET /api/v1/market/prices/{commodity}
 ```
 
-**Parameters:**
-- `commodity` (path): Commodity symbol
+**Supported Commodities**: crude_oil, natural_gas, heating_oil, gasoline, electricity, coal
 
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "commodity": "crude_oil",
-    "price": 75.25,
-    "change": 0.75,
-    "changePercent": 1.01,
-    "volume": 125000,
-    "timestamp": "2024-07-29T22:00:00.000Z"
-  }
-}
+### Risk Management
+
+#### Portfolio Risk Analysis
+```http
+GET /api/v1/risk/portfolio
+```
+
+#### Value at Risk (VaR) Calculation
+```http
+GET /api/v1/risk/var?confidence=95&horizon=1
+```
+
+### Derivatives Trading
+
+#### Get Derivative Contracts
+```http
+GET /api/v1/derivatives/contracts
+```
+
+#### Create Derivative Contract
+```http
+POST /api/v1/derivatives/contracts
+```
+
+**Supported Types**: future, option, swap, structured_note
+
+### Settlement Processing
+
+#### Get Settlement Instructions
+```http
+GET /api/v1/settlement/instructions
+```
+
+#### Create Settlement Instruction
+```http
+POST /api/v1/settlement/instructions
+```
+
+**Settlement Types**: cash, physical, net
+
+### Exchange Connectors
+
+#### Get Available Exchanges
+```http
+GET /api/v1/exchanges
+```
+
+#### Get Exchange Status
+```http
+GET /api/v1/exchanges/{exchangeId}/status
+```
+
+**Supported Exchanges**: ICE, EEX, CME, NYMEX, DME, OPEC, Guyana NDR
+
+### Plugin Management
+
+#### List Available Plugins
+```http
+GET /api/v1/plugins
+```
+
+#### Execute Plugin
+```http
+POST /api/v1/plugins/{name}/execute
+```
+
+### Webhook Processing
+
+#### List Webhook Types
+```http
+GET /api/v1/webhooks
+```
+
+#### Process Webhook
+```http
+POST /api/v1/webhooks/{type}
+```
+
+### OCR Document Processing
+
+#### Process Document
+```http
+POST /api/v1/ocr/process
+```
+
+**Supported Formats**: PDF, image files (PNG, JPG, TIFF)
+
+### Compliance Reporting
+
+#### Get Compliance Reports
+```http
+GET /api/v1/compliance/reports
+```
+
+**Jurisdictions**: US, EU, UK, APAC, CA  
+**Report Types**: trade_reporting, position_reporting, risk_reporting
+
+### WebSocket Statistics
+
+#### Get Connection Statistics
+```http
+GET /api/v1/websocket/stats
 ```
 
 ## Error Handling
@@ -314,7 +203,7 @@ All API errors follow a consistent format:
   "success": false,
   "error": "Error type",
   "message": "Detailed error message",
-  "timestamp": "2024-07-29T22:00:00.000Z"
+  "timestamp": "2025-08-01T11:15:00.000Z"
 }
 ```
 
@@ -329,44 +218,6 @@ All API errors follow a consistent format:
 - `429` - Too Many Requests
 - `500` - Internal Server Error
 - `503` - Service Unavailable
-
-### Common Errors
-
-#### Authentication Error
-```json
-{
-  "success": false,
-  "error": "Unauthorized",
-  "message": "Invalid or expired token",
-  "timestamp": "2024-07-29T22:00:00.000Z"
-}
-```
-
-#### Rate Limit Error
-```json
-{
-  "success": false,
-  "error": "Too Many Requests",
-  "message": "Rate limit exceeded. Try again in 15 minutes.",
-  "timestamp": "2024-07-29T22:00:00.000Z"
-}
-```
-
-#### Validation Error
-```json
-{
-  "success": false,
-  "error": "Validation Error",
-  "message": "Invalid input parameters",
-  "details": [
-    {
-      "field": "quantity",
-      "message": "Must be a positive number"
-    }
-  ],
-  "timestamp": "2024-07-29T22:00:00.000Z"
-}
-```
 
 ## Rate Limiting
 
@@ -451,42 +302,100 @@ api = QuantEnergxAPI('http://localhost:3001/api/v1', 'your-token')
 market_data = api.get_market_data('crude_oil')
 ```
 
-## Testing
+## Testing with Swagger UI
 
-### Postman Collection
+### API Testing Workflow
 
-Import the Postman collection for easy API testing:
-- [Download Collection](./postman/quantenergx-api.json)
+1. **Start Local Development Server**:
+   ```bash
+   cd backend && npm run dev
+   ```
 
-### API Testing
+2. **Access Swagger UI**: 
+   Open http://localhost:3001/api-docs in your browser
 
-```bash
-# Health check
-curl -X GET http://localhost:3001/health
+3. **Authenticate**:
+   - Click the "Authorize" button in Swagger UI
+   - Enter your JWT token
+   - Click "Authorize"
 
-# Get plugins (with auth)
-curl -X GET http://localhost:3001/api/v1/plugins \
-  -H "Authorization: Bearer your-token"
+4. **Test Endpoints**:
+   - Expand any endpoint category
+   - Click "Try it out" on any endpoint
+   - Fill in required parameters
+   - Click "Execute" to test live
 
-# Execute plugin
-curl -X POST http://localhost:3001/api/v1/plugins/moving-average/execute \
-  -H "Authorization: Bearer your-token" \
-  -H "Content-Type: application/json" \
-  -d '{"prices": [75.0, 75.1, 75.2]}'
-```
+5. **Review Results**:
+   - View real API responses
+   - Check response headers and status codes
+   - Copy curl commands for integration
 
-## Changelog
+### Example Test Scenarios
 
-### v1.0.0 (Current)
-- Initial API implementation
-- Plugin management endpoints
-- Webhook processing
-- WebSocket statistics
+#### Health Check Test
+- **Endpoint**: GET /health
+- **Expected Response**: 200 OK with service status
+- **Test Steps**: No parameters required, just click Execute
+
+#### Plugin List Test  
+- **Endpoint**: GET /api/v1/plugins
+- **Expected Response**: Array of available plugins
+- **Authentication**: Required (JWT token)
+
+#### Market Data Test
+- **Endpoint**: GET /api/v1/market/prices/{commodity}
+- **Parameters**: commodity = "crude_oil"
+- **Expected Response**: Current price data with timestamp
+
+## OpenAPI Specification
+
+### Available Formats
+
+- **Interactive UI**: http://localhost:3001/api-docs
+- **JSON Format**: http://localhost:3001/api-docs.json
+- **YAML Format**: http://localhost:3001/api-docs.yaml
+
+### Specification Details
+
+- **OpenAPI Version**: 3.0.3
+- **API Version**: 2.0.0
+- **Security**: JWT Bearer token authentication
+- **Schemas**: Comprehensive data models for all endpoints
+- **Examples**: Real-world request/response examples
+- **Validation**: Built-in parameter and response validation
+
+## Supported Features
+
+### Trading Platform Features
 - Real-time trading infrastructure
+- Multi-commodity support (Oil, Gas, Electricity, Renewables, Carbon Credits)
+- Derivatives trading (Futures, Options, Swaps, Structured Notes)
+- Advanced risk management with VaR calculations
+- Multi-exchange connectivity (ICE, EEX, CME, NYMEX, DME, OPEC)
+- Compliance across multiple jurisdictions (MiFID II, REMIT, Dodd-Frank, EMIR)
+- Settlement processing (Cash/Physical/Net)
+- Plugin architecture and webhook integrations
+- OCR document processing
+- IoT and SCADA integration
 
-### Upcoming Features
-- GraphQL endpoint
-- Bulk operations
-- Advanced filtering
-- API versioning
-- Enhanced security
+### Compliance Standards
+- MiFID II (EU Markets in Financial Instruments)
+- REMIT (EU Energy Market Integrity)
+- Dodd-Frank (US Wall Street Reform)
+- EMIR (EU Market Infrastructure)
+- CFTC Rules (US Commodity Futures)
+- MAR (EU Market Abuse Regulation)
+- SEC Rules (US Securities)
+- FCA Rules (UK Financial Conduct)
+- Guyana Local Energy Regulations
+- SOC 2 Type II, ISO 27001, NERC CIP
+
+### Supported Regions
+US, EU, UK, APAC, CA, Middle East, Guyana, Global
+
+## Getting Help
+
+- **Documentation**: This README and Swagger UI
+- **API Issues**: Create GitHub issue with API tag
+- **Support**: support@quantenergx.com
+- **Live Testing**: Use Swagger UI for immediate endpoint testing
