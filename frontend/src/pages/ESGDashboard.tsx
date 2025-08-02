@@ -3,7 +3,7 @@
  * Environmental, Social, and Governance scoring interface
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Card,
@@ -30,16 +30,16 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Rating,
-  Divider
+  // Rating,
+  // Divider
 } from '@mui/material';
 import {
   ExpandMore,
   Nature,
   People,
   BusinessCenter,
-  TrendingUp,
-  Star,
+  // TrendingUp,
+  // Star,
   Lightbulb
 } from '@mui/icons-material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';

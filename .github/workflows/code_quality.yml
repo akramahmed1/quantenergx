@@ -161,13 +161,14 @@ jobs:
 
       # Upload security artifacts
       - name: Upload security reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: security-reports
           path: |
             bandit-report.json
             safety-report.json
+          if-no-files-found: ignore
 
   # Phase 3: Static Analysis
   static-analysis:
@@ -382,7 +383,7 @@ jobs:
 
       # Upload E2E artifacts
       - name: Upload E2E test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: e2e-results
@@ -391,6 +392,7 @@ jobs:
             e2e/cypress/screenshots/
             e2e/test-results/
             e2e/playwright-report/
+          if-no-files-found: ignore
 
   # Phase 6: Performance and Load Testing
   performance-tests:
@@ -509,7 +511,7 @@ jobs:
           echo "- Quality Gate: ${{ needs.quality-gate.result }}" >> quality-report.md
 
       - name: Upload Quality Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: quality-report
           path: quality-report.md
