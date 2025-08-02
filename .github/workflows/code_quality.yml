@@ -161,7 +161,7 @@ jobs:
 
       # Upload security artifacts
       - name: Upload security reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: security-reports
@@ -382,7 +382,7 @@ jobs:
 
       # Upload E2E artifacts
       - name: Upload E2E test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: e2e-results
@@ -509,7 +509,7 @@ jobs:
           echo "- Quality Gate: ${{ needs.quality-gate.result }}" >> quality-report.md
 
       - name: Upload Quality Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: quality-report
           path: quality-report.md

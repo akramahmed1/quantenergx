@@ -310,7 +310,7 @@ router.put('/anomalies/baselines/:commodity', async (req, res) => {
  */
 router.get('/dashboard', async (req, res) => {
   try {
-    const { timeframe = '24h' } = req.query;
+    const { timeframe: _timeframe = '24h' } = req.query;
 
     // Get data from all services
     const [sentimentAlerts, recentAnomalies] = await Promise.all([
@@ -411,7 +411,7 @@ router.post('/portfolio/rebalance', async (req, res) => {
  */
 router.post('/scenario/simulate', async (req, res) => {
   try {
-    const { portfolio_data, scenarios, simulation_params = {} } = req.body;
+    const { portfolio_data, scenarios, simulation_params: _simulation_params = {} } = req.body;
 
     if (!portfolio_data || !scenarios) {
       return res.status(400).json({

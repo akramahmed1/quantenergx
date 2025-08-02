@@ -61,7 +61,7 @@ export const OfflineTrading: React.FC<OfflineTradingProps> = ({
 
       return () => clearInterval(syncInterval);
     }
-  }, [isOnline, pendingOrders.length]);
+  }, [isOnline, pendingOrders.length, syncPendingOrders]);
 
   const loadOfflineData = () => {
     try {
@@ -96,7 +96,7 @@ export const OfflineTrading: React.FC<OfflineTradingProps> = ({
     localStorage.setItem('quantenergx_offline_mode', enabled.toString());
   };
 
-  const addOfflineOrder = (order: Omit<OfflineOrder, 'id' | 'timestamp' | 'status'>) => {
+  const _addOfflineOrder = (order: Omit<OfflineOrder, 'id' | 'timestamp' | 'status'>) => {
     const newOrder: OfflineOrder = {
       ...order,
       id: `offline_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,

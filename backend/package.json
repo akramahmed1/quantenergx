@@ -38,6 +38,7 @@
     "security:audit": "npm audit --audit-level=moderate",
     "security:static": "npm run test:security:static",
     "performance:monitor": "node scripts/performance-monitor.js",
+    "test:smoke": "jest --testPathPattern=test/smoke",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "lint:security": "ESLINT_USE_FLAT_CONFIG=false eslint src/ --config .eslintrc.security.json",
@@ -91,7 +92,7 @@
     "knex": "^2.5.1",
     "moment": "^2.29.4",
     "multer": "^2.0.0-rc.4",
-    "node-telegram-bot-api": "^0.63.0",
+    "node-telegram-bot-api": "^0.66.0",
     "pdf-parse": "^1.1.1",
     "pg": "^8.11.0",
     "react-scripts": "0.0.0",
@@ -132,5 +133,9 @@
     "supertest": "^7.1.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=8.0.0"
   }
 }
