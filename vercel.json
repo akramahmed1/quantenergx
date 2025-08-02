@@ -18,6 +18,7 @@
   "buildCommand": "cd frontend && npm ci && npm run build",
   "outputDirectory": "frontend/build",
   "installCommand": "cd frontend && npm ci",
+  "framework": null,
   "headers": [
     {
       "source": "/(.*)",

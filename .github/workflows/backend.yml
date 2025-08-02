@@ -68,6 +68,7 @@ jobs:
           path: |
             backend/semgrep-results.json
             backend/eslint-security-report.json
+          if-no-files-found: ignore
 
   backend-lint-and-test:
     name: Backend Lint & Test
@@ -163,6 +164,7 @@ jobs:
           path: |
             backend/test/contract/pacts/
             backend/test/mutation/reports/
+          if-no-files-found: ignore
 
   backend-build:
     name: Backend Build

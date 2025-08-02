@@ -61,7 +61,7 @@ export const OfflineTrading: React.FC<OfflineTradingProps> = ({
 
       return () => clearInterval(syncInterval);
     }
-  }, [isOnline, pendingOrders.length, syncPendingOrders]);
+  }, [isOnline, pendingOrders.length]); // syncPendingOrders is stable, no need to include
 
   const loadOfflineData = () => {
     try {
