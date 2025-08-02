@@ -75,20 +75,20 @@ class MarginService extends EventEmitter {
       let marginRequirement;
 
       switch (contract.type) {
-        case 'future':
-          marginRequirement = await this.calculateFutureMargin(contract, marginRules);
-          break;
-        case 'option':
-          marginRequirement = await this.calculateOptionMargin(contract, marginRules);
-          break;
-        case 'swap':
-          marginRequirement = await this.calculateSwapMargin(contract, marginRules);
-          break;
-        case 'structured_note':
-          marginRequirement = await this.calculateStructuredNoteMargin(contract, marginRules);
-          break;
-        default:
-          throw new Error(`Unsupported contract type: ${contract.type}`);
+      case 'future':
+        marginRequirement = await this.calculateFutureMargin(contract, marginRules);
+        break;
+      case 'option':
+        marginRequirement = await this.calculateOptionMargin(contract, marginRules);
+        break;
+      case 'swap':
+        marginRequirement = await this.calculateSwapMargin(contract, marginRules);
+        break;
+      case 'structured_note':
+        marginRequirement = await this.calculateStructuredNoteMargin(contract, marginRules);
+        break;
+      default:
+        throw new Error(`Unsupported contract type: ${contract.type}`);
       }
 
       // Store margin requirement

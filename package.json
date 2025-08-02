@@ -57,6 +57,7 @@
   "homepage": "https://github.com/akramahmed1/quantenergx#readme",
   "devDependencies": {
     "concurrently": "^8.2.0",
+    "eslint-plugin-security": "^3.0.1",
     "husky": "^8.0.3",
     "lint-staged": "^16.1.2",
     "nx": "21.3.9"

@@ -122,7 +122,7 @@ async function runCompleteVerification() {
       securities: 500000,
       commodities: 0
     }, 'US');
-    console.log(`   ✓ Updated trader collateral: $1.5M cash + $500K securities`);
+    console.log('   ✓ Updated trader collateral: $1.5M cash + $500K securities');
 
     // Check margin requirements
     const marginStatus = await marginService.checkMarginRequirements('trader-001', 'US');
@@ -167,7 +167,7 @@ async function runCompleteVerification() {
     console.log(`     Location: ${physicalSettlement.deliveryInstructions.location}`);
 
     // Execute a settlement
-    console.log(`   ✓ Executing cash settlement...`);
+    console.log('   ✓ Executing cash settlement...');
     await settlementService.executeSettlement(cashSettlement.id);
     const updatedSettlement = await settlementService.getSettlementInstruction(cashSettlement.id);
     console.log(`     Settlement Status: ${updatedSettlement.status}`);
@@ -221,18 +221,18 @@ async function runCompleteVerification() {
       volatility: 0.38,
       riskFreeRate: 0.0275
     });
-    console.log(`   ✓ Updated crude oil market data: $78.50, vol: 38%`);
+    console.log('   ✓ Updated crude oil market data: $78.50, vol: 38%');
 
     // Retrieve updated option with new Greeks
     const updatedOption = await derivativesService.getContract(optionContract.id);
-    console.log(`   ✓ Option Greeks updated after market data change`);
+    console.log('   ✓ Option Greeks updated after market data change');
     console.log('');
 
     // Generate summary reports
     console.log('10. Generating summary reports...');
     
     const marginReport = await marginService.getMarginReport('trader-001', 'US');
-    console.log(`   ✓ Margin Report Generated:`);
+    console.log('   ✓ Margin Report Generated:');
     console.log(`     Portfolio Margin: $${marginReport.portfolioMargin.totalInitialMargin.toLocaleString()}`);
     console.log(`     Available Collateral: $${(marginReport.collateral.cash + marginReport.collateral.securities * 0.8).toLocaleString()}`);
     console.log(`     Margin Status: ${marginReport.marginStatus.status}`);

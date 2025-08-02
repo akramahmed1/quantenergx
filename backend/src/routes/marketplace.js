@@ -496,33 +496,33 @@ router.post('/search', async (req, res) => {
 
     // Apply sorting
     switch (sort_by) {
-      case 'rating':
-        results.sort((a, b) => {
-          const pluginA = marketplace.plugins?.get(a.plugin_id);
-          const pluginB = marketplace.plugins?.get(b.plugin_id);
-          return (pluginB?.rating || 0) - (pluginA?.rating || 0);
-        });
-        break;
-      case 'downloads':
-        results.sort((a, b) => {
-          const pluginA = marketplace.plugins?.get(a.plugin_id);
-          const pluginB = marketplace.plugins?.get(b.plugin_id);
-          return (pluginB?.downloads || 0) - (pluginA?.downloads || 0);
-        });
-        break;
-      case 'newest':
-        results.sort((a, b) => b.published_date.getTime() - a.published_date.getTime());
-        break;
-      case 'price_low':
-        results.sort((a, b) => {
-          const pluginA = marketplace.plugins?.get(a.plugin_id);
-          const pluginB = marketplace.plugins?.get(b.plugin_id);
-          return (pluginA?.price || 0) - (pluginB?.price || 0);
-        });
-        break;
-      default: // relevance
-        // Results are already sorted by relevance from search
-        break;
+    case 'rating':
+      results.sort((a, b) => {
+        const pluginA = marketplace.plugins?.get(a.plugin_id);
+        const pluginB = marketplace.plugins?.get(b.plugin_id);
+        return (pluginB?.rating || 0) - (pluginA?.rating || 0);
+      });
+      break;
+    case 'downloads':
+      results.sort((a, b) => {
+        const pluginA = marketplace.plugins?.get(a.plugin_id);
+        const pluginB = marketplace.plugins?.get(b.plugin_id);
+        return (pluginB?.downloads || 0) - (pluginA?.downloads || 0);
+      });
+      break;
+    case 'newest':
+      results.sort((a, b) => b.published_date.getTime() - a.published_date.getTime());
+      break;
+    case 'price_low':
+      results.sort((a, b) => {
+        const pluginA = marketplace.plugins?.get(a.plugin_id);
+        const pluginB = marketplace.plugins?.get(b.plugin_id);
+        return (pluginA?.price || 0) - (pluginB?.price || 0);
+      });
+      break;
+    default: // relevance
+      // Results are already sorted by relevance from search
+      break;
     }
 
     // Apply pagination
