@@ -11,7 +11,7 @@
     "backend": {
       "source": "./backend",
       "build": {
-        "buildCommand": "npm ci",
+        "buildCommand": "npm ci && npm run build",
         "startCommand": "npm start"
       },
       "deploy": {

@@ -68,7 +68,7 @@ jobs:
         working-directory: backend
 
       - name: Run ESLint with security rules
-        run: npx eslint src/ --ext .js --config .eslintrc.security.js
+        run: npx eslint src/ --ext .js --config .eslintrc.security.json
         working-directory: backend
 
       - name: Install and run Semgrep
