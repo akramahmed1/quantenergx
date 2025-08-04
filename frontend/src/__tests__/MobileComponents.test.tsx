@@ -83,6 +83,9 @@ describe('Mobile Components', () => {
 
       await waitFor(() => {
         expect(mockCredentials.create).toHaveBeenCalled();
+      });
+      
+      await waitFor(() => {
         expect(onAuthSuccess).toHaveBeenCalled();
       });
     });
@@ -227,7 +230,7 @@ describe('Mobile Components', () => {
 
 describe('Regional Configuration', () => {
   it('provides correct configuration for different regions', () => {
-    const { getRegionalConfig, isMarketOpen } = require('../i18n/regionalConfig');
+    const { getRegionalConfig, isMarketOpen: _isMarketOpen } = require('../i18n/regionalConfig');
     
     const usConfig = getRegionalConfig('US');
     expect(usConfig.currency).toBe('USD');

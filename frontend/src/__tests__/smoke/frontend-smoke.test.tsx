@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -64,10 +64,10 @@ describe('Frontend Smoke Tests', () => {
     });
 
     test('Router is properly configured', () => {
-      renderWithProviders(<App />);
+      const { container } = renderWithProviders(<App />);
       
       // Should render without router errors
-      expect(document.querySelector('div')).toBeInTheDocument();
+      expect(container).toBeInTheDocument();
     });
   });
 
@@ -162,10 +162,10 @@ describe('Frontend Smoke Tests', () => {
     });
 
     test('routes are accessible without authentication errors', () => {
-      renderWithProviders(<App />);
+      const { container } = renderWithProviders(<App />);
       
       // Should render some content without routing errors
-      expect(document.body.children.length).toBeGreaterThan(0);
+      expect(container).toBeInTheDocument();
     });
   });
 

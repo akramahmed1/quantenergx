@@ -50,39 +50,6 @@ export const OfflineTrading: React.FC<OfflineTradingProps> = ({
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
 
-  useEffect(() => {
-    loadOfflineData();
-    
-    // Set up periodic sync when online
-    if (isOnline && pendingOrders.length > 0) {
-      const syncInterval = setInterval(() => {
-        syncPendingOrders();
-      }, 30000); // Sync every 30 seconds
-
-      return () => clearInterval(syncInterval);
-    }
-  }, [isOnline, pendingOrders.length]); // syncPendingOrders is stable, no need to include
-
-  const loadOfflineData = () => {
-    try {
-      const savedOrders = localStorage.getItem('quantenergx_offline_orders');
-      const savedMode = localStorage.getItem('quantenergx_offline_mode');
-      const savedSyncTime = localStorage.getItem('quantenergx_last_sync');
-
-      if (savedOrders) {
-        setPendingOrders(JSON.parse(savedOrders));
-      }
-      
-      setOfflineMode(savedMode === 'true');
-      
-      if (savedSyncTime) {
-        setLastSyncTime(new Date(savedSyncTime));
-      }
-    } catch (error) {
-      console.error('Failed to load offline data:', error);
-    }
-  };
-
   const saveOfflineData = useCallback((orders: OfflineOrder[]) => {
     try {
       localStorage.setItem('quantenergx_offline_orders', JSON.stringify(orders));
@@ -91,25 +58,7 @@ export const OfflineTrading: React.FC<OfflineTradingProps> = ({
     }
   }, []);
 
-  const toggleOfflineMode = (enabled: boolean) => {
-    setOfflineMode(enabled);
-    localStorage.setItem('quantenergx_offline_mode', enabled.toString());
-  };
-
-  const _addOfflineOrder = (order: Omit<OfflineOrder, 'id' | 'timestamp' | 'status'>) => {
-    const newOrder: OfflineOrder = {
-      ...order,
-      id: `offline_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      timestamp: Date.now(),
-      status: 'pending'
-    };
-
-    const updatedOrders = [...pendingOrders, newOrder];
-    setPendingOrders(updatedOrders);
-    saveOfflineData(updatedOrders);
-  };
-
-  const syncPendingOrders = async () => {
+  const syncPendingOrders = useCallback(async () => {
     if (!isOnline || pendingOrders.length === 0 || isSyncing) {
       return;
     }
@@ -153,6 +102,57 @@ export const OfflineTrading: React.FC<OfflineTradingProps> = ({
     } finally {
       setIsSyncing(false);
     }
+  }, [isOnline, pendingOrders, isSyncing, onSyncOrders, saveOfflineData]);
+
+  useEffect(() => {
+    loadOfflineData();
+    
+    // Set up periodic sync when online
+    if (isOnline && pendingOrders.length > 0) {
+      const syncInterval = setInterval(() => {
+        syncPendingOrders();
+      }, 30000); // Sync every 30 seconds
+
+      return () => clearInterval(syncInterval);
+    }
+  }, [isOnline, pendingOrders.length, syncPendingOrders]);  // Include syncPendingOrders
+
+  const loadOfflineData = () => {
+    try {
+      const savedOrders = localStorage.getItem('quantenergx_offline_orders');
+      const savedMode = localStorage.getItem('quantenergx_offline_mode');
+      const savedSyncTime = localStorage.getItem('quantenergx_last_sync');
+
+      if (savedOrders) {
+        setPendingOrders(JSON.parse(savedOrders));
+      }
+      
+      setOfflineMode(savedMode === 'true');
+      
+      if (savedSyncTime) {
+        setLastSyncTime(new Date(savedSyncTime));
+      }
+    } catch (error) {
+      console.error('Failed to load offline data:', error);
+    }
+  };
+
+  const toggleOfflineMode = (enabled: boolean) => {
+    setOfflineMode(enabled);
+    localStorage.setItem('quantenergx_offline_mode', enabled.toString());
+  };
+
+  const _addOfflineOrder = (order: Omit<OfflineOrder, 'id' | 'timestamp' | 'status'>) => {
+    const newOrder: OfflineOrder = {
+      ...order,
+      id: `offline_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      timestamp: Date.now(),
+      status: 'pending'
+    };
+
+    const updatedOrders = [...pendingOrders, newOrder];
+    setPendingOrders(updatedOrders);
+    saveOfflineData(updatedOrders);
   };
 
   const clearOfflineData = () => {
