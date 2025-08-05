@@ -32,11 +32,11 @@ router.get('/', (req, res) => {
       contracts: 'GET /derivatives/contracts',
       contract_details: 'GET /derivatives/contracts/:contractId',
       market_data: 'GET /derivatives/market-data/:commodity',
-      terminate: 'PUT /derivatives/contracts/:contractId/terminate'
+      terminate: 'PUT /derivatives/contracts/:contractId/terminate',
     },
     serviceStatus: derivativesService ? 'online' : 'offline',
     supportedDerivatives: ['future', 'option', 'swap', 'structured_note'],
-    supportedRegions: ['US', 'EU', 'UK', 'APAC', 'CA']
+    supportedRegions: ['US', 'EU', 'UK', 'APAC', 'CA'],
   });
 });
 
@@ -45,11 +45,24 @@ router.post(
   '/futures',
   authenticateToken,
   [
-    body('underlyingCommodity').isString().notEmpty().withMessage('Underlying commodity is required'),
-    body('notionalAmount').isNumeric().isFloat({ min: 1000 }).withMessage('Notional amount must be at least $1,000'),
+    body('underlyingCommodity')
+      .isString()
+      .notEmpty()
+      .withMessage('Underlying commodity is required'),
+    body('notionalAmount')
+      .isNumeric()
+      .isFloat({ min: 1000 })
+      .withMessage('Notional amount must be at least $1,000'),
     body('deliveryDate').isISO8601().withMessage('Valid delivery date is required'),
-    body('settlementType').optional().isIn(['cash', 'physical']).withMessage('Settlement type must be cash or physical'),
-    body('region').optional().isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code')
+    body('settlementType')
+      .optional()
+      .isIn(['cash', 'physical'])
+      .withMessage('Settlement type must be cash or physical'),
+    body('region')
+      .optional()
+      .isString()
+      .isLength({ min: 2, max: 10 })
+      .withMessage('Invalid region code'),
   ],
   async (req, res) => {
     try {
@@ -59,14 +72,14 @@ router.post(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!derivativesService) {
         return res.status(503).json({
           success: false,
-          error: 'Derivatives service unavailable'
+          error: 'Derivatives service unavailable',
         });
       }
 
@@ -75,7 +88,7 @@ router.post(
         notionalAmount,
         deliveryDate,
         settlementType = 'cash',
-        region = 'US'
+        region = 'US',
       } = req.body;
 
       const contract = await derivativesService.createFutureContract({
@@ -84,20 +97,19 @@ router.post(
         deliveryDate,
         settlementType,
         region,
-        userId: req.user.id
+        userId: req.user.id,
       });
 
       res.status(201).json({
         success: true,
         data: contract,
-        message: 'Future contract created successfully'
+        message: 'Future contract created successfully',
       });
-
     } catch (error) {
       console.error('Future contract creation error:', error);
       res.status(400).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -108,13 +120,29 @@ router.post(
   '/options',
   authenticateToken,
   [
-    body('underlyingCommodity').isString().notEmpty().withMessage('Underlying commodity is required'),
-    body('notionalAmount').isNumeric().isFloat({ min: 1000 }).withMessage('Notional amount must be at least $1,000'),
+    body('underlyingCommodity')
+      .isString()
+      .notEmpty()
+      .withMessage('Underlying commodity is required'),
+    body('notionalAmount')
+      .isNumeric()
+      .isFloat({ min: 1000 })
+      .withMessage('Notional amount must be at least $1,000'),
     body('optionType').isIn(['call', 'put']).withMessage('Option type must be call or put'),
-    body('strikePrice').isNumeric().isFloat({ min: 0 }).withMessage('Strike price must be positive'),
+    body('strikePrice')
+      .isNumeric()
+      .isFloat({ min: 0 })
+      .withMessage('Strike price must be positive'),
     body('expirationDate').isISO8601().withMessage('Valid expiration date is required'),
-    body('exerciseStyle').optional().isIn(['american', 'european', 'bermudan']).withMessage('Invalid exercise style'),
-    body('region').optional().isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code')
+    body('exerciseStyle')
+      .optional()
+      .isIn(['american', 'european', 'bermudan'])
+      .withMessage('Invalid exercise style'),
+    body('region')
+      .optional()
+      .isString()
+      .isLength({ min: 2, max: 10 })
+      .withMessage('Invalid region code'),
   ],
   async (req, res) => {
     try {
@@ -123,14 +151,14 @@ router.post(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!derivativesService) {
         return res.status(503).json({
           success: false,
-          error: 'Derivatives service unavailable'
+          error: 'Derivatives service unavailable',
         });
       }
 
@@ -141,7 +169,7 @@ router.post(
         strikePrice,
         expirationDate,
         exerciseStyle = 'european',
-        region = 'US'
+        region = 'US',
       } = req.body;
 
       const contract = await derivativesService.createOptionContract({
@@ -152,20 +180,19 @@ router.post(
         expirationDate,
         exerciseStyle,
         region,
-        userId: req.user.id
+        userId: req.user.id,
       });
 
       res.status(201).json({
         success: true,
         data: contract,
-        message: 'Option contract created successfully'
+        message: 'Option contract created successfully',
       });
-
     } catch (error) {
       console.error('Option contract creation error:', error);
       res.status(400).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -176,14 +203,32 @@ router.post(
   '/swaps',
   authenticateToken,
   [
-    body('underlyingCommodity').isString().notEmpty().withMessage('Underlying commodity is required'),
-    body('notionalAmount').isNumeric().isFloat({ min: 1000 }).withMessage('Notional amount must be at least $1,000'),
-    body('swapType').isIn(['commodity_swap', 'basis_swap', 'calendar_swap']).withMessage('Invalid swap type'),
+    body('underlyingCommodity')
+      .isString()
+      .notEmpty()
+      .withMessage('Underlying commodity is required'),
+    body('notionalAmount')
+      .isNumeric()
+      .isFloat({ min: 1000 })
+      .withMessage('Notional amount must be at least $1,000'),
+    body('swapType')
+      .isIn(['commodity_swap', 'basis_swap', 'calendar_swap'])
+      .withMessage('Invalid swap type'),
     body('fixedRate').optional().isNumeric().withMessage('Fixed rate must be numeric'),
-    body('floatingRateIndex').optional().isString().withMessage('Floating rate index must be a string'),
-    body('paymentFrequency').optional().isIn(['monthly', 'quarterly', 'semi-annual', 'annual']).withMessage('Invalid payment frequency'),
+    body('floatingRateIndex')
+      .optional()
+      .isString()
+      .withMessage('Floating rate index must be a string'),
+    body('paymentFrequency')
+      .optional()
+      .isIn(['monthly', 'quarterly', 'semi-annual', 'annual'])
+      .withMessage('Invalid payment frequency'),
     body('maturityDate').isISO8601().withMessage('Valid maturity date is required'),
-    body('region').optional().isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code')
+    body('region')
+      .optional()
+      .isString()
+      .isLength({ min: 2, max: 10 })
+      .withMessage('Invalid region code'),
   ],
   async (req, res) => {
     try {
@@ -192,14 +237,14 @@ router.post(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!derivativesService) {
         return res.status(503).json({
           success: false,
-          error: 'Derivatives service unavailable'
+          error: 'Derivatives service unavailable',
         });
       }
 
@@ -211,7 +256,7 @@ router.post(
         floatingRateIndex,
         paymentFrequency = 'quarterly',
         maturityDate,
-        region = 'US'
+        region = 'US',
       } = req.body;
 
       const contract = await derivativesService.createSwapContract({
@@ -223,20 +268,19 @@ router.post(
         paymentFrequency,
         maturityDate,
         region,
-        userId: req.user.id
+        userId: req.user.id,
       });
 
       res.status(201).json({
         success: true,
         data: contract,
-        message: 'Swap contract created successfully'
+        message: 'Swap contract created successfully',
       });
-
     } catch (error) {
       console.error('Swap contract creation error:', error);
       res.status(400).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -247,13 +291,29 @@ router.post(
   '/structured-notes',
   authenticateToken,
   [
-    body('underlyingCommodity').isString().notEmpty().withMessage('Underlying commodity is required'),
-    body('notionalAmount').isNumeric().isFloat({ min: 1000 }).withMessage('Notional amount must be at least $1,000'),
-    body('noteType').isIn(['autocall', 'barrier_note', 'range_accrual']).withMessage('Invalid note type'),
-    body('principalProtection').optional().isNumeric().isFloat({ min: 0, max: 100 }).withMessage('Principal protection must be between 0-100%'),
+    body('underlyingCommodity')
+      .isString()
+      .notEmpty()
+      .withMessage('Underlying commodity is required'),
+    body('notionalAmount')
+      .isNumeric()
+      .isFloat({ min: 1000 })
+      .withMessage('Notional amount must be at least $1,000'),
+    body('noteType')
+      .isIn(['autocall', 'barrier_note', 'range_accrual'])
+      .withMessage('Invalid note type'),
+    body('principalProtection')
+      .optional()
+      .isNumeric()
+      .isFloat({ min: 0, max: 100 })
+      .withMessage('Principal protection must be between 0-100%'),
     body('maturityDate').isISO8601().withMessage('Valid maturity date is required'),
     body('payoffStructure').isObject().withMessage('Payoff structure is required'),
-    body('region').optional().isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code')
+    body('region')
+      .optional()
+      .isString()
+      .isLength({ min: 2, max: 10 })
+      .withMessage('Invalid region code'),
   ],
   async (req, res) => {
     try {
@@ -262,14 +322,14 @@ router.post(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!derivativesService) {
         return res.status(503).json({
           success: false,
-          error: 'Derivatives service unavailable'
+          error: 'Derivatives service unavailable',
         });
       }
 
@@ -280,7 +340,7 @@ router.post(
         principalProtection = 100,
         maturityDate,
         payoffStructure,
-        region = 'US'
+        region = 'US',
       } = req.body;
 
       const contract = await derivativesService.createStructuredNote({
@@ -291,20 +351,19 @@ router.post(
         maturityDate,
         payoffStructure,
         region,
-        userId: req.user.id
+        userId: req.user.id,
       });
 
       res.status(201).json({
         success: true,
         data: contract,
-        message: 'Structured note created successfully'
+        message: 'Structured note created successfully',
       });
-
     } catch (error) {
       console.error('Structured note creation error:', error);
       res.status(400).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -315,11 +374,24 @@ router.get(
   '/contracts',
   authenticateToken,
   [
-    query('region').optional().isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code'),
-    query('type').optional().isIn(['future', 'option', 'swap', 'structured_note']).withMessage('Invalid contract type'),
-    query('status').optional().isIn(['active', 'expired', 'terminated', 'settled']).withMessage('Invalid status'),
+    query('region')
+      .optional()
+      .isString()
+      .isLength({ min: 2, max: 10 })
+      .withMessage('Invalid region code'),
+    query('type')
+      .optional()
+      .isIn(['future', 'option', 'swap', 'structured_note'])
+      .withMessage('Invalid contract type'),
+    query('status')
+      .optional()
+      .isIn(['active', 'expired', 'terminated', 'settled'])
+      .withMessage('Invalid status'),
     query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
-    query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100')
+    query('limit')
+      .optional()
+      .isInt({ min: 1, max: 100 })
+      .withMessage('Limit must be between 1 and 100'),
   ],
   async (req, res) => {
     try {
@@ -328,14 +400,14 @@ router.get(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!derivativesService) {
         return res.status(503).json({
           success: false,
-          error: 'Derivatives service unavailable'
+          error: 'Derivatives service unavailable',
         });
       }
 
@@ -364,16 +436,15 @@ router.get(
             page: parseInt(page),
             limit: parseInt(limit),
             total: contracts.length,
-            hasMore: endIndex < contracts.length
-          }
-        }
+            hasMore: endIndex < contracts.length,
+          },
+        },
       });
-
     } catch (error) {
       console.error('Get contracts error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -383,9 +454,7 @@ router.get(
 router.get(
   '/contracts/:contractId',
   authenticateToken,
-  [
-    param('contractId').isUUID().withMessage('Invalid contract ID')
-  ],
+  [param('contractId').isUUID().withMessage('Invalid contract ID')],
   async (req, res) => {
     try {
       const errors = validationResult(req);
@@ -393,14 +462,14 @@ router.get(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!derivativesService) {
         return res.status(503).json({
           success: false,
-          error: 'Derivatives service unavailable'
+          error: 'Derivatives service unavailable',
         });
       }
 
@@ -410,22 +479,21 @@ router.get(
       if (!contract) {
         return res.status(404).json({
           success: false,
-          error: 'Contract not found'
+          error: 'Contract not found',
         });
       }
 
       // In production, verify user ownership
-      
+
       res.json({
         success: true,
-        data: contract
+        data: contract,
       });
-
     } catch (error) {
       console.error('Get contract details error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -437,7 +505,7 @@ router.put(
   authenticateToken,
   [
     param('contractId').isUUID().withMessage('Invalid contract ID'),
-    body('reason').optional().isString().withMessage('Reason must be a string')
+    body('reason').optional().isString().withMessage('Reason must be a string'),
   ],
   async (req, res) => {
     try {
@@ -446,14 +514,14 @@ router.put(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!derivativesService) {
         return res.status(503).json({
           success: false,
-          error: 'Derivatives service unavailable'
+          error: 'Derivatives service unavailable',
         });
       }
 
@@ -465,14 +533,13 @@ router.put(
       res.json({
         success: true,
         data: contract,
-        message: 'Contract terminated successfully'
+        message: 'Contract terminated successfully',
       });
-
     } catch (error) {
       console.error('Contract termination error:', error);
       res.status(400).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -484,7 +551,11 @@ router.get(
   authenticateToken,
   [
     param('commodity').isString().notEmpty().withMessage('Commodity is required'),
-    query('region').optional().isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code')
+    query('region')
+      .optional()
+      .isString()
+      .isLength({ min: 2, max: 10 })
+      .withMessage('Invalid region code'),
   ],
   async (req, res) => {
     try {
@@ -493,14 +564,14 @@ router.get(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!derivativesService) {
         return res.status(503).json({
           success: false,
-          error: 'Derivatives service unavailable'
+          error: 'Derivatives service unavailable',
         });
       }
 
@@ -513,7 +584,7 @@ router.get(
       if (!marketData) {
         return res.status(404).json({
           success: false,
-          error: 'Market data not found for commodity'
+          error: 'Market data not found for commodity',
         });
       }
 
@@ -528,20 +599,19 @@ router.get(
         derivatives: {
           impliedVolatility: marketData.volatility * (0.9 + Math.random() * 0.2),
           openInterest: Math.floor(Math.random() * 10000),
-          averageVolume: Math.floor(Math.random() * 5000)
-        }
+          averageVolume: Math.floor(Math.random() * 5000),
+        },
       };
 
       res.json({
         success: true,
-        data: derivativeMarketData
+        data: derivativeMarketData,
       });
-
     } catch (error) {
       console.error('Get market data error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -554,8 +624,16 @@ router.put(
   [
     param('commodity').isString().notEmpty().withMessage('Commodity is required'),
     body('spot').optional().isNumeric().withMessage('Spot price must be numeric'),
-    body('volatility').optional().isNumeric().isFloat({ min: 0, max: 2 }).withMessage('Volatility must be between 0 and 2'),
-    body('riskFreeRate').optional().isNumeric().isFloat({ min: 0, max: 1 }).withMessage('Risk-free rate must be between 0 and 1')
+    body('volatility')
+      .optional()
+      .isNumeric()
+      .isFloat({ min: 0, max: 2 })
+      .withMessage('Volatility must be between 0 and 2'),
+    body('riskFreeRate')
+      .optional()
+      .isNumeric()
+      .isFloat({ min: 0, max: 1 })
+      .withMessage('Risk-free rate must be between 0 and 1'),
   ],
   async (req, res) => {
     try {
@@ -564,14 +642,14 @@ router.put(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!derivativesService) {
         return res.status(503).json({
           success: false,
-          error: 'Derivatives service unavailable'
+          error: 'Derivatives service unavailable',
         });
       }
 
@@ -579,7 +657,7 @@ router.put(
       if (req.user.role !== 'admin') {
         return res.status(403).json({
           success: false,
-          error: 'Insufficient permissions'
+          error: 'Insufficient permissions',
         });
       }
 
@@ -591,14 +669,13 @@ router.put(
       res.json({
         success: true,
         message: 'Market data updated successfully',
-        data: { commodity, updates: marketDataUpdate }
+        data: { commodity, updates: marketDataUpdate },
       });
-
     } catch (error) {
       console.error('Update market data error:', error);
       res.status(400).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -610,7 +687,7 @@ router.use((error, req, res, next) => {
   res.status(500).json({
     success: false,
     error: 'Internal server error',
-    message: 'An unexpected error occurred in the derivatives service'
+    message: 'An unexpected error occurred in the derivatives service',
   });
 });
 

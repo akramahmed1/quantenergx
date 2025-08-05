@@ -33,16 +33,16 @@ class NotificationService {
   async sendNotification(channel, recipient, message, options = {}) {
     try {
       switch (channel) {
-      case 'telegram':
-        return await this.sendTelegramMessage(recipient, message, options);
-      case 'whatsapp':
-        return await this.sendWhatsAppMessage(recipient, message, options);
-      case 'email':
-        return await this.sendEmailNotification(recipient, message, options);
-      case 'sms':
-        return await this.sendSMSNotification(recipient, message, options);
-      default:
-        throw new Error(`Unsupported notification channel: ${channel}`);
+        case 'telegram':
+          return await this.sendTelegramMessage(recipient, message, options);
+        case 'whatsapp':
+          return await this.sendWhatsAppMessage(recipient, message, options);
+        case 'email':
+          return await this.sendEmailNotification(recipient, message, options);
+        case 'sms':
+          return await this.sendSMSNotification(recipient, message, options);
+        default:
+          throw new Error(`Unsupported notification channel: ${channel}`);
       }
     } catch (error) {
       console.error(`Notification failed for channel ${channel}:`, error);
@@ -171,17 +171,17 @@ class NotificationService {
       let result;
 
       switch (this.emailConfig.provider) {
-      case 'sendgrid':
-        result = await this._sendEmailViaSendGrid(email, subject, message, html, attachments);
-        break;
-      case 'ses':
-        result = await this._sendEmailViaSES(email, subject, message, html, attachments);
-        break;
-      case 'mailgun':
-        result = await this._sendEmailViaMailgun(email, subject, message, html, attachments);
-        break;
-      default:
-        throw new Error(`Unsupported email provider: ${this.emailConfig.provider}`);
+        case 'sendgrid':
+          result = await this._sendEmailViaSendGrid(email, subject, message, html, attachments);
+          break;
+        case 'ses':
+          result = await this._sendEmailViaSES(email, subject, message, html, attachments);
+          break;
+        case 'mailgun':
+          result = await this._sendEmailViaMailgun(email, subject, message, html, attachments);
+          break;
+        default:
+          throw new Error(`Unsupported email provider: ${this.emailConfig.provider}`);
       }
 
       return {
@@ -278,17 +278,17 @@ class NotificationService {
       let result;
 
       switch (this.smsConfig.provider) {
-      case 'twilio':
-        result = await this._sendSMSViaTwilio(phoneNumber, message, options);
-        break;
-      case 'aws-sns':
-        result = await this._sendSMSViaSNS(phoneNumber, message, options);
-        break;
-      case 'vonage':
-        result = await this._sendSMSViaVonage(phoneNumber, message, options);
-        break;
-      default:
-        throw new Error(`Unsupported SMS provider: ${this.smsConfig.provider}`);
+        case 'twilio':
+          result = await this._sendSMSViaTwilio(phoneNumber, message, options);
+          break;
+        case 'aws-sns':
+          result = await this._sendSMSViaSNS(phoneNumber, message, options);
+          break;
+        case 'vonage':
+          result = await this._sendSMSViaVonage(phoneNumber, message, options);
+          break;
+        default:
+          throw new Error(`Unsupported SMS provider: ${this.smsConfig.provider}`);
       }
 
       return {
@@ -555,16 +555,16 @@ Please review and approve in QuantEnergx platform.`;
 
   getRecipientForChannel(channel, userPreferences) {
     switch (channel) {
-    case 'email':
-      return userPreferences.email;
-    case 'sms':
-      return userPreferences.phone;
-    case 'telegram':
-      return userPreferences.telegramChatId;
-    case 'whatsapp':
-      return userPreferences.whatsappPhone;
-    default:
-      return null;
+      case 'email':
+        return userPreferences.email;
+      case 'sms':
+        return userPreferences.phone;
+      case 'telegram':
+        return userPreferences.telegramChatId;
+      case 'whatsapp':
+        return userPreferences.whatsappPhone;
+      default:
+        return null;
     }
   }
 

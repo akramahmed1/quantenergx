@@ -32,9 +32,9 @@ const server = createServer(app);
 // Initialize Socket.IO for real-time communication
 const io = new SocketIOServer(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    methods: ["GET", "POST"]
-  }
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+  },
 });
 
 // Configure logger
@@ -77,7 +77,9 @@ async function initializeServices(): Promise<void> {
         await kafkaService.initialize();
         logger.info('Kafka service initialized');
       } catch (error) {
-        logger.warn('Failed to initialize Kafka service, continuing without it', { error: error instanceof Error ? error.message : String(error) });
+        logger.warn('Failed to initialize Kafka service, continuing without it', {
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
     } else {
       logger.info('Kafka service disabled for this environment');
@@ -104,7 +106,6 @@ async function initializeServices(): Promise<void> {
     } catch (error) {
       logger.warn('gRPC service not available, continuing without it');
     }
-
   } catch (error) {
     logger.error('Failed to initialize services:', error);
     // Don't throw error to allow server to start without Kafka in development
@@ -131,14 +132,14 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: ['\'self\''],
-        styleSrc: ['\'self\'', '\'unsafe-inline\'', 'https://fonts.googleapis.com'],
-        fontSrc: ['\'self\'', 'https://fonts.gstatic.com'],
-        imgSrc: ['\'self\'', 'data:', 'https:'],
-        scriptSrc: ['\'self\'', '\'unsafe-inline\''],
-        connectSrc: ['\'self\''],
-        frameSrc: ['\'none\''],
-        objectSrc: ['\'none\''],
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        connectSrc: ["'self'"],
+        frameSrc: ["'none'"],
+        objectSrc: ["'none'"],
         upgradeInsecureRequests: [],
       },
     },
@@ -167,8 +168,8 @@ const swaggerUiOptions = {
     filter: true,
     showExtensions: true,
     showCommonExtensions: true,
-    tryItOutEnabled: true
-  }
+    tryItOutEnabled: true,
+  },
 };
 
 // Load OpenAPI spec from YAML
@@ -257,7 +258,12 @@ app.use(
 
 // Handle JSON parsing errors
 app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
-  if (err instanceof SyntaxError && 'status' in err && (err as any).status === 400 && 'body' in err) {
+  if (
+    err instanceof SyntaxError &&
+    'status' in err &&
+    (err as any).status === 400 &&
+    'body' in err
+  ) {
     res.status(400).json({ error: 'Invalid JSON' });
     return;
   }
@@ -381,13 +387,13 @@ app.get('/api/v1/websocket/stats', (req: Request, res: Response): void => {
     res.json({
       success: true,
       data: websocketService.getStats(),
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   } else {
     res.status(503).json({
       success: false,
       error: 'WebSocket service not available',
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   }
 });
@@ -423,13 +429,13 @@ app.get('/api/v1/plugins', (req: Request, res: Response): void => {
     res.json({
       success: true,
       data: pluginManager.listPlugins(),
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   } else {
     res.status(503).json({
       success: false,
       error: 'Plugin manager not available',
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   }
 });
@@ -491,7 +497,7 @@ app.post('/api/v1/plugins/:name/execute', async (req: Request, res: Response): P
     res.status(503).json({
       success: false,
       error: 'Plugin manager not available',
-      timestamp: new Date()
+      timestamp: new Date(),
     });
     return;
   }
@@ -499,20 +505,20 @@ app.post('/api/v1/plugins/:name/execute', async (req: Request, res: Response): P
   try {
     const { name } = req.params;
     const input = req.body;
-    
+
     const result = await pluginManager.executePlugin(name, input);
-    
+
     res.json({
       success: true,
       data: result,
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   } catch (error) {
     logger.error(`Plugin execution error:`, error);
     res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Plugin execution failed',
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   }
 });
@@ -578,7 +584,7 @@ app.post('/api/v1/webhooks/:type', async (req: Request, res: Response): Promise<
     res.status(503).json({
       success: false,
       error: 'Webhook manager not available',
-      timestamp: new Date()
+      timestamp: new Date(),
     });
     return;
   }
@@ -592,21 +598,21 @@ app.post('/api/v1/webhooks/:type', async (req: Request, res: Response): Promise<
       source: req.body.source || 'unknown',
       data: req.body,
       timestamp: new Date(),
-      signature
+      signature,
     };
 
     const result = await webhookManager.processWebhook(type, payload, signature);
-    
+
     res.json({
       ...result,
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   } catch (error) {
     logger.error(`Webhook processing error:`, error);
     res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Webhook processing failed',
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   }
 });
@@ -645,15 +651,15 @@ app.get('/api/v1/webhooks', (req: Request, res: Response): void => {
     res.json({
       success: true,
       data: {
-        registeredTypes: webhookManager.getRegisteredTypes()
+        registeredTypes: webhookManager.getRegisteredTypes(),
       },
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   } else {
     res.status(503).json({
       success: false,
       error: 'Webhook manager not available',
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   }
 });
@@ -683,20 +689,20 @@ app.use('*', (req: Request, res: Response): void => {
 // Graceful shutdown handler
 async function gracefulShutdown(): Promise<void> {
   logger.info('SIGINT received, shutting down gracefully');
-  
+
   try {
     if (pluginManager) {
       await pluginManager.shutdown();
     }
-    
+
     if (kafkaService) {
       await kafkaService.shutdown();
     }
-    
+
     if (grpcService) {
       grpcService.stop();
     }
-    
+
     server.close(() => {
       logger.info('Server closed');
       process.exit(0);
@@ -709,29 +715,31 @@ async function gracefulShutdown(): Promise<void> {
 
 // Start servers only if not in test mode
 if (process.env.NODE_ENV !== 'test') {
-  initializeServices().then(() => {
-    server.listen(PORT, () => {
-      logger.info(`QuantEnergx Backend Server running on port ${PORT}`);
-      logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
-      logger.info('Real-time trading infrastructure enabled:');
-      logger.info('  ✓ WebSocket server for real-time communication');
-      logger.info('  ✓ Kafka integration for message streaming');
-      logger.info('  ✓ Webhook support for third-party integrations');
-      logger.info('  ✓ Modular plugin architecture');
+  initializeServices()
+    .then(() => {
+      server.listen(PORT, () => {
+        logger.info(`QuantEnergx Backend Server running on port ${PORT}`);
+        logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+        logger.info('Real-time trading infrastructure enabled:');
+        logger.info('  ✓ WebSocket server for real-time communication');
+        logger.info('  ✓ Kafka integration for message streaming');
+        logger.info('  ✓ Webhook support for third-party integrations');
+        logger.info('  ✓ Modular plugin architecture');
+      });
+
+      // Start gRPC service if available
+      if (grpcService) {
+        grpcService.start(GRPC_PORT);
+        logger.info(`QuantEnergx gRPC Service running on port ${GRPC_PORT}`);
+      }
+
+      process.on('SIGINT', gracefulShutdown);
+      process.on('SIGTERM', gracefulShutdown);
+    })
+    .catch(error => {
+      logger.error('Failed to start server:', error);
+      process.exit(1);
     });
-
-    // Start gRPC service if available
-    if (grpcService) {
-      grpcService.start(GRPC_PORT);
-      logger.info(`QuantEnergx gRPC Service running on port ${GRPC_PORT}`);
-    }
-
-    process.on('SIGINT', gracefulShutdown);
-    process.on('SIGTERM', gracefulShutdown);
-  }).catch((error) => {
-    logger.error('Failed to start server:', error);
-    process.exit(1);
-  });
 }
 
 // Export both app and io for testing and external use

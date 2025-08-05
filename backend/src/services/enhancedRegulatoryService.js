@@ -18,7 +18,7 @@ class EnhancedRegulatoryService {
           'transaction_reporting',
           'position_reporting',
           'market_surveillance',
-          'investor_protection'
+          'investor_protection',
         ],
         exportFormats: ['XML', 'XBRL'],
         reportingDeadline: 'T+1',
@@ -30,7 +30,7 @@ class EnhancedRegulatoryService {
           'fundamental_data',
           'inside_information',
           'transaction_reporting',
-          'order_data'
+          'order_data',
         ],
         exportFormats: ['XML', 'CSV'],
         reportingDeadline: 'T+1',
@@ -42,7 +42,7 @@ class EnhancedRegulatoryService {
           'derivatives_reporting',
           'clearing_obligations',
           'risk_mitigation',
-          'position_reporting'
+          'position_reporting',
         ],
         exportFormats: ['XML', 'XBRL'],
         reportingDeadline: 'T+1',
@@ -54,7 +54,7 @@ class EnhancedRegulatoryService {
           'suspicious_transactions',
           'insider_dealing',
           'market_manipulation',
-          'disclosure_requirements'
+          'disclosure_requirements',
         ],
         exportFormats: ['XML', 'CSV'],
         reportingDeadline: 'immediate',
@@ -68,7 +68,7 @@ class EnhancedRegulatoryService {
           'swap_data_reporting',
           'volcker_rule',
           'systemically_important',
-          'derivatives_oversight'
+          'derivatives_oversight',
         ],
         exportFormats: ['XML', 'CSV'],
         reportingDeadline: 'T+1',
@@ -80,7 +80,7 @@ class EnhancedRegulatoryService {
           'large_trader_reporting',
           'position_limits',
           'swap_execution',
-          'margin_requirements'
+          'margin_requirements',
         ],
         exportFormats: ['XML', 'CSV'],
         reportingDeadline: 'T+1',
@@ -92,7 +92,7 @@ class EnhancedRegulatoryService {
           'securities_reporting',
           'insider_trading',
           'market_making',
-          'customer_protection'
+          'customer_protection',
         ],
         exportFormats: ['XML', 'XBRL'],
         reportingDeadline: 'T+1',
@@ -106,7 +106,7 @@ class EnhancedRegulatoryService {
           'transaction_reporting',
           'conduct_of_business',
           'market_conduct',
-          'prudential_requirements'
+          'prudential_requirements',
         ],
         exportFormats: ['XML', 'CSV'],
         reportingDeadline: 'T+1',
@@ -120,7 +120,7 @@ class EnhancedRegulatoryService {
           'energy_transactions',
           'local_content',
           'environmental_compliance',
-          'revenue_transparency'
+          'revenue_transparency',
         ],
         exportFormats: ['CSV', 'XML'],
         reportingDeadline: 'T+2',
@@ -149,11 +149,11 @@ class EnhancedRegulatoryService {
           'buy_sell_indicator',
           'client_identification',
           'investment_decision_maker',
-          'execution_decision_maker'
+          'execution_decision_maker',
         ],
         format: 'XML',
-        schema: 'ESMA_MiFID_II_v2.0.xsd'
-      }
+        schema: 'ESMA_MiFID_II_v2.0.xsd',
+      },
     });
 
     // REMIT Fundamental Data Template
@@ -167,11 +167,11 @@ class EnhancedRegulatoryService {
           'capacity',
           'unavailable_capacity',
           'scheduled_consumption',
-          'day_ahead_price'
+          'day_ahead_price',
         ],
         format: 'XML',
-        schema: 'ACER_REMIT_v3.0.xsd'
-      }
+        schema: 'ACER_REMIT_v3.0.xsd',
+      },
     });
 
     // Dodd-Frank Swap Data Reporting Template
@@ -186,11 +186,11 @@ class EnhancedRegulatoryService {
           'transaction_type',
           'reference_data',
           'counterparty_data',
-          'collateral_data'
+          'collateral_data',
         ],
         format: 'XML',
-        schema: 'CFTC_SDR_v1.0.xsd'
-      }
+        schema: 'CFTC_SDR_v1.0.xsd',
+      },
     });
 
     // CFTC Large Trader Reporting Template
@@ -204,11 +204,11 @@ class EnhancedRegulatoryService {
           'long_positions',
           'short_positions',
           'position_delta',
-          'trading_venue'
+          'trading_venue',
         ],
         format: 'CSV',
-        headers: true
-      }
+        headers: true,
+      },
     });
 
     // Guyana Local Reporting Template
@@ -223,11 +223,11 @@ class EnhancedRegulatoryService {
           'total_value',
           'local_content_percentage',
           'environmental_impact_score',
-          'revenue_transparency_data'
+          'revenue_transparency_data',
         ],
         format: 'CSV',
-        headers: true
-      }
+        headers: true,
+      },
     });
 
     // Add template for SEC regulation
@@ -241,11 +241,11 @@ class EnhancedRegulatoryService {
           'currency',
           'transaction_time',
           'buy_sell_indicator',
-          'client_identification'
+          'client_identification',
         ],
         format: 'XML',
-        schema: 'SEC_v1.0.xsd'
-      }
+        schema: 'SEC_v1.0.xsd',
+      },
     });
   }
 
@@ -255,12 +255,12 @@ class EnhancedRegulatoryService {
   async performRegulatoryCheck(transactionData, exchangeId) {
     const checkId = uuidv4();
     const timestamp = new Date().toISOString();
-    
+
     // Get applicable regulations based on exchange
     const applicableRegulations = this.getApplicableRegulations(exchangeId);
-    
+
     const complianceResults = [];
-    
+
     for (const regulation of applicableRegulations) {
       try {
         const result = await this.checkRegulationCompliance(
@@ -275,7 +275,7 @@ class EnhancedRegulatoryService {
           regulation,
           compliant: false,
           error: error.message,
-          severity: 'high'
+          severity: 'high',
         });
       }
     }
@@ -307,21 +307,17 @@ class EnhancedRegulatoryService {
     for (const regulation of regulations) {
       if (this.regulatoryFrameworks[regulation]) {
         const framework = this.regulatoryFrameworks[regulation];
-        
+
         // Check if export format is supported
         if (!framework.exportFormats.includes(exportFormat)) {
           throw new Error(
             `Export format ${exportFormat} not supported for ${regulation}. ` +
-            `Supported formats: ${framework.exportFormats.join(', ')}`
+              `Supported formats: ${framework.exportFormats.join(', ')}`
           );
         }
 
-        const report = await this.generateSingleReport(
-          regulation,
-          transactionData,
-          exportFormat
-        );
-        
+        const report = await this.generateSingleReport(regulation, transactionData, exportFormat);
+
         reports.push({
           regulation,
           reportId: `${reportId}_${regulation}`,
@@ -350,37 +346,40 @@ class EnhancedRegulatoryService {
   async generateSingleReport(regulation, transactionData, exportFormat) {
     const template = this.reportingTemplates.get(regulation);
     const framework = this.regulatoryFrameworks[regulation];
-    
+
     if (!template) {
       throw new Error(`No template found for regulation: ${regulation}`);
     }
 
     const reportData = this.extractReportData(transactionData, template);
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    
+
     let content, filename, schema;
 
     switch (exportFormat) {
-    case 'XML':
-      content = this.generateXMLReport(reportData, regulation, template);
-      filename = `${regulation}_${timestamp}.xml`;
-      schema = template.transactionReport?.schema || template.fundamentalData?.schema || template.swapDataReport?.schema;
-      break;
-        
-    case 'XBRL':
-      content = this.generateXBRLReport(reportData, regulation, template);
-      filename = `${regulation}_${timestamp}.xbrl`;
-      schema = `${regulation}_taxonomy.xsd`;
-      break;
-        
-    case 'CSV':
-      content = this.generateCSVReport(reportData, regulation, template);
-      filename = `${regulation}_${timestamp}.csv`;
-      schema = null;
-      break;
-        
-    default:
-      throw new Error(`Unsupported export format: ${exportFormat}`);
+      case 'XML':
+        content = this.generateXMLReport(reportData, regulation, template);
+        filename = `${regulation}_${timestamp}.xml`;
+        schema =
+          template.transactionReport?.schema ||
+          template.fundamentalData?.schema ||
+          template.swapDataReport?.schema;
+        break;
+
+      case 'XBRL':
+        content = this.generateXBRLReport(reportData, regulation, template);
+        filename = `${regulation}_${timestamp}.xbrl`;
+        schema = `${regulation}_taxonomy.xsd`;
+        break;
+
+      case 'CSV':
+        content = this.generateCSVReport(reportData, regulation, template);
+        filename = `${regulation}_${timestamp}.csv`;
+        schema = null;
+        break;
+
+      default:
+        throw new Error(`Unsupported export format: ${exportFormat}`);
     }
 
     return { content, filename, schema };
@@ -393,13 +392,13 @@ class EnhancedRegulatoryService {
     try {
       // Create output directory if it doesn't exist
       await fs.mkdir(outputDirectory, { recursive: true });
-      
+
       const exportedFiles = [];
-      
+
       for (const report of reports) {
         const filePath = path.join(outputDirectory, report.filename);
         await fs.writeFile(filePath, report.content, 'utf8');
-        
+
         exportedFiles.push({
           regulation: report.regulation,
           filename: report.filename,
@@ -408,7 +407,7 @@ class EnhancedRegulatoryService {
           exportedAt: new Date().toISOString(),
         });
       }
-      
+
       return {
         success: true,
         exportedFiles,
@@ -444,20 +443,16 @@ class EnhancedRegulatoryService {
    */
   async checkRegulationCompliance(regulation, transactionData, exchangeId) {
     const framework = this.regulatoryFrameworks[regulation];
-    
+
     if (!framework) {
       throw new Error(`Unknown regulation: ${regulation}`);
     }
 
     const checks = [];
-    
+
     // Check reporting requirements
     for (const requirement of framework.reportingRequirements) {
-      const check = await this.checkSpecificRequirement(
-        requirement,
-        transactionData,
-        regulation
-      );
+      const check = await this.checkSpecificRequirement(requirement, transactionData, regulation);
       checks.push(check);
     }
 
@@ -484,26 +479,27 @@ class EnhancedRegulatoryService {
       // Transaction reporting checks
       transaction_reporting: () => this.checkTransactionReporting(transactionData, regulation),
       position_reporting: () => this.checkPositionReporting(transactionData, regulation),
-      
+
       // Market surveillance checks
       market_surveillance: () => this.checkMarketSurveillance(transactionData, regulation),
       suspicious_transactions: () => this.checkSuspiciousTransactions(transactionData, regulation),
-      
+
       // Data reporting checks
       fundamental_data: () => this.checkFundamentalData(transactionData, regulation),
       order_data: () => this.checkOrderData(transactionData, regulation),
-      
+
       // Compliance checks
       position_limits: () => this.checkPositionLimits(transactionData, regulation),
       margin_requirements: () => this.checkMarginRequirements(transactionData, regulation),
-      
+
       // Specific regulatory checks
       local_content: () => this.checkLocalContent(transactionData, regulation),
-      environmental_compliance: () => this.checkEnvironmentalCompliance(transactionData, regulation),
+      environmental_compliance: () =>
+        this.checkEnvironmentalCompliance(transactionData, regulation),
     };
 
     const checkFunction = checks[requirement];
-    
+
     if (!checkFunction) {
       return {
         requirement,
@@ -529,13 +525,14 @@ class EnhancedRegulatoryService {
   async checkTransactionReporting(transactionData, regulation) {
     const requiredFields = this.getRequiredFields(regulation, 'transaction');
     const missingFields = requiredFields.filter(field => !transactionData[field]);
-    
+
     return {
       requirement: 'transaction_reporting',
       compliant: missingFields.length === 0,
-      message: missingFields.length > 0 
-        ? `Missing required fields: ${missingFields.join(', ')}`
-        : 'All required transaction fields present',
+      message:
+        missingFields.length > 0
+          ? `Missing required fields: ${missingFields.join(', ')}`
+          : 'All required transaction fields present',
       missingFields,
       severity: missingFields.length > 0 ? 'high' : 'none',
     };
@@ -545,13 +542,13 @@ class EnhancedRegulatoryService {
     // Check if position reporting thresholds are met
     const { quantity, totalPosition } = transactionData;
     const threshold = this.getPositionReportingThreshold(regulation);
-    
+
     const requiresReporting = totalPosition >= threshold;
-    
+
     return {
       requirement: 'position_reporting',
       compliant: true, // Assuming we handle this automatically
-      message: requiresReporting 
+      message: requiresReporting
         ? 'Position reporting required and will be submitted'
         : 'Position below reporting threshold',
       requiresReporting,
@@ -573,13 +570,14 @@ class EnhancedRegulatoryService {
 
     const { localContentPercentage } = transactionData;
     const minimumRequired = 30; // 30% local content requirement
-    
+
     return {
       requirement: 'local_content',
       compliant: localContentPercentage >= minimumRequired,
-      message: localContentPercentage >= minimumRequired
-        ? `Local content ${localContentPercentage}% meets requirement`
-        : `Local content ${localContentPercentage}% below minimum ${minimumRequired}%`,
+      message:
+        localContentPercentage >= minimumRequired
+          ? `Local content ${localContentPercentage}% meets requirement`
+          : `Local content ${localContentPercentage}% below minimum ${minimumRequired}%`,
       currentPercentage: localContentPercentage,
       minimumRequired,
       severity: localContentPercentage >= minimumRequired ? 'none' : 'medium',
@@ -588,23 +586,23 @@ class EnhancedRegulatoryService {
 
   async checkEnvironmentalCompliance(transactionData, regulation) {
     const { environmentalImpactScore, certifications } = transactionData;
-    
+
     const requiredScore = 70; // Minimum environmental score
     const scoreCompliant = environmentalImpactScore >= requiredScore;
     const certCompliant = certifications?.environmental || false;
-    
+
     return {
       requirement: 'environmental_compliance',
       compliant: scoreCompliant && certCompliant,
-      message: !scoreCompliant 
+      message: !scoreCompliant
         ? 'Environmental impact score below minimum'
-        : !certCompliant 
+        : !certCompliant
           ? 'Environmental certification missing'
           : 'Environmental compliance requirements met',
       currentScore: environmentalImpactScore,
       requiredScore,
       hasCertification: certCompliant,
-      severity: (!scoreCompliant || !certCompliant) ? 'medium' : 'none',
+      severity: !scoreCompliant || !certCompliant ? 'medium' : 'none',
     };
   }
 
@@ -613,53 +611,54 @@ class EnhancedRegulatoryService {
     const xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>\n';
     const rootElement = `<${regulation}_Report xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">`;
     const timestamp = new Date().toISOString();
-    
+
     let xmlContent = xmlHeader + rootElement + '\n';
     xmlContent += '  <ReportHeader>\n';
     xmlContent += `    <ReportID>${uuidv4()}</ReportID>\n`;
     xmlContent += `    <GeneratedAt>${timestamp}</GeneratedAt>\n`;
     xmlContent += `    <Regulation>${regulation}</Regulation>\n`;
     xmlContent += '  </ReportHeader>\n';
-    
+
     xmlContent += '  <TransactionData>\n';
     Object.entries(reportData).forEach(([key, value]) => {
       xmlContent += `    <${key}>${this.escapeXml(value)}</${key}>\n`;
     });
     xmlContent += '  </TransactionData>\n';
-    
+
     xmlContent += `</${regulation}_Report>`;
-    
+
     return xmlContent;
   }
 
   generateXBRLReport(reportData, regulation, template) {
     const xbrlHeader = '<?xml version="1.0" encoding="UTF-8"?>\n';
     const namespace = `http://www.quantenergx.com/${regulation.toLowerCase()}`;
-    
+
     let xbrlContent = xbrlHeader;
     xbrlContent += `<xbrl xmlns="${namespace}" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\n`;
-    
+
     Object.entries(reportData).forEach(([key, value]) => {
       xbrlContent += `  <${regulation.toLowerCase()}:${key} contextRef="current">${this.escapeXml(value)}</${regulation.toLowerCase()}:${key}>\n`;
     });
-    
+
     xbrlContent += '</xbrl>';
-    
+
     return xbrlContent;
   }
 
   generateCSVReport(reportData, regulation, template) {
-    const fields = template.largeTraderReport?.fields || 
-                  template.energyTransactionReport?.fields || 
-                  Object.keys(reportData);
-    
+    const fields =
+      template.largeTraderReport?.fields ||
+      template.energyTransactionReport?.fields ||
+      Object.keys(reportData);
+
     let csvContent = '';
-    
+
     // Add headers if specified in template
     if (template.largeTraderReport?.headers || template.energyTransactionReport?.headers) {
       csvContent += fields.join(',') + '\n';
     }
-    
+
     // Add data row
     const values = fields.map(field => {
       const value = reportData[field] !== undefined ? reportData[field] : '';
@@ -668,28 +667,29 @@ class EnhancedRegulatoryService {
         ? `"${value.replace(/"/g, '""')}"`
         : value;
     });
-    
+
     csvContent += values.join(',') + '\n';
-    
+
     return csvContent;
   }
 
   // Helper methods
   extractReportData(transactionData, template) {
     const reportData = {};
-    
+
     // Get field list from template
-    const fields = template.transactionReport?.fields || 
-                  template.fundamentalData?.fields ||
-                  template.swapDataReport?.fields ||
-                  template.largeTraderReport?.fields ||
-                  template.energyTransactionReport?.fields ||
-                  Object.keys(transactionData);
-    
+    const fields =
+      template.transactionReport?.fields ||
+      template.fundamentalData?.fields ||
+      template.swapDataReport?.fields ||
+      template.largeTraderReport?.fields ||
+      template.energyTransactionReport?.fields ||
+      Object.keys(transactionData);
+
     fields.forEach(field => {
       reportData[field] = transactionData[field] || this.getDefaultValue(field);
     });
-    
+
     return reportData;
   }
 
@@ -702,7 +702,7 @@ class EnhancedRegulatoryService {
       buy_sell_indicator: 'B',
       asset_class: 'ENERGY',
     };
-    
+
     const defaultFunction = defaults[field];
     return defaultFunction ? defaultFunction() : '';
   }
@@ -710,55 +710,61 @@ class EnhancedRegulatoryService {
   getRequiredFields(regulation, reportType) {
     const fieldMap = {
       MiFID_II: {
-        transaction: ['transaction_reference_number', 'quantity', 'price', 'currency', 'transaction_time']
+        transaction: [
+          'transaction_reference_number',
+          'quantity',
+          'price',
+          'currency',
+          'transaction_time',
+        ],
       },
       REMIT: {
-        transaction: ['data_provider_id', 'publication_time', 'asset_id', 'capacity']
+        transaction: ['data_provider_id', 'publication_time', 'asset_id', 'capacity'],
       },
       Dodd_Frank: {
-        transaction: ['unique_swap_identifier', 'product_id', 'asset_class', 'transaction_type']
+        transaction: ['unique_swap_identifier', 'product_id', 'asset_class', 'transaction_type'],
       },
       CFTC: {
-        transaction: ['trader_id', 'commodity_code', 'long_positions', 'short_positions']
+        transaction: ['trader_id', 'commodity_code', 'long_positions', 'short_positions'],
       },
       Guyana_Local: {
-        transaction: ['transaction_id', 'commodity_type', 'volume', 'local_content_percentage']
-      }
+        transaction: ['transaction_id', 'commodity_type', 'volume', 'local_content_percentage'],
+      },
     };
-    
+
     return fieldMap[regulation]?.[reportType] || [];
   }
 
   getPositionReportingThreshold(regulation) {
     const thresholds = {
       MiFID_II: 1000000, // €1M
-      CFTC: 5000000,     // $5M
+      CFTC: 5000000, // $5M
       Dodd_Frank: 8000000, // $8M
-      FCA: 800000,       // £800K
+      FCA: 800000, // £800K
       Guyana_Local: 100000, // $100K
     };
-    
+
     return thresholds[regulation] || 1000000;
   }
 
   calculateReportingDeadline(deadline) {
     const now = new Date();
-    
+
     switch (deadline) {
-    case 'immediate':
-      return now.toISOString();
-    case 'T+1':
-      return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
-    case 'T+2':
-      return new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString();
-    default:
-      return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
+      case 'immediate':
+        return now.toISOString();
+      case 'T+1':
+        return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
+      case 'T+2':
+        return new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString();
+      default:
+        return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
     }
   }
 
   calculateSeverity(violations) {
     if (violations.length === 0) return 'none';
-    
+
     const severities = violations.map(v => v.severity);
     if (severities.includes('high')) return 'high';
     if (severities.includes('medium')) return 'medium';
@@ -767,10 +773,10 @@ class EnhancedRegulatoryService {
 
   calculateRiskLevel(violations) {
     if (violations.length === 0) return 'low';
-    
+
     const highSeverityCount = violations.filter(v => v.severity === 'high').length;
     const mediumSeverityCount = violations.filter(v => v.severity === 'medium').length;
-    
+
     if (highSeverityCount >= 2) return 'critical';
     if (highSeverityCount >= 1) return 'high';
     if (mediumSeverityCount >= 2) return 'medium';
@@ -779,7 +785,7 @@ class EnhancedRegulatoryService {
 
   generateRequiredReports(complianceResults, transactionData) {
     const requiredReports = [];
-    
+
     complianceResults.forEach(result => {
       if (result.compliant) {
         const framework = this.regulatoryFrameworks[result.regulation];
@@ -793,7 +799,7 @@ class EnhancedRegulatoryService {
         }
       }
     });
-    
+
     return requiredReports;
   }
 
@@ -801,7 +807,7 @@ class EnhancedRegulatoryService {
     if (typeof value !== 'string') {
       value = String(value);
     }
-    
+
     return value
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -813,22 +819,23 @@ class EnhancedRegulatoryService {
   // Additional check methods for completeness
   async checkMarketSurveillance(transactionData, regulation) {
     const { price, marketPrice, volume, tradingTime } = transactionData;
-    
+
     const priceDeviation = Math.abs((price - marketPrice) / marketPrice) * 100;
     const unusualVolume = volume > 100000; // Large volume threshold
     const offHours = this.isOffHours(tradingTime);
-    
+
     const issues = [];
     if (priceDeviation > 10) issues.push('significant_price_deviation');
     if (unusualVolume) issues.push('unusual_volume');
     if (offHours) issues.push('off_hours_trading');
-    
+
     return {
       requirement: 'market_surveillance',
       compliant: issues.length === 0,
-      message: issues.length > 0 
-        ? `Market surveillance flags: ${issues.join(', ')}`
-        : 'No market surveillance issues detected',
+      message:
+        issues.length > 0
+          ? `Market surveillance flags: ${issues.join(', ')}`
+          : 'No market surveillance issues detected',
       issues,
       priceDeviation,
       severity: issues.length > 0 ? 'medium' : 'none',
@@ -837,22 +844,23 @@ class EnhancedRegulatoryService {
 
   async checkSuspiciousTransactions(transactionData, regulation) {
     const { traderId, counterpartyId, frequency, value } = transactionData;
-    
+
     const highFrequency = frequency > 100; // transactions per day
     const highValue = value > 10000000; // $10M
     const newCounterparty = transactionData.newCounterparty || false;
-    
+
     const suspicionFactors = [];
     if (highFrequency) suspicionFactors.push('high_frequency');
     if (highValue) suspicionFactors.push('high_value');
     if (newCounterparty) suspicionFactors.push('new_counterparty');
-    
+
     return {
       requirement: 'suspicious_transactions',
       compliant: suspicionFactors.length < 2, // Trigger if 2+ factors
-      message: suspicionFactors.length >= 2
-        ? `Suspicious transaction factors: ${suspicionFactors.join(', ')}`
-        : 'No suspicious transaction patterns detected',
+      message:
+        suspicionFactors.length >= 2
+          ? `Suspicious transaction factors: ${suspicionFactors.join(', ')}`
+          : 'No suspicious transaction patterns detected',
       suspicionFactors,
       riskScore: suspicionFactors.length * 25,
       severity: suspicionFactors.length >= 2 ? 'high' : 'none',
@@ -861,19 +869,21 @@ class EnhancedRegulatoryService {
 
   async checkFundamentalData(transactionData, regulation) {
     const requiredFundamentalFields = [
-      'asset_id', 'capacity', 'unavailable_capacity', 'scheduled_consumption'
+      'asset_id',
+      'capacity',
+      'unavailable_capacity',
+      'scheduled_consumption',
     ];
-    
-    const missingFields = requiredFundamentalFields.filter(
-      field => !transactionData[field]
-    );
-    
+
+    const missingFields = requiredFundamentalFields.filter(field => !transactionData[field]);
+
     return {
       requirement: 'fundamental_data',
       compliant: missingFields.length === 0,
-      message: missingFields.length > 0
-        ? `Missing fundamental data: ${missingFields.join(', ')}`
-        : 'All fundamental data fields present',
+      message:
+        missingFields.length > 0
+          ? `Missing fundamental data: ${missingFields.join(', ')}`
+          : 'All fundamental data fields present',
       missingFields,
       severity: missingFields.length > 0 ? 'medium' : 'none',
     };
@@ -881,17 +891,16 @@ class EnhancedRegulatoryService {
 
   async checkOrderData(transactionData, regulation) {
     const requiredOrderFields = ['order_id', 'order_time', 'order_type', 'execution_venue'];
-    
-    const missingFields = requiredOrderFields.filter(
-      field => !transactionData[field]
-    );
-    
+
+    const missingFields = requiredOrderFields.filter(field => !transactionData[field]);
+
     return {
       requirement: 'order_data',
       compliant: missingFields.length === 0,
-      message: missingFields.length > 0
-        ? `Missing order data: ${missingFields.join(', ')}`
-        : 'All order data fields present',
+      message:
+        missingFields.length > 0
+          ? `Missing order data: ${missingFields.join(', ')}`
+          : 'All order data fields present',
       missingFields,
       severity: missingFields.length > 0 ? 'medium' : 'none',
     };
@@ -901,13 +910,14 @@ class EnhancedRegulatoryService {
     const { quantity, totalPosition, commodity } = transactionData;
     const limit = this.getPositionLimit(commodity, regulation);
     const newTotal = (totalPosition || 0) + quantity;
-    
+
     return {
       requirement: 'position_limits',
       compliant: newTotal <= limit,
-      message: newTotal <= limit
-        ? 'Position within regulatory limits'
-        : `Position ${newTotal} exceeds limit ${limit}`,
+      message:
+        newTotal <= limit
+          ? 'Position within regulatory limits'
+          : `Position ${newTotal} exceeds limit ${limit}`,
       currentPosition: totalPosition || 0,
       newPosition: newTotal,
       limit,
@@ -918,9 +928,9 @@ class EnhancedRegulatoryService {
 
   async checkMarginRequirements(transactionData, regulation) {
     const { value, currentMargin, marginRequirement } = transactionData;
-    const required = marginRequirement || (value * 0.1); // 10% default
+    const required = marginRequirement || value * 0.1; // 10% default
     const sufficient = currentMargin >= required;
-    
+
     return {
       requirement: 'margin_requirements',
       compliant: sufficient,
@@ -941,7 +951,7 @@ class EnhancedRegulatoryService {
       electricity: 5000,
       renewable: 2000,
     };
-    
+
     return limits[commodity] || 1000000;
   }
 

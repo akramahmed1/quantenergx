@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Container,
-  Typography,
-  Tabs,
-  Tab,
-  Paper,
-  Alert
-} from '@mui/material';
+import { Box, Container, Typography, Tabs, Tab, Paper, Alert } from '@mui/material';
 import { useTranslation } from '../i18n/I18nProvider';
 import BiometricAuth from '../components/mobile/BiometricAuth';
 import OfflineTrading from '../components/mobile/OfflineTrading';
@@ -31,11 +23,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`mobile-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 }
@@ -96,28 +84,30 @@ export const MobileFeaturesDemo: React.FC = () => {
         <Typography variant="h3" component="h1" gutterBottom align="center">
           {t('mobile.title')} - Demo
         </Typography>
-        
+
         <Typography variant="subtitle1" align="center" color="textSecondary" gutterBottom>
-          Comprehensive mobile trading platform with offline capabilities, biometric authentication, and multi-language support
+          Comprehensive mobile trading platform with offline capabilities, biometric authentication,
+          and multi-language support
         </Typography>
 
         {authMessage && (
           <Box sx={{ mb: 2 }}>
-            <Alert severity={authSeverity}>
-              {authMessage}
-            </Alert>
+            <Alert severity={authSeverity}>{authMessage}</Alert>
           </Box>
         )}
 
         <Alert severity="info" sx={{ mb: 3 }}>
-          Connection Status: {isOnline ? 'Online' : 'Offline'} | 
-          Language: {t('common.language')} | 
+          Connection Status: {isOnline ? 'Online' : 'Offline'} | Language: {t('common.language')} |
           Mobile Features: Active
         </Alert>
 
         <Paper sx={{ width: '100%' }}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={tabValue} onChange={handleTabChange} aria-label="mobile features demo tabs">
+            <Tabs
+              value={tabValue}
+              onChange={handleTabChange}
+              aria-label="mobile features demo tabs"
+            >
               <Tab label={t('mobile.biometricAuth')} {...a11yProps(0)} />
               <Tab label={t('mobile.offlineTrading')} {...a11yProps(1)} />
               <Tab label={t('mobile.pushNotifications')} {...a11yProps(2)} />
@@ -130,13 +120,10 @@ export const MobileFeaturesDemo: React.FC = () => {
               {t('mobile.biometricAuth')}
             </Typography>
             <Typography variant="body1" color="textSecondary" gutterBottom>
-              Secure authentication using fingerprint or facial recognition technology.
-              This feature uses the WebAuthn API for secure, passwordless authentication.
+              Secure authentication using fingerprint or facial recognition technology. This feature
+              uses the WebAuthn API for secure, passwordless authentication.
             </Typography>
-            <BiometricAuth
-              onAuthSuccess={handleAuthSuccess}
-              onAuthFailure={handleAuthFailure}
-            />
+            <BiometricAuth onAuthSuccess={handleAuthSuccess} onAuthFailure={handleAuthFailure} />
           </TabPanel>
 
           <TabPanel value={tabValue} index={1}>
@@ -144,13 +131,10 @@ export const MobileFeaturesDemo: React.FC = () => {
               {t('mobile.offlineTrading')}
             </Typography>
             <Typography variant="body1" color="textSecondary" gutterBottom>
-              Trade even when offline. Orders are stored locally and automatically synchronized
-              when connection is restored. Perfect for trading on-the-go.
+              Trade even when offline. Orders are stored locally and automatically synchronized when
+              connection is restored. Perfect for trading on-the-go.
             </Typography>
-            <OfflineTrading
-              isOnline={isOnline}
-              onSyncOrders={handleSyncOrders}
-            />
+            <OfflineTrading isOnline={isOnline} onSyncOrders={handleSyncOrders} />
           </TabPanel>
 
           <TabPanel value={tabValue} index={2}>
@@ -158,8 +142,8 @@ export const MobileFeaturesDemo: React.FC = () => {
               {t('mobile.pushNotifications')}
             </Typography>
             <Typography variant="body1" color="textSecondary" gutterBottom>
-              Stay informed with real-time push notifications for trades, price alerts,
-              market updates, and system notifications. Fully configurable and secure.
+              Stay informed with real-time push notifications for trades, price alerts, market
+              updates, and system notifications. Fully configurable and secure.
             </Typography>
             <PushNotifications />
           </TabPanel>

@@ -40,12 +40,44 @@ quantenergx/
 
 ## 🚀 Quick Start
 
+### One-Command Setup
+
+**For fastest setup, use our automated setup script:**
+
+```bash
+# Clone the repository
+git clone https://github.com/akramahmed1/quantenergx.git
+cd quantenergx
+
+# Run the automated setup script
+./setup-local.sh
+```
+
+This script will:
+- ✅ Check system requirements (Node.js 20+, Docker)
+- ✅ Start PostgreSQL and Redis services
+- ✅ Set up environment files from templates  
+- ✅ Install all dependencies
+- ✅ Run database migrations and seeders
+- ✅ Lint and auto-fix code
+- ✅ Build backend and frontend
+- ✅ Start development servers
+- ✅ Perform health checks
+- ✅ Provide troubleshooting guidance
+
+**After setup completes:**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:3001  
+- API Docs: http://localhost:3001/api-docs
+
+📖 **For detailed setup options and troubleshooting, see [SETUP_GUIDE.md](./SETUP_GUIDE.md)**
+
 ### Prerequisites
-- Node.js 18+ and npm 8+
-- Docker and Docker Compose (for local development)
+- Node.js 20+ and npm 8+
+- Docker and Docker Compose (for local development with databases)
 - Git
 
-### Local Development Setup
+### Manual Setup (Alternative)
 
 1. **Clone the repository**
    ```bash

@@ -21,7 +21,7 @@ router.post('/check', async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -38,7 +38,7 @@ router.get('/products', async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -53,12 +53,12 @@ router.get('/trading-time', async (req, res) => {
     const result = shariaService.isValidTradingTime();
     res.json({
       success: true,
-      trading_time_check: result
+      trading_time_check: result,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -82,12 +82,12 @@ router.post('/bulk-check', async (req, res) => {
       success: true,
       total_instruments: instruments.length,
       compliant_count: results.filter(r => r.is_sharia_compliant).length,
-      results: results
+      results: results,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -107,7 +107,7 @@ router.get('/guidelines', (req, res) => {
         'Gambling and gaming',
         'Conventional banking with interest',
         'Pork and pork products',
-        'Adult entertainment'
+        'Adult entertainment',
       ],
       permitted_energy_sectors: [
         'Solar energy generation',
@@ -115,28 +115,28 @@ router.get('/guidelines', (req, res) => {
         'Hydroelectric power',
         'Geothermal energy',
         'Natural gas (halal sourced)',
-        'Crude oil (halal sourced)'
+        'Crude oil (halal sourced)',
       ],
       contract_requirements: {
         asset_backing: 'Minimum 51% tangible asset backing required',
         speculation_limit: 'Excessive uncertainty (Gharar) must be minimized',
         interest_prohibition: 'No interest-based (Riba) transactions',
-        contract_clarity: 'All terms must be clearly defined'
+        contract_clarity: 'All terms must be clearly defined',
       },
       approved_structures: [
         'Murabaha (cost-plus financing)',
         'Ijara (leasing)',
         'Salam (forward sale)',
         'Istisna (manufacturing contract)',
-        'Spot transactions'
+        'Spot transactions',
       ],
       certification_standards: [
         'AAOIFI (Accounting and Auditing Organization for Islamic Financial Institutions)',
         'Islamic Fiqh Academy',
         'National Sharia boards',
-        'International Islamic Liquidity Management Corporation (IILM)'
-      ]
-    }
+        'International Islamic Liquidity Management Corporation (IILM)',
+      ],
+    },
   });
 });
 

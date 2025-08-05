@@ -26,12 +26,12 @@ export class WebhookManager {
     this.registerHandler('market_data_provider', new MarketDataWebhookHandler(this.logger));
     this.registerHandler('compliance_service', new ComplianceWebhookHandler(this.logger));
     this.registerHandler('payment_processor', new PaymentWebhookHandler(this.logger));
-    
+
     // Hardware integration handlers
     this.registerHandler('scada_system', new SCADAWebhookHandler(this.logger));
     this.registerHandler('iot_sensor', new IoTSensorWebhookHandler(this.logger));
     this.registerHandler('smart_meter', new SmartMeterWebhookHandler(this.logger));
-    
+
     // AI/ML platform handlers
     this.registerHandler('ml_prediction_service', new MLPredictionWebhookHandler(this.logger));
     this.registerHandler('fraud_detection_ai', new FraudDetectionWebhookHandler(this.logger));
@@ -59,7 +59,7 @@ export class WebhookManager {
         .digest('hex');
 
       const providedSignature = signature.replace('sha256=', '');
-      
+
       return crypto.timingSafeEqual(
         Buffer.from(expectedSignature, 'hex'),
         Buffer.from(providedSignature, 'hex')
@@ -81,11 +81,8 @@ export class WebhookManager {
     try {
       // Verify signature if provided
       if (signature) {
-        const isValidSignature = this.verifySignature(
-          JSON.stringify(payload.data),
-          signature
-        );
-        
+        const isValidSignature = this.verifySignature(JSON.stringify(payload.data), signature);
+
         if (!isValidSignature) {
           this.logger.warn(`Invalid webhook signature for type: ${type}`);
           return { success: false, message: 'Invalid signature' };
@@ -99,24 +96,23 @@ export class WebhookManager {
       }
 
       const result = await handler.handle(payload);
-      
+
       this.logger.info(`Webhook processed successfully: ${type}`, {
         webhookId: payload.id,
         type,
-        source: payload.source
+        source: payload.source,
       });
 
       return {
         success: true,
         message: 'Webhook processed successfully',
-        data: result
+        data: result,
       };
-
     } catch (error) {
       this.logger.error(`Error processing webhook ${type}:`, error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Processing failed'
+        message: error instanceof Error ? error.message : 'Processing failed',
       };
     }
   }
@@ -174,10 +170,10 @@ export abstract class WebhookHandler {
 class MarketDataWebhookHandler extends WebhookHandler {
   async handle(payload: WebhookPayload): Promise<any> {
     const { data } = payload;
-    
+
     this.logger.info('Processing market data webhook', {
       source: payload.source,
-      timestamp: payload.timestamp
+      timestamp: payload.timestamp,
     });
 
     // Process market data update
@@ -185,7 +181,7 @@ class MarketDataWebhookHandler extends WebhookHandler {
     return {
       processed: true,
       timestamp: new Date(),
-      marketDataPoints: Array.isArray(data.prices) ? data.prices.length : 1
+      marketDataPoints: Array.isArray(data.prices) ? data.prices.length : 1,
     };
   }
 }
@@ -196,17 +192,17 @@ class MarketDataWebhookHandler extends WebhookHandler {
 class ComplianceWebhookHandler extends WebhookHandler {
   async handle(payload: WebhookPayload): Promise<any> {
     const { data } = payload;
-    
+
     this.logger.info('Processing compliance webhook', {
       alertType: data.alertType,
-      severity: data.severity
+      severity: data.severity,
     });
 
     // Process compliance alert or update
     return {
       processed: true,
       alertId: data.alertId || payload.id,
-      action: data.action || 'logged'
+      action: data.action || 'logged',
     };
   }
 }
@@ -217,17 +213,17 @@ class ComplianceWebhookHandler extends WebhookHandler {
 class PaymentWebhookHandler extends WebhookHandler {
   async handle(payload: WebhookPayload): Promise<any> {
     const { data } = payload;
-    
+
     this.logger.info('Processing payment webhook', {
       paymentId: data.paymentId,
-      status: data.status
+      status: data.status,
     });
 
     // Process payment status update
     return {
       processed: true,
       paymentId: data.paymentId,
-      newStatus: data.status
+      newStatus: data.status,
     };
   }
 }
@@ -238,17 +234,17 @@ class PaymentWebhookHandler extends WebhookHandler {
 class SCADAWebhookHandler extends WebhookHandler {
   async handle(payload: WebhookPayload): Promise<any> {
     const { data } = payload;
-    
+
     this.logger.info('Processing SCADA system webhook', {
       systemId: data.systemId,
-      alertLevel: data.alertLevel
+      alertLevel: data.alertLevel,
     });
 
     // Process SCADA system data or alerts
     return {
       processed: true,
       systemId: data.systemId,
-      dataPoints: data.measurements?.length || 0
+      dataPoints: data.measurements?.length || 0,
     };
   }
 }
@@ -259,17 +255,17 @@ class SCADAWebhookHandler extends WebhookHandler {
 class IoTSensorWebhookHandler extends WebhookHandler {
   async handle(payload: WebhookPayload): Promise<any> {
     const { data } = payload;
-    
+
     this.logger.info('Processing IoT sensor webhook', {
       sensorId: data.sensorId,
-      sensorType: data.type
+      sensorType: data.type,
     });
 
     // Process IoT sensor data
     return {
       processed: true,
       sensorId: data.sensorId,
-      reading: data.value
+      reading: data.value,
     };
   }
 }
@@ -280,17 +276,17 @@ class IoTSensorWebhookHandler extends WebhookHandler {
 class SmartMeterWebhookHandler extends WebhookHandler {
   async handle(payload: WebhookPayload): Promise<any> {
     const { data } = payload;
-    
+
     this.logger.info('Processing smart meter webhook', {
       meterId: data.meterId,
-      usage: data.usage
+      usage: data.usage,
     });
 
     // Process smart meter data
     return {
       processed: true,
       meterId: data.meterId,
-      consumption: data.usage
+      consumption: data.usage,
     };
   }
 }
@@ -301,17 +297,17 @@ class SmartMeterWebhookHandler extends WebhookHandler {
 class MLPredictionWebhookHandler extends WebhookHandler {
   async handle(payload: WebhookPayload): Promise<any> {
     const { data } = payload;
-    
+
     this.logger.info('Processing ML prediction webhook', {
       modelId: data.modelId,
-      predictionType: data.type
+      predictionType: data.type,
     });
 
     // Process ML prediction results
     return {
       processed: true,
       modelId: data.modelId,
-      predictions: Array.isArray(data.predictions) ? data.predictions.length : 1
+      predictions: Array.isArray(data.predictions) ? data.predictions.length : 1,
     };
   }
 }
@@ -322,17 +318,17 @@ class MLPredictionWebhookHandler extends WebhookHandler {
 class FraudDetectionWebhookHandler extends WebhookHandler {
   async handle(payload: WebhookPayload): Promise<any> {
     const { data } = payload;
-    
+
     this.logger.warn('Processing fraud detection webhook', {
       transactionId: data.transactionId,
-      riskScore: data.riskScore
+      riskScore: data.riskScore,
     });
 
     // Process fraud detection alert
     return {
       processed: true,
       transactionId: data.transactionId,
-      action: data.riskScore > 0.8 ? 'flagged' : 'approved'
+      action: data.riskScore > 0.8 ? 'flagged' : 'approved',
     };
   }
 }
@@ -343,17 +339,17 @@ class FraudDetectionWebhookHandler extends WebhookHandler {
 class RiskAnalysisWebhookHandler extends WebhookHandler {
   async handle(payload: WebhookPayload): Promise<any> {
     const { data } = payload;
-    
+
     this.logger.info('Processing risk analysis webhook', {
       analysisId: data.analysisId,
-      riskLevel: data.riskLevel
+      riskLevel: data.riskLevel,
     });
 
     // Process risk analysis results
     return {
       processed: true,
       analysisId: data.analysisId,
-      riskLevel: data.riskLevel
+      riskLevel: data.riskLevel,
     };
   }
 }

@@ -29,7 +29,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  SelectChangeEvent
+  SelectChangeEvent,
 } from '@mui/material';
 import {
   Search,
@@ -39,7 +39,7 @@ import {
   Category,
   Security,
   CloudDownload,
-  Store
+  Store,
 } from '@mui/icons-material';
 
 interface Plugin {
@@ -126,7 +126,7 @@ const Marketplace: React.FC = () => {
     { id: 'Trading Algorithms', name: 'Trading Algorithms' },
     { id: 'Compliance & Reporting', name: 'Compliance & Reporting' },
     { id: 'Market Data & Analytics', name: 'Market Data & Analytics' },
-    { id: 'Integration & APIs', name: 'Integration & APIs' }
+    { id: 'Integration & APIs', name: 'Integration & APIs' },
   ];
 
   const fetchPlugins = useCallback(async () => {
@@ -134,7 +134,7 @@ const Marketplace: React.FC = () => {
       setLoading(true);
       const response = await fetch('/api/v1/marketplace/plugins');
       const result = await response.json();
-      
+
       if (result.success) {
         setPlugins(result.data);
       }
@@ -149,7 +149,7 @@ const Marketplace: React.FC = () => {
     try {
       const response = await fetch('/api/v1/marketplace/featured');
       const result = await response.json();
-      
+
       if (result.success) {
         setFeaturedPlugins(result.data);
       }
@@ -162,7 +162,7 @@ const Marketplace: React.FC = () => {
     try {
       const response = await fetch(`/api/v1/marketplace/plugins/${pluginId}`);
       const result = await response.json();
-      
+
       if (result.success) {
         setSelectedPlugin(result.data);
         setDetailDialogOpen(true);
@@ -181,12 +181,12 @@ const Marketplace: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_permissions: ['plugins:install', 'risk:read', 'analytics:read']
-        })
+          user_permissions: ['plugins:install', 'risk:read', 'analytics:read'],
+        }),
       });
-      
+
       const result = await response.json();
-      
+
       if (result.success) {
         alert('Plugin installed successfully!');
         setInstallDialogOpen(false);
@@ -216,12 +216,12 @@ const Marketplace: React.FC = () => {
         },
         body: JSON.stringify({
           query: searchQuery,
-          category: selectedCategory || undefined
-        })
+          category: selectedCategory || undefined,
+        }),
       });
-      
+
       const result = await response.json();
-      
+
       if (result.success) {
         setPlugins(result.data);
       }
@@ -259,7 +259,7 @@ const Marketplace: React.FC = () => {
     if (marketplace.pricing_model === 'free') {
       return 'Free';
     }
-    
+
     if (marketplace.pricing_details) {
       if (marketplace.pricing_model === 'subscription') {
         return `$${marketplace.pricing_details.monthly}/month`;
@@ -271,7 +271,7 @@ const Marketplace: React.FC = () => {
         return `$${marketplace.pricing_details.per_calculation}/use`;
       }
     }
-    
+
     return 'Contact for pricing';
   };
 
@@ -282,59 +282,64 @@ const Marketplace: React.FC = () => {
           <Typography variant="h6" component="h2" noWrap>
             {entry.plugin_id.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
           </Typography>
-          {entry.featured && (
-            <Chip label="Featured" color="primary" size="small" />
-          )}
+          {entry.featured && <Chip label="Featured" color="primary" size="small" />}
         </Box>
-        
+
         <Typography variant="body2" color="text.secondary" mb={1}>
           by {entry.publisher}
         </Typography>
-        
-        <Typography variant="body2" mb={2} sx={{ 
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          display: '-webkit-box',
-          WebkitLineClamp: 3,
-          WebkitBoxOrient: 'vertical'
-        }}>
+
+        <Typography
+          variant="body2"
+          mb={2}
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: 'vertical',
+          }}
+        >
           Advanced plugin for {entry.marketplace_category.toLowerCase()}
         </Typography>
-        
+
         <Box display="flex" alignItems="center" mb={1}>
           <Rating value={4.5} precision={0.1} size="small" readOnly />
           <Typography variant="body2" color="text.secondary" ml={1}>
             (125 reviews)
           </Typography>
         </Box>
-        
+
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Chip 
-            label={entry.marketplace_category}
-            variant="outlined"
-            size="small"
-          />
+          <Chip label={entry.marketplace_category} variant="outlined" size="small" />
           <Typography variant="h6" color="primary">
             {getPriceDisplay(entry)}
           </Typography>
         </Box>
       </CardContent>
-      
+
       <CardActions>
-        <Button 
-          size="small" 
-          onClick={() => fetchPluginDetails(entry.plugin_id)}
-        >
+        <Button size="small" onClick={() => fetchPluginDetails(entry.plugin_id)}>
           View Details
         </Button>
-        <Button 
-          size="small" 
+        <Button
+          size="small"
           variant="contained"
           startIcon={<CloudDownload />}
           onClick={() => {
-            setSelectedPlugin({ 
-              plugin: { id: entry.plugin_id, name: entry.plugin_id, version: '1.0.0', description: 'Plugin', author: entry.publisher, category: entry.marketplace_category, type: 'third_party', license: 'paid', verified: true },
-              marketplace: { ...entry, review_count: 0, average_rating: 0 }
+            setSelectedPlugin({
+              plugin: {
+                id: entry.plugin_id,
+                name: entry.plugin_id,
+                version: '1.0.0',
+                description: 'Plugin',
+                author: entry.publisher,
+                category: entry.marketplace_category,
+                type: 'third_party',
+                license: 'paid',
+                verified: true,
+              },
+              marketplace: { ...entry, review_count: 0, average_rating: 0 },
             });
             setInstallDialogOpen(true);
           }}
@@ -352,7 +357,7 @@ const Marketplace: React.FC = () => {
         <Typography variant="h4" component="h1">
           Plugin Marketplace
         </Typography>
-        <Chip 
+        <Chip
           icon={<Store />}
           label={`${plugins.length} plugins available`}
           color="primary"
@@ -368,7 +373,7 @@ const Marketplace: React.FC = () => {
               fullWidth
               placeholder="Search plugins..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -381,11 +386,11 @@ const Marketplace: React.FC = () => {
                       ×
                     </IconButton>
                   </InputAdornment>
-                )
+                ),
               }}
             />
           </Grid>
-          
+
           <Grid item xs={12} md={4}>
             <FormControl fullWidth>
               <InputLabel>Category</InputLabel>
@@ -395,7 +400,7 @@ const Marketplace: React.FC = () => {
                 onChange={handleCategoryChange}
                 startAdornment={<Category sx={{ mr: 1 }} />}
               >
-                {categories.map((category) => (
+                {categories.map(category => (
                   <MenuItem key={category.id} value={category.id}>
                     {category.name}
                   </MenuItem>
@@ -403,13 +408,9 @@ const Marketplace: React.FC = () => {
               </Select>
             </FormControl>
           </Grid>
-          
+
           <Grid item xs={12} md={2}>
-            <Button
-              fullWidth
-              variant="outlined"
-              startIcon={<FilterList />}
-            >
+            <Button fullWidth variant="outlined" startIcon={<FilterList />}>
               More Filters
             </Button>
           </Grid>
@@ -434,16 +435,14 @@ const Marketplace: React.FC = () => {
             </Box>
           ) : (
             <Grid container spacing={3}>
-              {plugins.map((entry) => (
+              {plugins.map(entry => (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={entry.plugin_id}>
                   <PluginCard entry={entry} />
                 </Grid>
               ))}
               {plugins.length === 0 && (
                 <Grid item xs={12}>
-                  <Alert severity="info">
-                    No plugins found matching your criteria.
-                  </Alert>
+                  <Alert severity="info">No plugins found matching your criteria.</Alert>
                 </Grid>
               )}
             </Grid>
@@ -453,7 +452,7 @@ const Marketplace: React.FC = () => {
         {/* Featured Tab */}
         <TabPanel value={activeTab} index={1}>
           <Grid container spacing={3}>
-            {featuredPlugins.map((entry) => (
+            {featuredPlugins.map(entry => (
               <Grid item xs={12} sm={6} md={4} lg={3} key={entry.plugin_id}>
                 <PluginCard entry={entry} />
               </Grid>
@@ -464,7 +463,7 @@ const Marketplace: React.FC = () => {
         {/* Categories Tab */}
         <TabPanel value={activeTab} index={2}>
           <Grid container spacing={3}>
-            {categories.slice(1).map((category) => (
+            {categories.slice(1).map(category => (
               <Grid item xs={12} sm={6} md={4} key={category.id}>
                 <Card>
                   <CardContent>
@@ -475,14 +474,12 @@ const Marketplace: React.FC = () => {
                       Discover plugins in this category
                     </Typography>
                     <Box display="flex" justifyContent="space-between" alignItems="center">
-                      <Typography variant="body2">
-                        Available plugins
-                      </Typography>
+                      <Typography variant="body2">Available plugins</Typography>
                       <Chip label="5" color="primary" size="small" />
                     </Box>
                   </CardContent>
                   <CardActions>
-                    <Button 
+                    <Button
                       size="small"
                       onClick={() => {
                         setSelectedCategory(category.id);
@@ -500,8 +497,8 @@ const Marketplace: React.FC = () => {
       </Paper>
 
       {/* Plugin Details Dialog */}
-      <Dialog 
-        open={detailDialogOpen} 
+      <Dialog
+        open={detailDialogOpen}
         onClose={() => setDetailDialogOpen(false)}
         maxWidth="md"
         fullWidth
@@ -510,27 +507,20 @@ const Marketplace: React.FC = () => {
           <>
             <DialogTitle>
               <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography variant="h5">
-                  {selectedPlugin.plugin.name}
-                </Typography>
+                <Typography variant="h5">{selectedPlugin.plugin.name}</Typography>
                 {selectedPlugin.plugin.verified && (
-                  <Chip 
-                    icon={<Verified />}
-                    label="Verified"
-                    color="success"
-                    size="small"
-                  />
+                  <Chip icon={<Verified />} label="Verified" color="success" size="small" />
                 )}
               </Box>
             </DialogTitle>
-            
+
             <DialogContent dividers>
               <Grid container spacing={3}>
                 <Grid item xs={12} md={8}>
                   <Typography variant="body1" paragraph>
                     {selectedPlugin.plugin.description}
                   </Typography>
-                  
+
                   <Typography variant="h6" gutterBottom>
                     Features
                   </Typography>
@@ -546,13 +536,13 @@ const Marketplace: React.FC = () => {
                     </ListItem>
                   </List>
                 </Grid>
-                
+
                 <Grid item xs={12} md={4}>
                   <Paper variant="outlined" sx={{ p: 2 }}>
                     <Typography variant="h6" gutterBottom>
                       Plugin Info
                     </Typography>
-                    
+
                     <Box mb={2}>
                       <Typography variant="body2" color="text.secondary">
                         Publisher
@@ -561,16 +551,14 @@ const Marketplace: React.FC = () => {
                         {selectedPlugin.marketplace.publisher}
                       </Typography>
                     </Box>
-                    
+
                     <Box mb={2}>
                       <Typography variant="body2" color="text.secondary">
                         Version
                       </Typography>
-                      <Typography variant="body1">
-                        {selectedPlugin.plugin.version}
-                      </Typography>
+                      <Typography variant="body1">{selectedPlugin.plugin.version}</Typography>
                     </Box>
-                    
+
                     <Box mb={2}>
                       <Typography variant="body2" color="text.secondary">
                         Category
@@ -579,7 +567,7 @@ const Marketplace: React.FC = () => {
                         {selectedPlugin.marketplace.marketplace_category}
                       </Typography>
                     </Box>
-                    
+
                     <Box mb={2}>
                       <Typography variant="body2" color="text.secondary">
                         Downloads
@@ -588,13 +576,13 @@ const Marketplace: React.FC = () => {
                         {selectedPlugin.plugin.downloads || 0}
                       </Typography>
                     </Box>
-                    
+
                     <Box mb={2}>
                       <Typography variant="body2" color="text.secondary">
                         Rating
                       </Typography>
                       <Box display="flex" alignItems="center">
-                        <Rating 
+                        <Rating
                           value={selectedPlugin.marketplace.average_rating || 0}
                           precision={0.1}
                           size="small"
@@ -609,12 +597,10 @@ const Marketplace: React.FC = () => {
                 </Grid>
               </Grid>
             </DialogContent>
-            
+
             <DialogActions>
-              <Button onClick={() => setDetailDialogOpen(false)}>
-                Close
-              </Button>
-              <Button 
+              <Button onClick={() => setDetailDialogOpen(false)}>Close</Button>
+              <Button
                 variant="contained"
                 startIcon={<CloudDownload />}
                 onClick={() => {
@@ -643,11 +629,11 @@ const Marketplace: React.FC = () => {
               <Typography variant="body1" paragraph>
                 Are you sure you want to install "{selectedPlugin.plugin.name}"?
               </Typography>
-              
+
               <Alert severity="info" sx={{ mb: 2 }}>
                 This plugin will have access to the following permissions:
               </Alert>
-              
+
               <List dense>
                 <ListItem>
                   <ListItemIcon>
@@ -662,7 +648,7 @@ const Marketplace: React.FC = () => {
                   <ListItemText primary="Generate analytics reports" />
                 </ListItem>
               </List>
-              
+
               <Typography variant="h6" color="primary">
                 Price: {getPriceDisplay(selectedPlugin.marketplace)}
               </Typography>
@@ -670,9 +656,7 @@ const Marketplace: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setInstallDialogOpen(false)}>
-            Cancel
-          </Button>
+          <Button onClick={() => setInstallDialogOpen(false)}>Cancel</Button>
           <Button
             variant="contained"
             onClick={() => selectedPlugin && installPlugin(selectedPlugin.plugin.id)}

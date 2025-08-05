@@ -109,17 +109,17 @@ class EnhancedPluginManager extends EventEmitter {
               method: 'POST',
               description: 'Run Monte Carlo risk simulation',
               auth_required: true,
-              permissions: ['risk:execute']
-            }
+              permissions: ['risk:execute'],
+            },
           ],
           hooks: ['portfolio:update', 'market:price_change'],
           resources: [],
-          security_requirements: ['encrypted_storage']
+          security_requirements: ['encrypted_storage'],
         },
         status: 'active',
         install_date: new Date(),
         last_updated: new Date(),
-        verified: true
+        verified: true,
       },
       {
         id: 'compliance-monitor-pro',
@@ -142,24 +142,24 @@ class EnhancedPluginManager extends EventEmitter {
               method: 'GET',
               description: 'Get compliance monitoring status',
               auth_required: true,
-              permissions: ['compliance:read']
-            }
+              permissions: ['compliance:read'],
+            },
           ],
           hooks: ['trade:executed', 'user:action'],
           resources: [
             {
               type: 'database',
               name: 'compliance_logs',
-              configuration: { encrypted: true }
-            }
+              configuration: { encrypted: true },
+            },
           ],
-          security_requirements: ['audit_trail', 'encryption']
+          security_requirements: ['audit_trail', 'encryption'],
         },
         status: 'active',
         install_date: new Date(),
         last_updated: new Date(),
-        verified: true
-      }
+        verified: true,
+      },
     ];
 
     builtinPlugins.forEach(plugin => {
@@ -184,8 +184,8 @@ class EnhancedPluginManager extends EventEmitter {
             rating: 5,
             comment: 'Excellent weather risk integration',
             date: new Date('2024-07-15'),
-            verified_purchase: true
-          }
+            verified_purchase: true,
+          },
         ],
         screenshots: ['/screenshots/weather-risk-1.png'],
         documentation_url: 'https://weathertech.com/docs/risk-analytics',
@@ -194,8 +194,8 @@ class EnhancedPluginManager extends EventEmitter {
         pricing_details: {
           monthly: 299,
           annual: 2990,
-          currency: 'USD'
-        }
+          currency: 'USD',
+        },
       },
       {
         plugin_id: 'esg-scoring-engine',
@@ -209,11 +209,11 @@ class EnhancedPluginManager extends EventEmitter {
         support_url: 'https://greenanalytics.com/support',
         pricing_model: 'usage_based',
         pricing_details: {
-          per_calculation: 0.50,
+          per_calculation: 0.5,
           monthly_cap: 500,
-          currency: 'USD'
-        }
-      }
+          currency: 'USD',
+        },
+      },
     ];
 
     marketplaceEntries.forEach(entry => {
@@ -240,7 +240,7 @@ class EnhancedPluginManager extends EventEmitter {
           config_schema: {
             api_key: 'string',
             regions: 'array',
-            update_frequency: 'number'
+            update_frequency: 'number',
           },
           endpoints: [
             {
@@ -248,25 +248,25 @@ class EnhancedPluginManager extends EventEmitter {
               method: 'POST',
               description: 'Assess weather-related risks',
               auth_required: true,
-              permissions: ['risk:weather_analysis']
-            }
+              permissions: ['risk:weather_analysis'],
+            },
           ],
           hooks: ['weather:forecast_update', 'portfolio:risk_calculation'],
           resources: [
             {
               type: 'external_api',
               name: 'weather_service',
-              configuration: { provider: 'WeatherTech' }
-            }
+              configuration: { provider: 'WeatherTech' },
+            },
           ],
-          security_requirements: ['api_key_encryption', 'rate_limiting']
+          security_requirements: ['api_key_encryption', 'rate_limiting'],
         },
         status: 'installed',
         install_date: new Date(),
         last_updated: new Date(),
         rating: 4.8,
         downloads: 1250,
-        verified: true
+        verified: true,
       },
       {
         id: 'esg-scoring-engine',
@@ -285,7 +285,7 @@ class EnhancedPluginManager extends EventEmitter {
           entry_point: 'esg-scoring/index.js',
           config_schema: {
             scoring_model: 'string',
-            weight_preferences: 'object'
+            weight_preferences: 'object',
           },
           endpoints: [
             {
@@ -293,20 +293,20 @@ class EnhancedPluginManager extends EventEmitter {
               method: 'POST',
               description: 'Calculate ESG scores',
               auth_required: true,
-              permissions: ['esg:calculate']
-            }
+              permissions: ['esg:calculate'],
+            },
           ],
           hooks: ['portfolio:esg_update', 'sustainability:report_generation'],
           resources: [],
-          security_requirements: ['data_privacy', 'audit_trail']
+          security_requirements: ['data_privacy', 'audit_trail'],
         },
         status: 'disabled',
         install_date: new Date(),
         last_updated: new Date(),
         rating: 4.5,
         downloads: 890,
-        verified: true
-      }
+        verified: true,
+      },
     ];
 
     thirdPartyPlugins.forEach(plugin => {
@@ -326,7 +326,7 @@ class EnhancedPluginManager extends EventEmitter {
 
       // Download plugin from marketplace
       const pluginData = await this.marketplaceAPI.downloadPlugin(pluginId);
-      
+
       // Validate plugin security
       const securityCheck = await this.securityValidator.validatePlugin(pluginData);
       if (!securityCheck.safe) {
@@ -351,14 +351,13 @@ class EnhancedPluginManager extends EventEmitter {
         ...pluginData,
         status: 'installed',
         install_date: new Date(),
-        last_updated: new Date()
+        last_updated: new Date(),
       };
 
       this.plugins.set(pluginId, plugin);
-      
+
       this.emit('plugin:installed', { pluginId, plugin });
       return true;
-
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       this.emit('plugin:install_failed', { pluginId, error: errorMessage });
@@ -391,7 +390,8 @@ class EnhancedPluginManager extends EventEmitter {
       const plugin = this.plugins.get(entry.plugin_id);
       if (!plugin) return false;
 
-      const searchText = `${plugin.name} ${plugin.description} ${entry.marketplace_category}`.toLowerCase();
+      const searchText =
+        `${plugin.name} ${plugin.description} ${entry.marketplace_category}`.toLowerCase();
       return searchText.includes(query.toLowerCase());
     });
 
@@ -403,28 +403,31 @@ class EnhancedPluginManager extends EventEmitter {
    */
   getPluginStatistics(): any {
     const plugins = Array.from(this.plugins.values());
-    
+
     return {
       total_plugins: plugins.length,
       by_status: {
         active: plugins.filter(p => p.status === 'active').length,
         installed: plugins.filter(p => p.status === 'installed').length,
         disabled: plugins.filter(p => p.status === 'disabled').length,
-        error: plugins.filter(p => p.status === 'error').length
+        error: plugins.filter(p => p.status === 'error').length,
       },
       by_type: {
         internal: plugins.filter(p => p.type === 'internal').length,
-        third_party: plugins.filter(p => p.type === 'third_party').length
+        third_party: plugins.filter(p => p.type === 'third_party').length,
       },
-      by_category: plugins.reduce((acc, plugin) => {
-        acc[plugin.category] = (acc[plugin.category] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>),
+      by_category: plugins.reduce(
+        (acc, plugin) => {
+          acc[plugin.category] = (acc[plugin.category] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      ),
       marketplace_stats: {
         total_listings: this.marketplace.size,
         featured_count: Array.from(this.marketplace.values()).filter(e => e.featured).length,
-        average_rating: this.calculateAverageMarketplaceRating()
-      }
+        average_rating: this.calculateAverageMarketplaceRating(),
+      },
     };
   }
 
@@ -434,11 +437,10 @@ class EnhancedPluginManager extends EventEmitter {
   }
 
   private calculateAverageMarketplaceRating(): number {
-    const allReviews = Array.from(this.marketplace.values())
-      .flatMap(entry => entry.reviews);
-    
+    const allReviews = Array.from(this.marketplace.values()).flatMap(entry => entry.reviews);
+
     if (allReviews.length === 0) return 0;
-    
+
     const totalRating = allReviews.reduce((sum, review) => sum + review.rating, 0);
     return Math.round((totalRating / allReviews.length) * 10) / 10;
   }
@@ -468,7 +470,7 @@ class PluginSecurityValidator {
 
     return {
       safe: issues.length === 0,
-      issues
+      issues,
     };
   }
 
@@ -476,7 +478,7 @@ class PluginSecurityValidator {
     // Simplified malicious code detection
     const maliciousPatterns = ['eval(', 'exec(', 'require("child_process")'];
     const codeString = JSON.stringify(pluginData);
-    
+
     return maliciousPatterns.some(pattern => codeString.includes(pattern));
   }
 
@@ -516,8 +518,8 @@ class MarketplaceAPI {
         endpoints: [],
         hooks: [],
         resources: [],
-        security_requirements: []
-      }
+        security_requirements: [],
+      },
     };
   }
 }

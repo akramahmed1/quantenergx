@@ -8,7 +8,7 @@ class ESGScoringService {
     this.weightings = {
       environmental: 0.5,
       social: 0.25,
-      governance: 0.25
+      governance: 0.25,
     };
 
     this.environmentalFactors = {
@@ -16,21 +16,21 @@ class ESGScoringService {
       renewable_energy_ratio: 0.25,
       waste_management: 0.15,
       water_usage: 0.15,
-      biodiversity_impact: 0.15
+      biodiversity_impact: 0.15,
     };
 
     this.socialFactors = {
       community_impact: 0.3,
       worker_safety: 0.25,
       local_employment: 0.2,
-      human_rights: 0.25
+      human_rights: 0.25,
     };
 
     this.governanceFactors = {
       transparency: 0.3,
       regulatory_compliance: 0.3,
       stakeholder_engagement: 0.2,
-      risk_management: 0.2
+      risk_management: 0.2,
     };
   }
 
@@ -45,11 +45,10 @@ class ESGScoringService {
       const socialScore = this.calculateSocialScore(entity);
       const governanceScore = this.calculateGovernanceScore(entity);
 
-      const overallScore = (
+      const overallScore =
         environmentalScore.score * this.weightings.environmental +
         socialScore.score * this.weightings.social +
-        governanceScore.score * this.weightings.governance
-      );
+        governanceScore.score * this.weightings.governance;
 
       const rating = this.getESGRating(overallScore);
 
@@ -62,16 +61,20 @@ class ESGScoringService {
         scores: {
           environmental: environmentalScore,
           social: socialScore,
-          governance: governanceScore
+          governance: governanceScore,
         },
-        recommendations: this.generateESGRecommendations(environmentalScore, socialScore, governanceScore),
+        recommendations: this.generateESGRecommendations(
+          environmentalScore,
+          socialScore,
+          governanceScore
+        ),
         benchmark_comparison: await this.getBenchmarkComparison(entity, overallScore),
-        last_updated: new Date().toISOString()
+        last_updated: new Date().toISOString(),
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -87,8 +90,8 @@ class ESGScoringService {
     const carbonIntensity = entity.carbon_intensity || 0; // kg CO2 per unit
     factors.carbon_intensity = {
       value: carbonIntensity,
-      score: Math.max(0, 100 - (carbonIntensity / 10)), // Normalized scale
-      weight: this.environmentalFactors.carbon_intensity
+      score: Math.max(0, 100 - carbonIntensity / 10), // Normalized scale
+      weight: this.environmentalFactors.carbon_intensity,
     };
 
     // Renewable energy ratio (higher is better)
@@ -96,28 +99,28 @@ class ESGScoringService {
     factors.renewable_energy_ratio = {
       value: renewableRatio,
       score: renewableRatio * 100,
-      weight: this.environmentalFactors.renewable_energy_ratio
+      weight: this.environmentalFactors.renewable_energy_ratio,
     };
 
     // Waste management practices
     const wasteScore = this.assessWasteManagement(entity.waste_management || {});
     factors.waste_management = {
       score: wasteScore,
-      weight: this.environmentalFactors.waste_management
+      weight: this.environmentalFactors.waste_management,
     };
 
     // Water usage efficiency
     const waterScore = this.assessWaterUsage(entity.water_usage || {});
     factors.water_usage = {
       score: waterScore,
-      weight: this.environmentalFactors.water_usage
+      weight: this.environmentalFactors.water_usage,
     };
 
     // Biodiversity impact
     const biodiversityScore = this.assessBiodiversityImpact(entity.biodiversity || {});
     factors.biodiversity_impact = {
       score: biodiversityScore,
-      weight: this.environmentalFactors.biodiversity_impact
+      weight: this.environmentalFactors.biodiversity_impact,
     };
 
     // Calculate weighted score
@@ -128,7 +131,7 @@ class ESGScoringService {
     return {
       score: totalScore,
       factors: factors,
-      category: 'Environmental'
+      category: 'Environmental',
     };
   }
 
@@ -143,28 +146,28 @@ class ESGScoringService {
     const communityScore = this.assessCommunityImpact(entity.community_programs || {});
     factors.community_impact = {
       score: communityScore,
-      weight: this.socialFactors.community_impact
+      weight: this.socialFactors.community_impact,
     };
 
     // Worker safety
     const safetyScore = this.assessWorkerSafety(entity.safety_record || {});
     factors.worker_safety = {
       score: safetyScore,
-      weight: this.socialFactors.worker_safety
+      weight: this.socialFactors.worker_safety,
     };
 
     // Local employment
     const employmentScore = this.assessLocalEmployment(entity.employment || {});
     factors.local_employment = {
       score: employmentScore,
-      weight: this.socialFactors.local_employment
+      weight: this.socialFactors.local_employment,
     };
 
     // Human rights
     const humanRightsScore = this.assessHumanRights(entity.human_rights || {});
     factors.human_rights = {
       score: humanRightsScore,
-      weight: this.socialFactors.human_rights
+      weight: this.socialFactors.human_rights,
     };
 
     // Calculate weighted score
@@ -175,7 +178,7 @@ class ESGScoringService {
     return {
       score: totalScore,
       factors: factors,
-      category: 'Social'
+      category: 'Social',
     };
   }
 
@@ -190,28 +193,28 @@ class ESGScoringService {
     const transparencyScore = this.assessTransparency(entity.transparency || {});
     factors.transparency = {
       score: transparencyScore,
-      weight: this.governanceFactors.transparency
+      weight: this.governanceFactors.transparency,
     };
 
     // Regulatory compliance
     const complianceScore = this.assessRegulatoryCompliance(entity.compliance || {});
     factors.regulatory_compliance = {
       score: complianceScore,
-      weight: this.governanceFactors.regulatory_compliance
+      weight: this.governanceFactors.regulatory_compliance,
     };
 
     // Stakeholder engagement
     const stakeholderScore = this.assessStakeholderEngagement(entity.stakeholder_engagement || {});
     factors.stakeholder_engagement = {
       score: stakeholderScore,
-      weight: this.governanceFactors.stakeholder_engagement
+      weight: this.governanceFactors.stakeholder_engagement,
     };
 
     // Risk management
     const riskScore = this.assessRiskManagement(entity.risk_management || {});
     factors.risk_management = {
       score: riskScore,
-      weight: this.governanceFactors.risk_management
+      weight: this.governanceFactors.risk_management,
     };
 
     // Calculate weighted score
@@ -222,7 +225,7 @@ class ESGScoringService {
     return {
       score: totalScore,
       factors: factors,
-      category: 'Governance'
+      category: 'Governance',
     };
   }
 
@@ -377,7 +380,7 @@ class ESGScoringService {
         category: 'Environmental',
         priority: 'High',
         action: 'Implement renewable energy sources to reduce carbon intensity',
-        impact: 'Significant improvement in environmental score'
+        impact: 'Significant improvement in environmental score',
       });
     }
 
@@ -387,7 +390,7 @@ class ESGScoringService {
         category: 'Social',
         priority: 'Medium',
         action: 'Enhance community engagement and local employment programs',
-        impact: 'Improved social license to operate'
+        impact: 'Improved social license to operate',
       });
     }
 
@@ -397,7 +400,7 @@ class ESGScoringService {
         category: 'Governance',
         priority: 'High',
         action: 'Strengthen transparency and regulatory compliance frameworks',
-        impact: 'Enhanced stakeholder trust and risk mitigation'
+        impact: 'Enhanced stakeholder trust and risk mitigation',
       });
     }
 
@@ -414,7 +417,7 @@ class ESGScoringService {
       renewable_energy: 75,
       nuclear: 60,
       coal: 25,
-      hydroelectric: 80
+      hydroelectric: 80,
     };
 
     const industryBenchmark = industryBenchmarks[entity.sector] || 50;
@@ -424,7 +427,7 @@ class ESGScoringService {
       industry_average: industryBenchmark,
       entity_score: score,
       percentile: percentile,
-      ranking: this.getPercentileRanking(percentile)
+      ranking: this.getPercentileRanking(percentile),
     };
   }
 
@@ -453,13 +456,13 @@ class ESGScoringService {
         environmental: [65, 67, 70, 72, 75], // Sample monthly scores
         social: [60, 62, 65, 67, 68],
         governance: [70, 72, 74, 76, 78],
-        overall: [65, 67, 70, 72, 74]
+        overall: [65, 67, 70, 72, 74],
       },
       trend_analysis: {
         direction: 'improving',
         rate_of_change: '+2.3 points per quarter',
-        key_drivers: ['Renewable energy adoption', 'Enhanced governance practices']
-      }
+        key_drivers: ['Renewable energy adoption', 'Enhanced governance practices'],
+      },
     };
   }
 }

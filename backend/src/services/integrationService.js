@@ -416,20 +416,20 @@ class IntegrationService {
       }
 
       switch (type) {
-      case 'trade_executed':
-        await this.notificationService.notifyTradeExecuted(data, userPrefs);
-        break;
-      case 'risk_alert':
-        await this.notificationService.notifyRiskLimitBreach(data, userPrefs);
-        break;
-      case 'margin_call':
-        await this.notificationService.notifyMarginCall(data, userPrefs);
-        break;
-      case 'compliance_alert':
-        await this.notificationService.notifyComplianceAlert(data, userPrefs);
-        break;
-      default:
-        throw new Error(`Unknown notification type: ${type}`);
+        case 'trade_executed':
+          await this.notificationService.notifyTradeExecuted(data, userPrefs);
+          break;
+        case 'risk_alert':
+          await this.notificationService.notifyRiskLimitBreach(data, userPrefs);
+          break;
+        case 'margin_call':
+          await this.notificationService.notifyMarginCall(data, userPrefs);
+          break;
+        case 'compliance_alert':
+          await this.notificationService.notifyComplianceAlert(data, userPrefs);
+          break;
+        default:
+          throw new Error(`Unknown notification type: ${type}`);
       }
 
       return { success: true, message: `${type} notification sent successfully` };

@@ -36,9 +36,7 @@ Object.defineProperty(window, 'Notification', {
 
 // Test wrapper component
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <I18nProvider defaultLanguage="en">
-    {children}
-  </I18nProvider>
+  <I18nProvider defaultLanguage="en">{children}</I18nProvider>
 );
 
 describe('Mobile Components', () => {
@@ -84,7 +82,7 @@ describe('Mobile Components', () => {
       await waitFor(() => {
         expect(mockCredentials.create).toHaveBeenCalled();
       });
-      
+
       await waitFor(() => {
         expect(onAuthSuccess).toHaveBeenCalled();
       });
@@ -115,8 +113,8 @@ describe('Mobile Components', () => {
           quantity: 100,
           price: 80,
           timestamp: Date.now(),
-          status: 'pending'
-        }
+          status: 'pending',
+        },
       ];
       localStorage.setItem('quantenergx_offline_orders', JSON.stringify(mockOrders));
 
@@ -231,15 +229,15 @@ describe('Mobile Components', () => {
 describe('Regional Configuration', () => {
   it('provides correct configuration for different regions', () => {
     const { getRegionalConfig, isMarketOpen: _isMarketOpen } = require('../i18n/regionalConfig');
-    
+
     const usConfig = getRegionalConfig('US');
     expect(usConfig.currency).toBe('USD');
     expect(usConfig.timezone).toBe('America/New_York');
-    
+
     const ukConfig = getRegionalConfig('UK');
     expect(ukConfig.currency).toBe('GBP');
     expect(ukConfig.timezone).toBe('Europe/London');
-    
+
     const meConfig = getRegionalConfig('ME');
     expect(meConfig.currency).toBe('AED');
     expect(meConfig.timezone).toBe('Asia/Dubai');
@@ -249,10 +247,19 @@ describe('Regional Configuration', () => {
 describe('Translations', () => {
   it('provides all required language translations', () => {
     const { translations } = require('../i18n/translations');
-    
+
     const languages = ['en', 'es', 'fr', 'ar', 'pt'];
-    const sections = ['common', 'navigation', 'trading', 'market', 'mobile', 'auth', 'notifications', 'regional'];
-    
+    const sections = [
+      'common',
+      'navigation',
+      'trading',
+      'market',
+      'mobile',
+      'auth',
+      'notifications',
+      'regional',
+    ];
+
     languages.forEach(lang => {
       expect(translations[lang]).toBeDefined();
       sections.forEach(section => {
@@ -263,10 +270,10 @@ describe('Translations', () => {
 
   it('has consistent keys across all languages', () => {
     const { translations } = require('../i18n/translations');
-    
+
     const englishKeys = Object.keys(translations.en.common);
     const languages = ['es', 'fr', 'ar', 'pt'];
-    
+
     languages.forEach(lang => {
       const langKeys = Object.keys(translations[lang].common);
       expect(langKeys).toEqual(englishKeys);
@@ -291,7 +298,7 @@ describe('Service Worker', () => {
 
     // Simulate service worker registration
     await navigator.serviceWorker.register('/sw.js');
-    
+
     expect(mockRegister).toHaveBeenCalledWith('/sw.js');
   });
 });
@@ -299,7 +306,7 @@ describe('Service Worker', () => {
 describe('Offline Functionality', () => {
   it('stores orders offline when network is unavailable', () => {
     const { useOfflineOrders } = require('../components/mobile/OfflineTrading');
-    
+
     // This would be more complex in a real test environment
     // Here we're just testing that the hook exists and can be imported
     expect(useOfflineOrders).toBeDefined();
@@ -310,20 +317,20 @@ describe('PWA Manifest', () => {
   it('has all required PWA manifest fields', async () => {
     // In a real test, you might fetch and parse the manifest.json file
     const manifest = {
-      name: "QuantEnergx Mobile Trading",
-      short_name: "QuantEnergx",
-      start_url: "/",
-      display: "standalone",
-      theme_color: "#1976d2",
-      background_color: "#ffffff",
+      name: 'QuantEnergx Mobile Trading',
+      short_name: 'QuantEnergx',
+      start_url: '/',
+      display: 'standalone',
+      theme_color: '#1976d2',
+      background_color: '#ffffff',
       icons: expect.any(Array),
       features: expect.arrayContaining([
-        "biometric-authentication",
-        "offline-trading",
-        "push-notifications"
-      ])
+        'biometric-authentication',
+        'offline-trading',
+        'push-notifications',
+      ]),
     };
-    
+
     expect(manifest.name).toBeDefined();
     expect(manifest.short_name).toBeDefined();
     expect(manifest.start_url).toBeDefined();

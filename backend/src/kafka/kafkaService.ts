@@ -14,7 +14,7 @@ export class KafkaService {
 
   constructor(logger: winston.Logger) {
     this.logger = logger;
-    
+
     // Initialize Kafka client
     this.kafka = new Kafka({
       clientId: 'quantenergx-backend',
@@ -23,8 +23,8 @@ export class KafkaService {
       requestTimeout: 25000,
       retry: {
         initialRetryTime: 100,
-        retries: 8
-      }
+        retries: 8,
+      },
     });
   }
 
@@ -37,7 +37,7 @@ export class KafkaService {
       this.producer = this.kafka.producer({
         transactionTimeout: 30000,
         idempotent: true,
-        maxInFlightRequests: 1
+        maxInFlightRequests: 1,
       });
 
       await this.producer.connect();
@@ -45,7 +45,6 @@ export class KafkaService {
 
       // Create topics if they don't exist
       await this.createTopics();
-
     } catch (error) {
       this.logger.error('Failed to initialize Kafka service:', error);
       throw error;
@@ -66,8 +65,8 @@ export class KafkaService {
         replicationFactor: 1,
         configEntries: [
           { name: 'cleanup.policy', value: 'compact' },
-          { name: 'retention.ms', value: '604800000' } // 7 days
-        ]
+          { name: 'retention.ms', value: '604800000' }, // 7 days
+        ],
       },
       {
         topic: 'trade-updates',
@@ -75,35 +74,35 @@ export class KafkaService {
         replicationFactor: 1,
         configEntries: [
           { name: 'cleanup.policy', value: 'delete' },
-          { name: 'retention.ms', value: '2592000000' } // 30 days
-        ]
+          { name: 'retention.ms', value: '2592000000' }, // 30 days
+        ],
       },
       {
         topic: 'order-updates',
         numPartitions: 5,
-        replicationFactor: 1
+        replicationFactor: 1,
       },
       {
         topic: 'system-alerts',
         numPartitions: 2,
-        replicationFactor: 1
+        replicationFactor: 1,
       },
       {
         topic: 'compliance-events',
         numPartitions: 3,
-        replicationFactor: 1
+        replicationFactor: 1,
       },
       {
         topic: 'webhook-events',
         numPartitions: 2,
-        replicationFactor: 1
-      }
+        replicationFactor: 1,
+      },
     ];
 
     try {
       await admin.createTopics({
         topics,
-        waitForLeaders: true
+        waitForLeaders: true,
       });
       this.logger.info('Kafka topics created successfully');
     } catch (error) {
@@ -132,16 +131,16 @@ export class KafkaService {
             timestamp: message.timestamp.getTime().toString(),
             headers: {
               source: 'quantenergx-backend',
-              messageType: message.value.type || 'unknown'
-            }
-          }
-        ]
+              messageType: message.value.type || 'unknown',
+            },
+          },
+        ],
       });
 
       this.logger.debug(`Message published to topic ${topic}`, {
         topic,
         messageType: message.value.type,
-        timestamp: message.timestamp
+        timestamp: message.timestamp,
       });
     } catch (error) {
       this.logger.error(`Failed to publish message to topic ${topic}:`, error);
@@ -153,14 +152,14 @@ export class KafkaService {
    * Subscribe to Kafka topic with message handler
    */
   async subscribeToTopic(
-    topic: string, 
-    groupId: string, 
+    topic: string,
+    groupId: string,
     messageHandler: (message: KafkaMessage) => Promise<void>
   ): Promise<void> {
     const consumer = this.kafka.consumer({
       groupId,
       sessionTimeout: 30000,
-      heartbeatInterval: 3000
+      heartbeatInterval: 3000,
     });
 
     try {
@@ -178,20 +177,18 @@ export class KafkaService {
               offset: message.offset,
               key: message.key?.toString(),
               value: JSON.parse(message.value.toString()),
-              timestamp: new Date(parseInt(message.timestamp))
+              timestamp: new Date(parseInt(message.timestamp)),
             };
 
             await messageHandler(kafkaMessage);
-
           } catch (error) {
             this.logger.error(`Error processing message from topic ${topic}:`, error);
           }
-        }
+        },
       });
 
       this.consumers.set(`${topic}-${groupId}`, consumer);
       this.logger.info(`Subscribed to topic ${topic} with group ${groupId}`);
-
     } catch (error) {
       this.logger.error(`Failed to subscribe to topic ${topic}:`, error);
       throw error;
@@ -209,9 +206,9 @@ export class KafkaService {
       key: marketData.commodity,
       value: {
         type: 'MARKET_UPDATE',
-        ...marketData
+        ...marketData,
       },
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     await this.publishMessage('market-data', message);
@@ -228,9 +225,9 @@ export class KafkaService {
       key: trade.id,
       value: {
         type: 'TRADE_UPDATE',
-        ...trade
+        ...trade,
       },
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     await this.publishMessage('trade-updates', message);
@@ -247,9 +244,9 @@ export class KafkaService {
       key: order.id,
       value: {
         type: 'ORDER_UPDATE',
-        ...order
+        ...order,
       },
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     await this.publishMessage('order-updates', message);
@@ -265,9 +262,9 @@ export class KafkaService {
       offset: '',
       value: {
         type: 'SYSTEM_ALERT',
-        ...alert
+        ...alert,
       },
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     await this.publishMessage('system-alerts', message);

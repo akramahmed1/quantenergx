@@ -55,7 +55,7 @@ router.get('/', (req, res) => {
       sharia: '/api/v1/sharia',
       esg: '/api/v1/esg',
       carbon: '/api/v1/carbon',
-      'renewable-certificates': '/api/v1/renewable-certificates'
+      'renewable-certificates': '/api/v1/renewable-certificates',
     },
     features: {
       derivatives_trading: [
@@ -64,7 +64,7 @@ router.get('/', (req, res) => {
         'Commodity swaps (fixed/floating)',
         'Structured notes with custom payoffs',
         'Real-time margin calculations',
-        'Multi-region settlement workflows'
+        'Multi-region settlement workflows',
       ],
       margin_management: [
         'SPAN-like margin calculations',
@@ -72,7 +72,7 @@ router.get('/', (req, res) => {
         'Real-time margin monitoring',
         'Automated margin calls',
         'Cross-margining across commodities',
-        'Region-specific margin rules'
+        'Region-specific margin rules',
       ],
       settlement_processing: [
         'Multi-type settlements (cash/physical/net)',
@@ -80,7 +80,7 @@ router.get('/', (req, res) => {
         'Real-time settlement monitoring',
         'Region-specific settlement rules',
         'Automated settlement execution',
-        'Settlement history and reporting'
+        'Settlement history and reporting',
       ],
       streaming_engine: [
         'Millisecond-level tick processing',
@@ -235,7 +235,7 @@ router.get('/', (req, res) => {
       'Futures (Cash/Physical Settlement)',
       'Options (Call/Put, American/European/Bermudan)',
       'Swaps (Commodity/Basis/Calendar)',
-      'Structured Notes (Autocall/Barrier/Range Accrual)'
+      'Structured Notes (Autocall/Barrier/Range Accrual)',
     ],
     supported_exchanges: [
       'ICE (Intercontinental Exchange)',
