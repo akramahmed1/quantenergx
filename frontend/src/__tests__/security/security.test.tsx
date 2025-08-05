@@ -71,8 +71,12 @@ describe('Frontend Security Tests', () => {
       const mockFetch = jest.fn();
       global.fetch = mockFetch;
 
+      // Mock CSRF token approach without direct DOM access
+      const mockCSRFToken = 'test-csrf-token-123';
+      
       const apiCall = async () => {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        // In a real app, this would get the token from a secure location
+        const csrfToken = mockCSRFToken;
         
         return fetch('/api/user/profile', {
           method: 'POST',

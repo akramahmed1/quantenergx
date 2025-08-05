@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 
@@ -95,7 +96,9 @@ describe('Frontend Performance Tests', () => {
 
       const { rerender } = render(<ParentComponent />);
       
-      const initialRenderCount = renderCount;
+      // Store initial render count for comparison
+      let previousCount;
+      previousCount = renderCount;
       
       // Trigger re-renders by changing count
       act(() => {
@@ -105,7 +108,7 @@ describe('Frontend Performance Tests', () => {
       rerender(<ParentComponent />);
       
       // ExpensiveComponent should not re-render since data prop hasn't changed
-      expect(renderCount).toBe(initialRenderCount);
+      expect(renderCount).toBe(previousCount);
     });
   });
 
@@ -393,7 +396,7 @@ describe('Frontend Performance Tests', () => {
         </PerformanceWrapper>
       );
 
-      waitFor(() => {
+      await waitFor(() => {
         expect(screen.getByTestId('render-time')).toBeInTheDocument();
       });
     });
@@ -433,7 +436,7 @@ describe('Frontend Performance Tests', () => {
 
       render(<WebVitalsTracker />);
       
-      waitFor(() => {
+      await waitFor(() => {
         expect(screen.getByTestId('vitals')).toBeInTheDocument();
       });
     });

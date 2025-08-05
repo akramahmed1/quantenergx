@@ -144,7 +144,7 @@ describe('AppBar Component', () => {
 
   describe('Interactive Elements', () => {
     test('notification button is clickable', () => {
-      const mockClick = jest.fn();
+      const _mockClick = jest.fn();
       
       renderWithProviders(<AppBar />);
       
@@ -156,7 +156,7 @@ describe('AppBar Component', () => {
     });
 
     test('account button is clickable', () => {
-      const mockClick = jest.fn();
+      const _mockClick = jest.fn();
       
       renderWithProviders(<AppBar />);
       

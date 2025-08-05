@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Card,
@@ -16,13 +16,10 @@ import {
   DialogContent,
   DialogActions,
   Rating,
-  Avatar,
   List,
   ListItem,
   ListItemText,
   ListItemIcon,
-  ListItemAvatar,
-  Divider,
   Alert,
   CircularProgress,
   Tab,
@@ -38,14 +35,11 @@ import {
   Search,
   FilterList,
   Download,
-  Star,
   Verified,
   Category,
-  AttachMoney,
   Security,
   CloudDownload,
-  Store,
-  TrendingUp
+  Store
 } from '@mui/icons-material';
 
 interface Plugin {
@@ -135,7 +129,7 @@ const Marketplace: React.FC = () => {
     { id: 'Integration & APIs', name: 'Integration & APIs' }
   ];
 
-  const fetchPlugins = async () => {
+  const fetchPlugins = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch('/api/v1/marketplace/plugins');
@@ -149,9 +143,9 @@ const Marketplace: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchFeaturedPlugins = async () => {
+  const fetchFeaturedPlugins = useCallback(async () => {
     try {
       const response = await fetch('/api/v1/marketplace/featured');
       const result = await response.json();
@@ -162,7 +156,7 @@ const Marketplace: React.FC = () => {
     } catch (error) {
       console.error('Failed to fetch featured plugins:', error);
     }
-  };
+  }, []);
 
   const fetchPluginDetails = async (pluginId: string) => {
     try {
@@ -207,7 +201,7 @@ const Marketplace: React.FC = () => {
     }
   };
 
-  const searchPlugins = async () => {
+  const searchPlugins = useCallback(async () => {
     if (!searchQuery.trim()) {
       fetchPlugins();
       return;
@@ -236,12 +230,12 @@ const Marketplace: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery, selectedCategory, fetchPlugins]);
 
   useEffect(() => {
     fetchPlugins();
     fetchFeaturedPlugins();
-  }, []);
+  }, [fetchPlugins, fetchFeaturedPlugins]);
 
   useEffect(() => {
     const delayedSearch = setTimeout(() => {
@@ -251,7 +245,7 @@ const Marketplace: React.FC = () => {
     }, 500);
 
     return () => clearTimeout(delayedSearch);
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, searchPlugins]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
