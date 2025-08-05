@@ -13,7 +13,7 @@ import {
   ListItemIcon,
   Chip,
   Alert,
-  CircularProgress
+  CircularProgress,
 } from '@mui/material';
 import {
   CloudOff,
@@ -21,7 +21,7 @@ import {
   Sync,
   SyncProblem,
   CheckCircle,
-  ErrorOutline
+  ErrorOutline,
 } from '@mui/icons-material';
 import { useTranslation } from '../../i18n/I18nProvider';
 
@@ -40,10 +40,7 @@ interface OfflineTradingProps {
   onSyncOrders: (orders: OfflineOrder[]) => Promise<void>;
 }
 
-export const OfflineTrading: React.FC<OfflineTradingProps> = ({
-  isOnline,
-  onSyncOrders
-}) => {
+export const OfflineTrading: React.FC<OfflineTradingProps> = ({ isOnline, onSyncOrders }) => {
   const { t } = useTranslation();
   const [offlineMode, setOfflineMode] = useState(false);
   const [pendingOrders, setPendingOrders] = useState<OfflineOrder[]>([]);
@@ -64,39 +61,38 @@ export const OfflineTrading: React.FC<OfflineTradingProps> = ({
     }
 
     setIsSyncing(true);
-    
+
     try {
       await onSyncOrders(pendingOrders);
-      
+
       // Mark orders as synced
       const syncedOrders = pendingOrders.map(order => ({
         ...order,
-        status: 'synced' as const
+        status: 'synced' as const,
       }));
-      
+
       setPendingOrders(syncedOrders);
       saveOfflineData(syncedOrders);
       setLastSyncTime(new Date());
       localStorage.setItem('quantenergx_last_sync', new Date().toISOString());
-      
+
       // Clear synced orders after 24 hours
       setTimeout(() => {
-        const filteredOrders = syncedOrders.filter(order => 
-          order.status !== 'synced' || Date.now() - order.timestamp < 24 * 60 * 60 * 1000
+        const filteredOrders = syncedOrders.filter(
+          order => order.status !== 'synced' || Date.now() - order.timestamp < 24 * 60 * 60 * 1000
         );
         setPendingOrders(filteredOrders);
         saveOfflineData(filteredOrders);
       }, 100);
-      
     } catch (error) {
       console.error('Sync failed:', error);
-      
+
       // Mark orders as failed
       const failedOrders = pendingOrders.map(order => ({
         ...order,
-        status: 'failed' as const
+        status: 'failed' as const,
       }));
-      
+
       setPendingOrders(failedOrders);
       saveOfflineData(failedOrders);
     } finally {
@@ -106,7 +102,7 @@ export const OfflineTrading: React.FC<OfflineTradingProps> = ({
 
   useEffect(() => {
     loadOfflineData();
-    
+
     // Set up periodic sync when online
     if (isOnline && pendingOrders.length > 0) {
       const syncInterval = setInterval(() => {
@@ -115,7 +111,7 @@ export const OfflineTrading: React.FC<OfflineTradingProps> = ({
 
       return () => clearInterval(syncInterval);
     }
-  }, [isOnline, pendingOrders.length, syncPendingOrders]);  // Include syncPendingOrders
+  }, [isOnline, pendingOrders.length, syncPendingOrders]); // Include syncPendingOrders
 
   const loadOfflineData = () => {
     try {
@@ -126,9 +122,9 @@ export const OfflineTrading: React.FC<OfflineTradingProps> = ({
       if (savedOrders) {
         setPendingOrders(JSON.parse(savedOrders));
       }
-      
+
       setOfflineMode(savedMode === 'true');
-      
+
       if (savedSyncTime) {
         setLastSyncTime(new Date(savedSyncTime));
       }
@@ -147,7 +143,7 @@ export const OfflineTrading: React.FC<OfflineTradingProps> = ({
       ...order,
       id: `offline_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       timestamp: Date.now(),
-      status: 'pending'
+      status: 'pending',
     };
 
     const updatedOrders = [...pendingOrders, newOrder];
@@ -194,12 +190,10 @@ export const OfflineTrading: React.FC<OfflineTradingProps> = ({
     <Card>
       <CardContent>
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-          <Typography variant="h6">
-            {t('mobile.offlineTrading')}
-          </Typography>
+          <Typography variant="h6">{t('mobile.offlineTrading')}</Typography>
           <Box display="flex" alignItems="center" gap={1}>
             {!isOnline && <CloudOff color="error" />}
-            <Chip 
+            <Chip
               label={isOnline ? 'Online' : 'Offline'}
               color={isOnline ? 'success' : 'error'}
               size="small"
@@ -209,10 +203,7 @@ export const OfflineTrading: React.FC<OfflineTradingProps> = ({
 
         <FormControlLabel
           control={
-            <Switch
-              checked={offlineMode}
-              onChange={(e) => toggleOfflineMode(e.target.checked)}
-            />
+            <Switch checked={offlineMode} onChange={e => toggleOfflineMode(e.target.checked)} />
           }
           label={t('trading.offlineMode')}
         />
@@ -242,22 +233,16 @@ export const OfflineTrading: React.FC<OfflineTradingProps> = ({
             <Typography variant="subtitle2" gutterBottom>
               Offline Orders ({pendingOrders.length})
             </Typography>
-            
+
             <List dense>
-              {pendingOrders.slice(-5).map((order) => (
+              {pendingOrders.slice(-5).map(order => (
                 <ListItem key={order.id}>
-                  <ListItemIcon>
-                    {getStatusIcon(order.status)}
-                  </ListItemIcon>
+                  <ListItemIcon>{getStatusIcon(order.status)}</ListItemIcon>
                   <ListItemText
                     primary={`${order.type.toUpperCase()} ${order.quantity} ${order.commodity}`}
                     secondary={`$${order.price} - ${new Date(order.timestamp).toLocaleString()}`}
                   />
-                  <Chip
-                    label={order.status}
-                    color={getStatusColor(order.status)}
-                    size="small"
-                  />
+                  <Chip label={order.status} color={getStatusColor(order.status)} size="small" />
                 </ListItem>
               ))}
             </List>
@@ -280,12 +265,7 @@ export const OfflineTrading: React.FC<OfflineTradingProps> = ({
 
         {pendingOrders.length > 0 && (
           <Box mt={2}>
-            <Button
-              variant="outlined"
-              color="secondary"
-              size="small"
-              onClick={clearOfflineData}
-            >
+            <Button variant="outlined" color="secondary" size="small" onClick={clearOfflineData}>
               Clear Offline Data
             </Button>
           </Box>
@@ -299,22 +279,25 @@ export const OfflineTrading: React.FC<OfflineTradingProps> = ({
 export const useOfflineOrders = () => {
   const [orders, setOrders] = useState<OfflineOrder[]>([]);
 
-  const addOfflineOrder = useCallback((order: Omit<OfflineOrder, 'id' | 'timestamp' | 'status'>) => {
-    const newOrder: OfflineOrder = {
-      ...order,
-      id: `offline_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      timestamp: Date.now(),
-      status: 'pending'
-    };
+  const addOfflineOrder = useCallback(
+    (order: Omit<OfflineOrder, 'id' | 'timestamp' | 'status'>) => {
+      const newOrder: OfflineOrder = {
+        ...order,
+        id: `offline_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        timestamp: Date.now(),
+        status: 'pending',
+      };
 
-    setOrders(prev => {
-      const updated = [...prev, newOrder];
-      localStorage.setItem('quantenergx_offline_orders', JSON.stringify(updated));
-      return updated;
-    });
+      setOrders(prev => {
+        const updated = [...prev, newOrder];
+        localStorage.setItem('quantenergx_offline_orders', JSON.stringify(updated));
+        return updated;
+      });
 
-    return newOrder;
-  }, []);
+      return newOrder;
+    },
+    []
+  );
 
   const getOfflineOrders = useCallback(() => {
     return orders.filter(order => order.status === 'pending');
@@ -334,7 +317,7 @@ export const useOfflineOrders = () => {
   return {
     addOfflineOrder,
     getOfflineOrders,
-    allOrders: orders
+    allOrders: orders,
   };
 };
 

@@ -12,7 +12,7 @@ class NLPSentimentAnalysisService {
       gas: ['natural gas', 'LNG', 'pipeline', 'shale', 'fracking', 'Henry Hub'],
       renewable: ['solar', 'wind', 'renewable', 'clean energy', 'green', 'ESG', 'carbon'],
       geopolitical: ['sanctions', 'war', 'conflict', 'embargo', 'trade war', 'tariff'],
-      economic: ['recession', 'inflation', 'GDP', 'demand', 'supply', 'inventory']
+      economic: ['recession', 'inflation', 'GDP', 'demand', 'supply', 'inventory'],
     };
     this.sources = [
       'Reuters Energy',
@@ -20,7 +20,7 @@ class NLPSentimentAnalysisService {
       'S&P Global Platts',
       'Energy Intelligence',
       'Wall Street Journal',
-      'Financial Times'
+      'Financial Times',
     ];
   }
 
@@ -31,7 +31,7 @@ class NLPSentimentAnalysisService {
     try {
       const newsData = await this.fetchNewsData(timeframe, commodities);
       const analysis = await this.processNewsArticles(newsData);
-      
+
       const result = {
         analysis_id: this.generateAnalysisId(),
         timestamp: new Date().toISOString(),
@@ -44,12 +44,12 @@ class NLPSentimentAnalysisService {
         news_volume: newsData.length,
         confidence_score: analysis.confidence,
         alerts: analysis.alerts,
-        recommendations: analysis.recommendations
+        recommendations: analysis.recommendations,
       };
 
       this.sentimentCache.set(result.analysis_id, result);
       this.updateSentimentHistory(result);
-      
+
       return result;
     } catch (error) {
       throw new Error(`Sentiment analysis failed: ${error.message}`);
@@ -63,7 +63,7 @@ class NLPSentimentAnalysisService {
     // Simulate fetching news data from multiple sources
     const articles = [];
     const articlesPerSource = this.getArticleCount(timeframe);
-    
+
     for (const source of this.sources) {
       for (let i = 0; i < articlesPerSource; i++) {
         const article = this.generateSimulatedArticle(source, commodities);
@@ -107,7 +107,7 @@ class NLPSentimentAnalysisService {
           article_title: article.title,
           sentiment_score: articleSentiment.overall_score,
           source: article.source,
-          published_at: article.published_at
+          published_at: article.published_at,
         });
       }
     }
@@ -124,7 +124,7 @@ class NLPSentimentAnalysisService {
       trend,
       confidence,
       alerts: alerts.slice(0, 5), // Top 5 alerts
-      recommendations: this.generateRecommendations(overall, byCommodity, alerts)
+      recommendations: this.generateRecommendations(overall, byCommodity, alerts),
     };
   }
 
@@ -133,7 +133,7 @@ class NLPSentimentAnalysisService {
    */
   async analyzeArticleSentiment(article) {
     const text = `${article.title} ${article.summary}`;
-    
+
     // Simulate NLP processing
     const overallScore = this.simulateNLPSentiment(text);
     const commodityScores = this.analyzeCommoditySpecificSentiment(text);
@@ -146,7 +146,7 @@ class NLPSentimentAnalysisService {
       themes: themes,
       entities: entities,
       text_length: text.length,
-      processing_confidence: this.calculateTextConfidence(text)
+      processing_confidence: this.calculateTextConfidence(text),
     };
   }
 
@@ -154,12 +154,30 @@ class NLPSentimentAnalysisService {
    * Simulate NLP sentiment analysis
    */
   simulateNLPSentiment(text) {
-    const positiveWords = ['surge', 'rise', 'increase', 'bullish', 'growth', 'strong', 'gains', 'optimistic'];
-    const negativeWords = ['fall', 'decline', 'drop', 'bearish', 'weak', 'concerns', 'crisis', 'crash'];
-    
+    const positiveWords = [
+      'surge',
+      'rise',
+      'increase',
+      'bullish',
+      'growth',
+      'strong',
+      'gains',
+      'optimistic',
+    ];
+    const negativeWords = [
+      'fall',
+      'decline',
+      'drop',
+      'bearish',
+      'weak',
+      'concerns',
+      'crisis',
+      'crash',
+    ];
+
     let score = 0;
     const words = text.toLowerCase().split(/\s+/);
-    
+
     words.forEach(word => {
       if (positiveWords.some(pw => word.includes(pw))) score += 0.1;
       if (negativeWords.some(nw => word.includes(nw))) score -= 0.1;
@@ -167,7 +185,7 @@ class NLPSentimentAnalysisService {
 
     // Add some random variation
     score += (Math.random() - 0.5) * 0.2;
-    
+
     // Normalize to [-1, 1]
     return Math.max(-1, Math.min(1, score));
   }
@@ -177,11 +195,11 @@ class NLPSentimentAnalysisService {
    */
   analyzeCommoditySpecificSentiment(text) {
     const scores = {};
-    
+
     for (const [commodity, keywords] of Object.entries(this.keywords)) {
       let commodityScore = 0;
       let keywordCount = 0;
-      
+
       keywords.forEach(keyword => {
         if (text.toLowerCase().includes(keyword.toLowerCase())) {
           keywordCount++;
@@ -190,14 +208,14 @@ class NLPSentimentAnalysisService {
           commodityScore += this.simulateNLPSentiment(context);
         }
       });
-      
+
       if (keywordCount > 0) {
         scores[commodity] = commodityScore / keywordCount;
       } else {
         scores[commodity] = 0;
       }
     }
-    
+
     return scores;
   }
 
@@ -207,7 +225,7 @@ class NLPSentimentAnalysisService {
   extractThemes(text) {
     const themes = [];
     const allKeywords = Object.values(this.keywords).flat();
-    
+
     allKeywords.forEach(keyword => {
       if (text.toLowerCase().includes(keyword.toLowerCase())) {
         themes.push(keyword);
@@ -236,7 +254,7 @@ class NLPSentimentAnalysisService {
       companies: [],
       countries: [],
       organizations: [],
-      commodities: []
+      commodities: [],
     };
 
     // Simulate entity extraction
@@ -264,10 +282,10 @@ class NLPSentimentAnalysisService {
    */
   getKeywordContext(text, keyword) {
     const sentences = text.split(/[.!?]+/);
-    const relevantSentences = sentences.filter(sentence => 
+    const relevantSentences = sentences.filter(sentence =>
       sentence.toLowerCase().includes(keyword.toLowerCase())
     );
-    
+
     return relevantSentences.join('. ');
   }
 
@@ -276,10 +294,11 @@ class NLPSentimentAnalysisService {
    */
   calculateOverallSentiment(scores) {
     if (scores.length === 0) return { score: 0, label: 'NEUTRAL' };
-    
+
     const average = scores.reduce((sum, score) => sum + score, 0) / scores.length;
-    const variance = scores.reduce((sum, score) => sum + Math.pow(score - average, 2), 0) / scores.length;
-    
+    const variance =
+      scores.reduce((sum, score) => sum + Math.pow(score - average, 2), 0) / scores.length;
+
     let label = 'NEUTRAL';
     if (average > 0.3) label = 'POSITIVE';
     else if (average > 0.1) label = 'SLIGHTLY_POSITIVE';
@@ -290,7 +309,7 @@ class NLPSentimentAnalysisService {
       score: average,
       label: label,
       confidence: Math.max(0, 1 - variance),
-      sample_size: scores.length
+      sample_size: scores.length,
     };
   }
 
@@ -299,7 +318,7 @@ class NLPSentimentAnalysisService {
    */
   calculateCommoditySentiments(commodityScores) {
     const result = {};
-    
+
     for (const [commodity, scores] of Object.entries(commodityScores)) {
       if (scores.length > 0) {
         result[commodity] = this.calculateOverallSentiment(scores);
@@ -307,7 +326,7 @@ class NLPSentimentAnalysisService {
         result[commodity] = { score: 0, label: 'NEUTRAL', confidence: 0, sample_size: 0 };
       }
     }
-    
+
     return result;
   }
 
@@ -318,17 +337,19 @@ class NLPSentimentAnalysisService {
     const historicalScores = this.sentimentHistory
       .slice(-10) // Last 10 analyses
       .map(h => h.overall_sentiment.score);
-    
+
     if (historicalScores.length < 3) {
       return { trend: 'INSUFFICIENT_DATA', change: 0, direction: 'STABLE' };
     }
 
     const recent = historicalScores.slice(-3).reduce((sum, score) => sum + score, 0) / 3;
-    const older = historicalScores.slice(0, -3).reduce((sum, score) => sum + score, 0) / (historicalScores.length - 3);
-    
+    const older =
+      historicalScores.slice(0, -3).reduce((sum, score) => sum + score, 0) /
+      (historicalScores.length - 3);
+
     const change = recent - older;
     let direction = 'STABLE';
-    
+
     if (change > 0.1) direction = 'IMPROVING';
     else if (change < -0.1) direction = 'DECLINING';
 
@@ -337,7 +358,7 @@ class NLPSentimentAnalysisService {
       change: change,
       direction: direction,
       historical_average: older,
-      recent_average: recent
+      recent_average: recent,
     };
   }
 
@@ -363,14 +384,14 @@ class NLPSentimentAnalysisService {
         type: 'SENTIMENT_BULLISH',
         action: 'Consider increasing long positions in energy markets',
         confidence: overall.confidence,
-        timeframe: 'short_term'
+        timeframe: 'short_term',
       });
     } else if (overall.score < -0.5) {
       recommendations.push({
         type: 'SENTIMENT_BEARISH',
         action: 'Consider hedging positions or taking defensive stance',
         confidence: overall.confidence,
-        timeframe: 'short_term'
+        timeframe: 'short_term',
       });
     }
 
@@ -382,7 +403,7 @@ class NLPSentimentAnalysisService {
           commodity: commodity,
           action: `Positive sentiment for ${commodity} suggests potential upside`,
           confidence: sentiment.confidence,
-          timeframe: 'short_term'
+          timeframe: 'short_term',
         });
       } else if (sentiment.score < -0.4 && sentiment.confidence > 0.6) {
         recommendations.push({
@@ -390,7 +411,7 @@ class NLPSentimentAnalysisService {
           commodity: commodity,
           action: `Negative sentiment for ${commodity} suggests potential downside`,
           confidence: sentiment.confidence,
-          timeframe: 'short_term'
+          timeframe: 'short_term',
         });
       }
     }
@@ -401,7 +422,7 @@ class NLPSentimentAnalysisService {
         type: 'HIGH_NEWS_ACTIVITY',
         action: 'High news activity detected - monitor for volatility',
         confidence: 0.8,
-        timeframe: 'immediate'
+        timeframe: 'immediate',
       });
     }
 
@@ -441,10 +462,10 @@ class NLPSentimentAnalysisService {
 
     // Keyword density factor
     const allKeywords = Object.values(this.keywords).flat();
-    const keywordMatches = allKeywords.filter(keyword => 
+    const keywordMatches = allKeywords.filter(keyword =>
       text.toLowerCase().includes(keyword.toLowerCase())
     ).length;
-    
+
     if (keywordMatches > 3) confidence += 0.1;
 
     return Math.min(0.95, Math.max(0.3, confidence));
@@ -458,7 +479,7 @@ class NLPSentimentAnalysisService {
       '12h': 8,
       '24h': 15,
       '48h': 25,
-      '7d': 50
+      '7d': 50,
     };
     return counts[timeframe] || 15;
   }
@@ -472,7 +493,7 @@ class NLPSentimentAnalysisService {
       'U.S. crude inventories show unexpected decline',
       'Global energy transition accelerates with new policy initiatives',
       'Refinery outages impact regional fuel supplies',
-      'LNG exports increase as European demand remains strong'
+      'LNG exports increase as European demand remains strong',
     ];
 
     const summaries = [
@@ -481,7 +502,7 @@ class NLPSentimentAnalysisService {
       'Economic indicators suggest continued volatility in commodity markets.',
       'Geopolitical events continue to influence global energy trade flows.',
       'Environmental regulations shape future investment strategies.',
-      'Technological advancements drive efficiency improvements across the sector.'
+      'Technological advancements drive efficiency improvements across the sector.',
     ];
 
     return {
@@ -492,7 +513,7 @@ class NLPSentimentAnalysisService {
       published_at: new Date(Date.now() - Math.random() * 86400000).toISOString(), // Last 24 hours
       url: `https://${source.toLowerCase().replace(/\s+/g, '')}.com/article/${Date.now()}`,
       author: 'Energy Reporter',
-      category: commodities[Math.floor(Math.random() * commodities.length)]
+      category: commodities[Math.floor(Math.random() * commodities.length)],
     };
   }
 
@@ -508,7 +529,7 @@ class NLPSentimentAnalysisService {
     this.sentimentHistory.push({
       timestamp: result.timestamp,
       overall_sentiment: result.overall_sentiment,
-      analysis_id: result.analysis_id
+      analysis_id: result.analysis_id,
     });
 
     // Keep only last 50 analyses
@@ -529,12 +550,11 @@ class NLPSentimentAnalysisService {
    * Get real-time sentiment alerts
    */
   getRealTimeAlerts() {
-    const recentAnalyses = Array.from(this.sentimentCache.values())
-      .filter(analysis => {
-        const analysisTime = new Date(analysis.timestamp);
-        const cutoff = new Date(Date.now() - 6 * 60 * 60 * 1000); // Last 6 hours
-        return analysisTime > cutoff;
-      });
+    const recentAnalyses = Array.from(this.sentimentCache.values()).filter(analysis => {
+      const analysisTime = new Date(analysis.timestamp);
+      const cutoff = new Date(Date.now() - 6 * 60 * 60 * 1000); // Last 6 hours
+      return analysisTime > cutoff;
+    });
 
     const alerts = [];
     recentAnalyses.forEach(analysis => {

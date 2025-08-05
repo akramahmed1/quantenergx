@@ -25,7 +25,7 @@ router.post('/recommendations/generate', async (req, res) => {
     if (!portfolio_data) {
       return res.status(400).json({
         success: false,
-        error: 'Portfolio data is required'
+        error: 'Portfolio data is required',
       });
     }
 
@@ -37,15 +37,14 @@ router.post('/recommendations/generate', async (req, res) => {
     res.json({
       success: true,
       data: recommendations,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Trade recommendation generation error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to generate trade recommendations',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -66,15 +65,14 @@ router.get('/recommendations/:portfolio_id', async (req, res) => {
       success: true,
       data: recommendations,
       count: recommendations.length,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Get recommendations error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve recommendations',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -92,7 +90,7 @@ router.put('/recommendations/:recommendation_id/performance', async (req, res) =
     if (!actual_outcome) {
       return res.status(400).json({
         success: false,
-        error: 'Actual outcome data is required'
+        error: 'Actual outcome data is required',
       });
     }
 
@@ -104,22 +102,21 @@ router.put('/recommendations/:recommendation_id/performance', async (req, res) =
     if (!updatedRecommendation) {
       return res.status(404).json({
         success: false,
-        error: 'Recommendation not found'
+        error: 'Recommendation not found',
       });
     }
 
     res.json({
       success: true,
       data: updatedRecommendation,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Update recommendation performance error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to update recommendation performance',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -138,15 +135,14 @@ router.post('/sentiment/analyze', async (req, res) => {
     res.json({
       success: true,
       data: analysis,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Sentiment analysis error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to analyze sentiment',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -166,15 +162,14 @@ router.get('/sentiment/history', async (req, res) => {
       success: true,
       data: history,
       count: history.length,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Get sentiment history error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve sentiment history',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -192,15 +187,14 @@ router.get('/sentiment/alerts', async (req, res) => {
       success: true,
       data: alerts,
       count: alerts.length,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Get sentiment alerts error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve sentiment alerts',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -217,7 +211,7 @@ router.post('/anomalies/detect', async (req, res) => {
     if (!data || !Array.isArray(data)) {
       return res.status(400).json({
         success: false,
-        error: 'Valid data array is required'
+        error: 'Valid data array is required',
       });
     }
 
@@ -226,15 +220,14 @@ router.post('/anomalies/detect', async (req, res) => {
     res.json({
       success: true,
       data: anomalies,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Anomaly detection error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to detect anomalies',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -254,15 +247,14 @@ router.get('/anomalies/recent', async (req, res) => {
       success: true,
       data: anomalies,
       count: anomalies.length,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Get recent anomalies error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve recent anomalies',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -280,7 +272,7 @@ router.put('/anomalies/baselines/:commodity', async (req, res) => {
     if (!data || !Array.isArray(data)) {
       return res.status(400).json({
         success: false,
-        error: 'Valid data array is required'
+        error: 'Valid data array is required',
       });
     }
 
@@ -290,15 +282,14 @@ router.put('/anomalies/baselines/:commodity', async (req, res) => {
       success: true,
       data: updatedBaselines,
       commodity: commodity,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Update baselines error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to update baselines',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -315,13 +306,13 @@ router.get('/dashboard', async (req, res) => {
     // Get data from all services
     const [sentimentAlerts, recentAnomalies] = await Promise.all([
       sentimentService.getRealTimeAlerts(),
-      anomalyService.getRecentAnomalies(24)
+      anomalyService.getRecentAnomalies(24),
     ]);
 
     const dashboard = {
       sentiment: {
         alerts: sentimentAlerts.slice(0, 5),
-        alert_count: sentimentAlerts.length
+        alert_count: sentimentAlerts.length,
       },
       anomalies: {
         recent: recentAnomalies.slice(0, 10),
@@ -329,36 +320,35 @@ router.get('/dashboard', async (req, res) => {
         by_severity: {
           severe: recentAnomalies.filter(a => a.severity === 'SEVERE').length,
           moderate: recentAnomalies.filter(a => a.severity === 'MODERATE').length,
-          mild: recentAnomalies.filter(a => a.severity === 'MILD').length
-        }
+          mild: recentAnomalies.filter(a => a.severity === 'MILD').length,
+        },
       },
       recommendations: {
         total_active: 0, // Would be calculated from active recommendations
         performance_summary: {
           success_rate: 0.75, // Placeholder
-          avg_return: 0.08
-        }
+          avg_return: 0.08,
+        },
       },
       system_status: {
         llm_service: 'operational',
         sentiment_service: 'operational',
         anomaly_service: 'operational',
-        last_updated: new Date().toISOString()
-      }
+        last_updated: new Date().toISOString(),
+      },
     };
 
     res.json({
       success: true,
       data: dashboard,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('AI dashboard error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve AI dashboard data',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -375,31 +365,30 @@ router.post('/portfolio/rebalance', async (req, res) => {
     if (!portfolio_data) {
       return res.status(400).json({
         success: false,
-        error: 'Portfolio data is required'
+        error: 'Portfolio data is required',
       });
     }
 
     // Use existing ML service for portfolio optimization
     const MLPredictionService = require('../services/mlPredictionService');
     const mlService = new MLPredictionService();
-    
+
     // Initialize the portfolio optimization model
     await mlService.trainModel('portfolio_optimization_rl');
-    
+
     const optimization = await mlService.optimizeAssets(portfolio_data, constraints);
 
     res.json({
       success: true,
       data: optimization,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Portfolio rebalancing error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to generate rebalancing recommendations',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -416,7 +405,7 @@ router.post('/scenario/simulate', async (req, res) => {
     if (!portfolio_data || !scenarios) {
       return res.status(400).json({
         success: false,
-        error: 'Portfolio data and scenarios are required'
+        error: 'Portfolio data and scenarios are required',
       });
     }
 
@@ -424,13 +413,14 @@ router.post('/scenario/simulate', async (req, res) => {
     const results = scenarios.map(scenario => {
       const impact = simulateScenarioImpact(portfolio_data, scenario);
       return {
-        scenario_id: scenario.id || `SCENARIO_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+        scenario_id:
+          scenario.id || `SCENARIO_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
         scenario_name: scenario.name,
         description: scenario.description,
         probability: scenario.probability || 0.1,
         portfolio_impact: impact,
         risk_metrics: calculateScenarioRiskMetrics(portfolio_data, impact),
-        mitigation_strategies: generateMitigationStrategies(scenario, impact)
+        mitigation_strategies: generateMitigationStrategies(scenario, impact),
       };
     });
 
@@ -441,17 +431,16 @@ router.post('/scenario/simulate', async (req, res) => {
         portfolio_id: portfolio_data.portfolio_id,
         scenarios: results,
         summary: generateScenarioSummary(results),
-        recommendations: generateScenarioRecommendations(results)
+        recommendations: generateScenarioRecommendations(results),
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Scenario simulation error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to run scenario simulation',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -464,19 +453,19 @@ function simulateScenarioImpact(portfolioData, scenario) {
 
   // Apply scenario-specific impacts
   if (scenario.oil_price_change) {
-    impactMultiplier *= (1 + scenario.oil_price_change * 0.5); // 50% correlation assumption
+    impactMultiplier *= 1 + scenario.oil_price_change * 0.5; // 50% correlation assumption
   }
   if (scenario.gas_price_change) {
-    impactMultiplier *= (1 + scenario.gas_price_change * 0.3);
+    impactMultiplier *= 1 + scenario.gas_price_change * 0.3;
   }
   if (scenario.volatility_change) {
-    impactMultiplier *= (1 - Math.abs(scenario.volatility_change) * 0.1);
+    impactMultiplier *= 1 - Math.abs(scenario.volatility_change) * 0.1;
   }
 
   return {
     absolute_change: baseValue * (impactMultiplier - 1),
     percentage_change: (impactMultiplier - 1) * 100,
-    new_value: baseValue * impactMultiplier
+    new_value: baseValue * impactMultiplier,
   };
 }
 
@@ -485,7 +474,7 @@ function calculateScenarioRiskMetrics(portfolioData, impact) {
     var_95: Math.abs(impact.absolute_change) * 1.2,
     expected_shortfall: Math.abs(impact.absolute_change) * 1.5,
     maximum_drawdown: Math.min(impact.percentage_change, 0),
-    recovery_time_estimate: Math.abs(impact.percentage_change) * 2 // weeks
+    recovery_time_estimate: Math.abs(impact.percentage_change) * 2, // weeks
   };
 }
 
@@ -496,7 +485,7 @@ function generateMitigationStrategies(scenario, impact) {
     strategies.push({
       strategy: 'Increase hedging positions',
       description: 'Add protective derivatives to limit downside risk',
-      estimated_cost: Math.abs(impact.absolute_change) * 0.02
+      estimated_cost: Math.abs(impact.absolute_change) * 0.02,
     });
   }
 
@@ -504,14 +493,14 @@ function generateMitigationStrategies(scenario, impact) {
     strategies.push({
       strategy: 'Reduce position sizes',
       description: 'Decrease exposure during high volatility periods',
-      estimated_impact: 'Reduce potential losses by 30-40%'
+      estimated_impact: 'Reduce potential losses by 30-40%',
     });
   }
 
   strategies.push({
     strategy: 'Portfolio diversification',
     description: 'Spread risk across uncorrelated assets',
-    estimated_impact: 'Reduce scenario impact by 15-25%'
+    estimated_impact: 'Reduce scenario impact by 15-25%',
   });
 
   return strategies;
@@ -521,8 +510,9 @@ function generateScenarioSummary(results) {
   return {
     worst_case_impact: Math.min(...results.map(r => r.portfolio_impact.percentage_change)),
     best_case_impact: Math.max(...results.map(r => r.portfolio_impact.percentage_change)),
-    average_impact: results.reduce((sum, r) => sum + r.portfolio_impact.percentage_change, 0) / results.length,
-    high_risk_scenarios: results.filter(r => r.portfolio_impact.percentage_change < -10).length
+    average_impact:
+      results.reduce((sum, r) => sum + r.portfolio_impact.percentage_change, 0) / results.length,
+    high_risk_scenarios: results.filter(r => r.portfolio_impact.percentage_change < -10).length,
   };
 }
 
@@ -535,17 +525,19 @@ function generateScenarioRecommendations(results) {
       type: 'RISK_MITIGATION',
       priority: 'HIGH',
       action: 'Implement immediate hedging strategies for severe downside scenarios',
-      affected_scenarios: severeScenarios.length
+      affected_scenarios: severeScenarios.length,
     });
   }
 
-  const highProbabilityRisks = results.filter(r => r.probability > 0.2 && r.portfolio_impact.percentage_change < -5);
+  const highProbabilityRisks = results.filter(
+    r => r.probability > 0.2 && r.portfolio_impact.percentage_change < -5
+  );
   if (highProbabilityRisks.length > 0) {
     recommendations.push({
       type: 'PROACTIVE_HEDGING',
       priority: 'MEDIUM',
       action: 'Consider preemptive hedging for high-probability negative scenarios',
-      affected_scenarios: highProbabilityRisks.length
+      affected_scenarios: highProbabilityRisks.length,
     });
   }
 

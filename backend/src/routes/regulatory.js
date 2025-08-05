@@ -13,9 +13,9 @@ router.get('/frameworks', async (req, res) => {
   try {
     const frameworks = Object.keys(regulatoryService.regulatoryFrameworks).map(key => ({
       id: key,
-      ...regulatoryService.regulatoryFrameworks[key]
+      ...regulatoryService.regulatoryFrameworks[key],
     }));
-    
+
     res.json({
       success: true,
       data: frameworks,
@@ -39,7 +39,7 @@ router.get('/frameworks/:regulation', async (req, res) => {
   try {
     const { regulation } = req.params;
     const framework = regulatoryService.regulatoryFrameworks[regulation];
-    
+
     if (!framework) {
       return res.status(404).json({
         success: false,
@@ -47,12 +47,12 @@ router.get('/frameworks/:regulation', async (req, res) => {
         timestamp: new Date().toISOString(),
       });
     }
-    
+
     res.json({
       success: true,
       data: {
         id: regulation,
-        ...framework
+        ...framework,
       },
       timestamp: new Date().toISOString(),
     });
@@ -72,7 +72,7 @@ router.get('/frameworks/:regulation', async (req, res) => {
 router.post('/check', async (req, res) => {
   try {
     const { transactionData, exchangeId } = req.body;
-    
+
     if (!transactionData) {
       return res.status(400).json({
         success: false,
@@ -88,9 +88,9 @@ router.post('/check', async (req, res) => {
         timestamp: new Date().toISOString(),
       });
     }
-    
+
     const result = await regulatoryService.performRegulatoryCheck(transactionData, exchangeId);
-    
+
     res.json({
       success: true,
       data: result,
@@ -112,7 +112,7 @@ router.post('/check', async (req, res) => {
 router.post('/reports/generate', async (req, res) => {
   try {
     const { transactionData, regulations, exportFormat = 'XML' } = req.body;
-    
+
     if (!transactionData) {
       return res.status(400).json({
         success: false,
@@ -137,13 +137,13 @@ router.post('/reports/generate', async (req, res) => {
         timestamp: new Date().toISOString(),
       });
     }
-    
+
     const result = await regulatoryService.generateRegulatoryReports(
-      transactionData, 
-      regulations, 
+      transactionData,
+      regulations,
       exportFormat
     );
-    
+
     res.json({
       success: true,
       data: result,
@@ -165,7 +165,7 @@ router.post('/reports/generate', async (req, res) => {
 router.post('/reports/export', async (req, res) => {
   try {
     const { reports, outputDirectory } = req.body;
-    
+
     if (!reports || !Array.isArray(reports)) {
       return res.status(400).json({
         success: false,
@@ -173,9 +173,9 @@ router.post('/reports/export', async (req, res) => {
         timestamp: new Date().toISOString(),
       });
     }
-    
+
     const result = await regulatoryService.exportReports(reports, outputDirectory);
-    
+
     res.json({
       success: true,
       data: result,
@@ -197,7 +197,7 @@ router.post('/reports/export', async (req, res) => {
 router.get('/reports/templates', async (req, res) => {
   try {
     const templates = [];
-    
+
     for (const [regulation, template] of regulatoryService.reportingTemplates) {
       templates.push({
         regulation,
@@ -206,10 +206,10 @@ router.get('/reports/templates', async (req, res) => {
           fields: template[key].fields,
           format: template[key].format,
           schema: template[key].schema,
-        }))
+        })),
       });
     }
-    
+
     res.json({
       success: true,
       data: templates,
@@ -233,7 +233,7 @@ router.get('/reports/templates/:regulation', async (req, res) => {
   try {
     const { regulation } = req.params;
     const template = regulatoryService.reportingTemplates.get(regulation);
-    
+
     if (!template) {
       return res.status(404).json({
         success: false,
@@ -241,19 +241,19 @@ router.get('/reports/templates/:regulation', async (req, res) => {
         timestamp: new Date().toISOString(),
       });
     }
-    
+
     const formattedTemplate = Object.keys(template).map(key => ({
       type: key,
       fields: template[key].fields,
       format: template[key].format,
       schema: template[key].schema,
     }));
-    
+
     res.json({
       success: true,
       data: {
         regulation,
-        template: formattedTemplate
+        template: formattedTemplate,
       },
       timestamp: new Date().toISOString(),
     });
@@ -274,7 +274,7 @@ router.get('/applicable/:exchangeId', async (req, res) => {
   try {
     const { exchangeId } = req.params;
     const applicableRegulations = regulatoryService.getApplicableRegulations(exchangeId);
-    
+
     if (applicableRegulations.length === 0) {
       return res.status(404).json({
         success: false,
@@ -282,18 +282,18 @@ router.get('/applicable/:exchangeId', async (req, res) => {
         timestamp: new Date().toISOString(),
       });
     }
-    
+
     const detailedRegulations = applicableRegulations.map(reg => ({
       id: reg,
-      ...regulatoryService.regulatoryFrameworks[reg]
+      ...regulatoryService.regulatoryFrameworks[reg],
     }));
-    
+
     res.json({
       success: true,
       data: {
         exchangeId,
         regulations: detailedRegulations,
-        total: detailedRegulations.length
+        total: detailedRegulations.length,
       },
       timestamp: new Date().toISOString(),
     });
@@ -313,7 +313,7 @@ router.get('/applicable/:exchangeId', async (req, res) => {
 router.post('/validate/transaction', async (req, res) => {
   try {
     const { transactionData, regulation } = req.body;
-    
+
     if (!transactionData) {
       return res.status(400).json({
         success: false,
@@ -329,7 +329,7 @@ router.post('/validate/transaction', async (req, res) => {
         timestamp: new Date().toISOString(),
       });
     }
-    
+
     const framework = regulatoryService.regulatoryFrameworks[regulation];
     if (!framework) {
       return res.status(404).json({
@@ -338,13 +338,13 @@ router.post('/validate/transaction', async (req, res) => {
         timestamp: new Date().toISOString(),
       });
     }
-    
+
     const result = await regulatoryService.checkRegulationCompliance(
-      regulation, 
-      transactionData, 
+      regulation,
+      transactionData,
       'VALIDATION'
     );
-    
+
     res.json({
       success: true,
       data: result,
@@ -366,12 +366,12 @@ router.post('/validate/transaction', async (req, res) => {
 router.get('/export-formats', async (req, res) => {
   try {
     const formats = {};
-    
+
     Object.keys(regulatoryService.regulatoryFrameworks).forEach(regulation => {
       const framework = regulatoryService.regulatoryFrameworks[regulation];
       formats[regulation] = framework.exportFormats;
     });
-    
+
     res.json({
       success: true,
       data: formats,
@@ -394,7 +394,7 @@ router.get('/export-formats', async (req, res) => {
 router.post('/reports/sample', async (req, res) => {
   try {
     const { regulation, exportFormat = 'XML' } = req.body;
-    
+
     if (!regulation) {
       return res.status(400).json({
         success: false,
@@ -402,14 +402,14 @@ router.post('/reports/sample', async (req, res) => {
         timestamp: new Date().toISOString(),
       });
     }
-    
+
     // Generate sample transaction data
     const sampleTransactionData = {
       transaction_reference_number: 'SAMPLE_TXN_' + Date.now(),
       trading_venue: 'SAMPLE_VENUE',
       instrument_identification: 'CRUDE_OIL_001',
       quantity: 1000,
-      price: 75.50,
+      price: 75.5,
       currency: 'USD',
       transaction_time: new Date().toISOString(),
       buy_sell_indicator: 'B',
@@ -426,13 +426,13 @@ router.post('/reports/sample', async (req, res) => {
       localContentPercentage: 35,
       environmentalScore: 75,
     };
-    
+
     const result = await regulatoryService.generateSingleReport(
       regulation,
       sampleTransactionData,
       exportFormat
     );
-    
+
     res.json({
       success: true,
       data: {

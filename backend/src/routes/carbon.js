@@ -21,7 +21,7 @@ router.post('/footprint', async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -38,7 +38,7 @@ router.post('/credits', async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -56,7 +56,7 @@ router.post('/offset-requirements', async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -70,13 +70,13 @@ router.get('/report/:entityId', async (req, res) => {
   try {
     const { entityId } = req.params;
     const { period } = req.query;
-    
+
     const result = await carbonService.generateCarbonReport(entityId, period);
     res.json(result);
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -93,7 +93,7 @@ router.get('/market-prices', async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -114,7 +114,7 @@ router.get('/emission-factors', (req, res) => {
           coal: { factor: 2249, unit: 'kg CO2 per ton' },
           heating_oil: { factor: 317, unit: 'kg CO2 per barrel' },
           gasoline: { factor: 317, unit: 'kg CO2 per barrel' },
-          diesel: { factor: 317, unit: 'kg CO2 per barrel' }
+          diesel: { factor: 317, unit: 'kg CO2 per barrel' },
         },
         electricity: {
           grid_average: { factor: 495, unit: 'kg CO2 per MWh' },
@@ -124,22 +124,22 @@ router.get('/emission-factors', (req, res) => {
           hydro: { factor: 24, unit: 'kg CO2 per MWh' },
           wind: { factor: 11, unit: 'kg CO2 per MWh' },
           solar: { factor: 40, unit: 'kg CO2 per MWh' },
-          geothermal: { factor: 38, unit: 'kg CO2 per MWh' }
+          geothermal: { factor: 38, unit: 'kg CO2 per MWh' },
         },
         transportation: {
           truck: { factor: 0.62, unit: 'kg CO2 per km per ton' },
           rail: { factor: 0.027, unit: 'kg CO2 per km per ton' },
           ship: { factor: 0.014, unit: 'kg CO2 per km per ton' },
-          pipeline: { factor: 0.002, unit: 'kg CO2 per km per ton' }
-        }
+          pipeline: { factor: 0.002, unit: 'kg CO2 per km per ton' },
+        },
       },
       methodology: 'Based on IPCC guidelines and industry standards',
-      last_updated: new Date().toISOString()
+      last_updated: new Date().toISOString(),
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -158,7 +158,7 @@ router.post('/batch-footprint', async (req, res) => {
     for (const transaction of transactions) {
       const result = await carbonService.calculateCarbonFootprint(transaction);
       results.push(result);
-      
+
       if (result.success) {
         totalEmissions += result.total_emissions;
       }
@@ -169,12 +169,12 @@ router.post('/batch-footprint', async (req, res) => {
       total_transactions: transactions.length,
       total_emissions: Math.round(totalEmissions * 100) / 100,
       average_emissions: Math.round((totalEmissions / transactions.length) * 100) / 100,
-      results: results
+      results: results,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -187,7 +187,7 @@ router.post('/batch-footprint', async (req, res) => {
 router.get('/blockchain/:hash', (req, res) => {
   try {
     const { hash } = req.params;
-    
+
     // Mock blockchain verification
     res.json({
       success: true,
@@ -198,12 +198,12 @@ router.get('/blockchain/:hash', (req, res) => {
       network: 'hyperledger_fabric',
       verification_url: `https://blockchain.quantenergx.com/verify/${hash}`,
       data_integrity: 'confirmed',
-      smart_contract: 'carbon_tracking_v1.0'
+      smart_contract: 'carbon_tracking_v1.0',
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -223,40 +223,40 @@ router.get('/compliance-status', (req, res) => {
           threshold: 10000, // tons CO2 per year
           description: 'Mandatory for large installations in EU',
           reporting_frequency: 'Annual',
-          verification_required: true
+          verification_required: true,
         },
         california_cap_trade: {
           name: 'California Cap-and-Trade Program',
           threshold: 25000,
           description: 'Covers large emission sources in California',
           reporting_frequency: 'Annual',
-          verification_required: true
+          verification_required: true,
         },
         rggi: {
           name: 'Regional Greenhouse Gas Initiative',
           threshold: 5000,
           description: 'Northeastern US states cap-and-trade program',
           reporting_frequency: 'Quarterly',
-          verification_required: true
+          verification_required: true,
         },
         voluntary_standards: {
           vcs: 'Verified Carbon Standard',
           gold_standard: 'Gold Standard Foundation',
           car: 'Climate Action Reserve',
-          plan_vivo: 'Plan Vivo Foundation'
-        }
+          plan_vivo: 'Plan Vivo Foundation',
+        },
       },
       net_zero_initiatives: {
         science_based_targets: 'Science Based Targets initiative (SBTi)',
         task_force_climate: 'Task Force on Climate-related Financial Disclosures (TCFD)',
         un_global_compact: 'UN Global Compact',
-        we_mean_business: 'We Mean Business Coalition'
-      }
+        we_mean_business: 'We Mean Business Coalition',
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });

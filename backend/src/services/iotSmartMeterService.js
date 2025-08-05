@@ -11,7 +11,7 @@ class IoTSmartMeterService {
       MODBUS: 'Modbus Protocol',
       ZIGBEE: 'ZigBee Wireless',
       LORA: 'LoRaWAN',
-      REST: 'RESTful API'
+      REST: 'RESTful API',
     };
 
     this.deviceTypes = {
@@ -21,7 +21,7 @@ class IoTSmartMeterService {
       battery_storage: 'Battery Management System',
       ev_charger: 'Electric Vehicle Charger',
       grid_sensor: 'Grid Monitoring Sensor',
-      weather_station: 'Weather Monitoring Station'
+      weather_station: 'Weather Monitoring Station',
     };
 
     this.dataPoints = {
@@ -34,7 +34,7 @@ class IoTSmartMeterService {
       power_factor: { unit: 'ratio', frequency: '1min' },
       temperature: { unit: '°C', frequency: '5min' },
       irradiance: { unit: 'W/m²', frequency: '5min' },
-      wind_speed: { unit: 'm/s', frequency: '1min' }
+      wind_speed: { unit: 'm/s', frequency: '1min' },
     };
   }
 
@@ -46,7 +46,7 @@ class IoTSmartMeterService {
   async registerDevice(deviceData) {
     try {
       const deviceId = this.generateDeviceId(deviceData);
-      
+
       const device = {
         id: deviceId,
         name: deviceData.name,
@@ -58,27 +58,27 @@ class IoTSmartMeterService {
           latitude: deviceData.latitude,
           longitude: deviceData.longitude,
           address: deviceData.address,
-          grid_zone: deviceData.grid_zone
+          grid_zone: deviceData.grid_zone,
         },
         connectivity: {
           protocol: deviceData.protocol,
           endpoint: deviceData.endpoint,
           authentication: this.setupAuthentication(deviceData),
           last_seen: null,
-          status: 'registered'
+          status: 'registered',
         },
         capabilities: this.getDeviceCapabilities(deviceData.type),
         configuration: {
           reporting_interval: deviceData.reporting_interval || '15min',
           data_retention: deviceData.data_retention || '2years',
-          alert_thresholds: deviceData.alert_thresholds || {}
+          alert_thresholds: deviceData.alert_thresholds || {},
         },
         registration: {
           registered_date: new Date().toISOString(),
           registered_by: deviceData.registered_by,
           owner: deviceData.owner,
-          operator: deviceData.operator
-        }
+          operator: deviceData.operator,
+        },
       };
 
       // Initialize device in monitoring system
@@ -89,12 +89,12 @@ class IoTSmartMeterService {
         device_id: deviceId,
         device: device,
         connection_instructions: this.generateConnectionInstructions(device),
-        api_endpoints: this.generateAPIEndpoints(deviceId)
+        api_endpoints: this.generateAPIEndpoints(deviceId),
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -108,22 +108,22 @@ class IoTSmartMeterService {
   async processDeviceData(deviceId, sensorData) {
     try {
       const timestamp = new Date().toISOString();
-      
+
       // Validate and normalize data
       const normalizedData = this.normalizeData(sensorData);
-      
+
       // Enrich with calculated metrics
       const enrichedData = await this.enrichData(deviceId, normalizedData);
-      
+
       // Store in time series database
       await this.storeTimeSeriesData(deviceId, enrichedData, timestamp);
-      
+
       // Check for alerts and anomalies
       const alerts = await this.checkAlerts(deviceId, enrichedData);
-      
+
       // Calculate energy metrics
       const energyMetrics = this.calculateEnergyMetrics(enrichedData);
-      
+
       // Update device status
       await this.updateDeviceStatus(deviceId, 'active', timestamp);
 
@@ -135,13 +135,13 @@ class IoTSmartMeterService {
         energy_metrics: energyMetrics,
         alerts: alerts,
         quality_score: this.calculateDataQuality(normalizedData),
-        next_expected: this.getNextExpectedReading(deviceId)
+        next_expected: this.getNextExpectedReading(deviceId),
       };
     } catch (error) {
       return {
         success: false,
         device_id: deviceId,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -168,7 +168,7 @@ class IoTSmartMeterService {
           reserve_margin: 4.2, // %
           grid_frequency: 50.02, // Hz
           carbon_intensity: 245, // gCO2/kWh
-          renewable_percentage: 35.8 // %
+          renewable_percentage: 35.8, // %
         },
         demand_forecast: this.generateDemandForecast(timeRange),
         supply_mix: {
@@ -178,48 +178,48 @@ class IoTSmartMeterService {
           hydro: 8.1,
           wind: 7.8,
           solar: 3.9,
-          other_renewables: 0.8
+          other_renewables: 0.8,
         },
         renewable_generation: {
           wind: {
             current_output: 1190.5, // MW
             capacity_factor: 76.2, // %
-            forecast_next_24h: this.generateWindForecast()
+            forecast_next_24h: this.generateWindForecast(),
           },
           solar: {
             current_output: 595.8, // MW
             capacity_factor: 42.1, // %
-            forecast_next_24h: this.generateSolarForecast()
+            forecast_next_24h: this.generateSolarForecast(),
           },
           hydro: {
             current_output: 1235.7, // MW
             reservoir_level: 78.5, // %
-            seasonal_availability: 'high'
-          }
+            seasonal_availability: 'high',
+          },
         },
         grid_stability: {
           voltage_stability: 'normal',
           frequency_deviation: 0.02,
           congestion_points: this.identifyGridCongestion(),
-          emergency_reserves: 850.0 // MW
+          emergency_reserves: 850.0, // MW
         },
         carbon_tracking: {
           current_emissions: 3738.3, // tons CO2/hour
           daily_total: 89719.2, // tons CO2
-          reduction_vs_yesterday: -5.2 // %
-        }
+          reduction_vs_yesterday: -5.2, // %
+        },
       };
 
       return {
         success: true,
         grid_analytics: gridData,
         data_sources: await this.getActiveDatasources(),
-        last_updated: new Date().toISOString()
+        last_updated: new Date().toISOString(),
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -236,7 +236,7 @@ class IoTSmartMeterService {
       for (const facilityId of facilityIds) {
         const facility = await this.getFacilityData(facilityId);
         const devices = await this.getFacilityDevices(facilityId);
-        
+
         let totalProduction = 0;
         let totalCapacity = 0;
         const deviceData = [];
@@ -250,13 +250,14 @@ class IoTSmartMeterService {
               device_type: device.type,
               current_output: latestData.power_demand || 0,
               daily_production: latestData.energy_production,
-              efficiency: this.calculateEfficiency(device, latestData)
+              efficiency: this.calculateEfficiency(device, latestData),
             });
           }
           totalCapacity += device.rated_capacity || 0;
         }
 
-        const capacityFactor = totalCapacity > 0 ? (totalProduction / (totalCapacity * 24)) * 100 : 0;
+        const capacityFactor =
+          totalCapacity > 0 ? (totalProduction / (totalCapacity * 24)) * 100 : 0;
 
         productionData.push({
           facility_id: facilityId,
@@ -269,7 +270,10 @@ class IoTSmartMeterService {
           device_count: devices.length,
           active_devices: deviceData.length,
           devices: deviceData,
-          environmental_benefits: this.calculateEnvironmentalBenefits(totalProduction, facility.type)
+          environmental_benefits: this.calculateEnvironmentalBenefits(
+            totalProduction,
+            facility.type
+          ),
         });
       }
 
@@ -278,13 +282,14 @@ class IoTSmartMeterService {
         monitoring_timestamp: new Date().toISOString(),
         facilities_monitored: facilityIds.length,
         total_production: productionData.reduce((sum, f) => sum + f.total_production, 0),
-        average_capacity_factor: productionData.reduce((sum, f) => sum + f.capacity_factor, 0) / productionData.length,
-        production_data: productionData
+        average_capacity_factor:
+          productionData.reduce((sum, f) => sum + f.capacity_factor, 0) / productionData.length,
+        production_data: productionData,
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -299,7 +304,7 @@ class IoTSmartMeterService {
     try {
       const timeWindow = options.time_window || '7d';
       const sensitivity = options.sensitivity || 'medium';
-      
+
       // Get historical data for baseline
       const historicalData = await this.getHistoricalData(deviceId, timeWindow);
       const recentData = await this.getRecentData(deviceId, '1h');
@@ -307,7 +312,11 @@ class IoTSmartMeterService {
       const anomalies = [];
 
       // Statistical anomaly detection
-      const statisticalAnomalies = this.detectStatisticalAnomalies(historicalData, recentData, sensitivity);
+      const statisticalAnomalies = this.detectStatisticalAnomalies(
+        historicalData,
+        recentData,
+        sensitivity
+      );
       anomalies.push(...statisticalAnomalies);
 
       // Pattern-based anomaly detection
@@ -329,12 +338,12 @@ class IoTSmartMeterService {
         anomalies_detected: anomalies.length,
         anomalies: anomalies,
         risk_level: this.calculateRiskLevel(anomalies),
-        recommendations: this.generateAnomalyRecommendations(anomalies)
+        recommendations: this.generateAnomalyRecommendations(anomalies),
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -351,12 +360,24 @@ class IoTSmartMeterService {
   getDeviceCapabilities(deviceType) {
     const capabilities = {
       smart_meter: ['energy_consumption', 'power_demand', 'voltage', 'current'],
-      solar_inverter: ['energy_production', 'power_demand', 'voltage', 'current', 'irradiance', 'temperature'],
+      solar_inverter: [
+        'energy_production',
+        'power_demand',
+        'voltage',
+        'current',
+        'irradiance',
+        'temperature',
+      ],
       wind_turbine: ['energy_production', 'power_demand', 'wind_speed', 'temperature'],
-      battery_storage: ['energy_consumption', 'energy_production', 'state_of_charge', 'temperature'],
+      battery_storage: [
+        'energy_consumption',
+        'energy_production',
+        'state_of_charge',
+        'temperature',
+      ],
       ev_charger: ['energy_consumption', 'power_demand', 'charging_status'],
       grid_sensor: ['voltage', 'current', 'frequency', 'power_factor'],
-      weather_station: ['temperature', 'irradiance', 'wind_speed', 'humidity']
+      weather_station: ['temperature', 'irradiance', 'wind_speed', 'humidity'],
     };
     return capabilities[deviceType] || [];
   }
@@ -366,7 +387,7 @@ class IoTSmartMeterService {
       method: deviceData.auth_method || 'api_key',
       api_key: this.generateAPIKey(),
       certificate_thumbprint: deviceData.certificate_thumbprint,
-      token_endpoint: '/api/v1/iot/auth/token'
+      token_endpoint: '/api/v1/iot/auth/token',
     };
   }
 
@@ -379,7 +400,7 @@ class IoTSmartMeterService {
     return {
       monitoring_enabled: true,
       alert_rules_configured: true,
-      data_pipeline_ready: true
+      data_pipeline_ready: true,
     };
   }
 
@@ -389,14 +410,14 @@ class IoTSmartMeterService {
       endpoint: `mqtt://iot.quantenergx.com:1883/devices/${device.id}`,
       authentication: {
         username: device.id,
-        password: device.connectivity.authentication.api_key
+        password: device.connectivity.authentication.api_key,
       },
       topics: {
         data_publish: `devices/${device.id}/data`,
         commands_subscribe: `devices/${device.id}/commands`,
-        status_publish: `devices/${device.id}/status`
+        status_publish: `devices/${device.id}/status`,
       },
-      sample_payload: this.generateSamplePayload(device.type)
+      sample_payload: this.generateSamplePayload(device.type),
     };
   }
 
@@ -407,15 +428,15 @@ class IoTSmartMeterService {
         energy_consumption: 125.5,
         power_demand: 5.2,
         voltage: 230.1,
-        current: 22.6
+        current: 22.6,
       },
       solar_inverter: {
         timestamp: '2024-01-15T10:30:00Z',
         energy_production: 45.8,
         power_demand: 7.5,
         irradiance: 850,
-        temperature: 35.2
-      }
+        temperature: 35.2,
+      },
     };
     return samples[deviceType] || samples.smart_meter;
   }
@@ -426,13 +447,13 @@ class IoTSmartMeterService {
       device_status: `/api/v1/iot/devices/${deviceId}/status`,
       historical_data: `/api/v1/iot/devices/${deviceId}/history`,
       alerts: `/api/v1/iot/devices/${deviceId}/alerts`,
-      configuration: `/api/v1/iot/devices/${deviceId}/config`
+      configuration: `/api/v1/iot/devices/${deviceId}/config`,
     };
   }
 
   normalizeData(sensorData) {
     const normalized = {};
-    
+
     Object.entries(sensorData).forEach(([key, value]) => {
       if (typeof value === 'number' && !isNaN(value)) {
         normalized[key] = value;
@@ -445,7 +466,7 @@ class IoTSmartMeterService {
   async enrichData(deviceId, normalizedData) {
     // Add calculated fields and metadata
     const enriched = { ...normalizedData };
-    
+
     if (enriched.power_demand && enriched.voltage && enriched.current) {
       enriched.power_factor = enriched.power_demand / (enriched.voltage * enriched.current);
     }
@@ -463,7 +484,7 @@ class IoTSmartMeterService {
       stored: true,
       device_id: deviceId,
       timestamp: timestamp,
-      data_points: Object.keys(data).length
+      data_points: Object.keys(data).length,
     };
   }
 
@@ -473,7 +494,7 @@ class IoTSmartMeterService {
     // Check for threshold violations
     Object.entries(data).forEach(([metric, value]) => {
       const thresholds = this.getMetricThresholds(metric);
-      
+
       if (value > thresholds.critical_high) {
         alerts.push({
           severity: 'critical',
@@ -481,7 +502,7 @@ class IoTSmartMeterService {
           metric: metric,
           value: value,
           threshold: thresholds.critical_high,
-          message: `${metric} critically high: ${value}`
+          message: `${metric} critically high: ${value}`,
         });
       } else if (value < thresholds.critical_low) {
         alerts.push({
@@ -490,7 +511,7 @@ class IoTSmartMeterService {
           metric: metric,
           value: value,
           threshold: thresholds.critical_low,
-          message: `${metric} critically low: ${value}`
+          message: `${metric} critically low: ${value}`,
         });
       }
     });
@@ -503,7 +524,7 @@ class IoTSmartMeterService {
       voltage: { critical_low: 200, critical_high: 250 },
       frequency: { critical_low: 49.5, critical_high: 50.5 },
       temperature: { critical_low: -10, critical_high: 80 },
-      power_demand: { critical_low: 0, critical_high: 10000 }
+      power_demand: { critical_low: 0, critical_high: 10000 },
     };
     return thresholds[metric] || { critical_low: -999999, critical_high: 999999 };
   }
@@ -514,25 +535,25 @@ class IoTSmartMeterService {
       energy_consumed: data.energy_consumption || 0,
       energy_produced: data.energy_production || 0,
       efficiency: data.efficiency || null,
-      carbon_footprint: this.calculateInstantCarbonFootprint(data)
+      carbon_footprint: this.calculateInstantCarbonFootprint(data),
     };
   }
 
   calculateInstantCarbonFootprint(data) {
     const gridCarbonIntensity = 245; // gCO2/kWh
     const energyConsumed = data.energy_consumption || 0;
-    return energyConsumed * gridCarbonIntensity / 1000; // kg CO2
+    return (energyConsumed * gridCarbonIntensity) / 1000; // kg CO2
   }
 
   calculateDataQuality(data) {
     let qualityScore = 100;
     let totalPoints = Object.keys(data).length;
-    
+
     if (totalPoints === 0) return 0;
-    
+
     // Reduce score for missing expected data points
     if (totalPoints < 5) qualityScore -= (5 - totalPoints) * 10;
-    
+
     return Math.max(0, qualityScore);
   }
 
@@ -547,7 +568,7 @@ class IoTSmartMeterService {
     return {
       device_id: deviceId,
       status: status,
-      last_seen: timestamp
+      last_seen: timestamp,
     };
   }
 
@@ -558,7 +579,7 @@ class IoTSmartMeterService {
     for (let i = 0; i < 24; i++) {
       hours.push({
         hour: i,
-        demand: 14000 + Math.sin(i * Math.PI / 12) * 2000 + Math.random() * 500
+        demand: 14000 + Math.sin((i * Math.PI) / 12) * 2000 + Math.random() * 500,
       });
     }
     return hours;
@@ -567,23 +588,23 @@ class IoTSmartMeterService {
   generateWindForecast() {
     return Array.from({ length: 24 }, (_, i) => ({
       hour: i,
-      wind_speed: 8 + Math.sin(i * Math.PI / 8) * 3 + Math.random() * 2,
-      capacity_factor: 60 + Math.random() * 30
+      wind_speed: 8 + Math.sin((i * Math.PI) / 8) * 3 + Math.random() * 2,
+      capacity_factor: 60 + Math.random() * 30,
     }));
   }
 
   generateSolarForecast() {
     return Array.from({ length: 24 }, (_, i) => ({
       hour: i,
-      irradiance: i > 6 && i < 18 ? 400 + Math.sin((i - 6) * Math.PI / 12) * 400 : 0,
-      capacity_factor: i > 6 && i < 18 ? 20 + Math.sin((i - 6) * Math.PI / 12) * 60 : 0
+      irradiance: i > 6 && i < 18 ? 400 + Math.sin(((i - 6) * Math.PI) / 12) * 400 : 0,
+      capacity_factor: i > 6 && i < 18 ? 20 + Math.sin(((i - 6) * Math.PI) / 12) * 60 : 0,
     }));
   }
 
   identifyGridCongestion() {
     return [
       { location: 'North-South Interconnect', severity: 'medium', cause: 'High renewable output' },
-      { location: 'Urban Load Center', severity: 'low', cause: 'Peak demand period' }
+      { location: 'Urban Load Center', severity: 'low', cause: 'Peak demand period' },
     ];
   }
 
@@ -593,7 +614,7 @@ class IoTSmartMeterService {
       solar_inverters: 320,
       wind_turbines: 85,
       grid_sensors: 45,
-      weather_stations: 25
+      weather_stations: 25,
     };
   }
 
@@ -603,8 +624,8 @@ class IoTSmartMeterService {
       id: facilityId,
       name: 'Solar Farm Alpha',
       type: 'solar',
-      location: { lat: 32.7767, lng: -96.7970 },
-      capacity: 50000 // kW
+      location: { lat: 32.7767, lng: -96.797 },
+      capacity: 50000, // kW
     };
   }
 
@@ -612,7 +633,7 @@ class IoTSmartMeterService {
     // Mock facility devices
     return [
       { id: 'INV_001', type: 'solar_inverter', rated_capacity: 5000 },
-      { id: 'INV_002', type: 'solar_inverter', rated_capacity: 5000 }
+      { id: 'INV_002', type: 'solar_inverter', rated_capacity: 5000 },
     ];
   }
 
@@ -621,7 +642,7 @@ class IoTSmartMeterService {
     return {
       energy_production: 35.5,
       power_demand: 4.2,
-      efficiency: 85.2
+      efficiency: 85.2,
     };
   }
 
@@ -635,16 +656,16 @@ class IoTSmartMeterService {
   calculateEnvironmentalBenefits(production, facilityType) {
     const carbonSavingsFactor = {
       solar: 0.85,
-      wind: 0.90,
-      hydro: 0.80
+      wind: 0.9,
+      hydro: 0.8,
     };
-    
+
     const factor = carbonSavingsFactor[facilityType] || 0.75;
-    
+
     return {
       carbon_saved: production * factor, // kg CO2
-      trees_equivalent: Math.round(production * factor / 22), // trees
-      homes_powered: Math.round(production / 30) // average daily consumption
+      trees_equivalent: Math.round((production * factor) / 22), // trees
+      homes_powered: Math.round(production / 30), // average daily consumption
     };
   }
 
@@ -654,39 +675,39 @@ class IoTSmartMeterService {
     const anomalies = [];
     const thresholds = { low: 2, medium: 2.5, high: 3 };
     const threshold = thresholds[sensitivity];
-    
+
     // Mock implementation
     if (Math.random() > 0.8) {
       anomalies.push({
         type: 'statistical',
         severity: 'medium',
         metric: 'power_demand',
-        description: 'Power demand deviates significantly from historical pattern'
+        description: 'Power demand deviates significantly from historical pattern',
       });
     }
-    
+
     return anomalies;
   }
 
   detectPatternAnomalies(historical, recent) {
     const anomalies = [];
-    
+
     // Mock pattern-based detection
     if (Math.random() > 0.9) {
       anomalies.push({
         type: 'pattern',
         severity: 'low',
         metric: 'energy_production',
-        description: 'Unexpected production pattern detected'
+        description: 'Unexpected production pattern detected',
       });
     }
-    
+
     return anomalies;
   }
 
   detectThresholdAnomalies(deviceId, data) {
     const anomalies = [];
-    
+
     Object.entries(data).forEach(([metric, value]) => {
       const thresholds = this.getMetricThresholds(metric);
       if (value > thresholds.critical_high || value < thresholds.critical_low) {
@@ -695,27 +716,27 @@ class IoTSmartMeterService {
           severity: 'high',
           metric: metric,
           value: value,
-          description: `${metric} outside acceptable range`
+          description: `${metric} outside acceptable range`,
         });
       }
     });
-    
+
     return anomalies;
   }
 
   detectMLAnomalies(historical, recent) {
     // Mock ML-based anomaly detection
     const anomalies = [];
-    
+
     if (Math.random() > 0.85) {
       anomalies.push({
         type: 'ml_prediction',
         severity: 'medium',
         confidence: 0.85,
-        description: 'Machine learning model detected unusual behavior pattern'
+        description: 'Machine learning model detected unusual behavior pattern',
       });
     }
-    
+
     return anomalies;
   }
 
@@ -728,24 +749,24 @@ class IoTSmartMeterService {
 
   generateAnomalyRecommendations(anomalies) {
     const recommendations = [];
-    
+
     anomalies.forEach(anomaly => {
       switch (anomaly.type) {
-      case 'threshold':
-        recommendations.push('Review device calibration and operating parameters');
-        break;
-      case 'statistical':
-        recommendations.push('Investigate recent changes in operating conditions');
-        break;
-      case 'pattern':
-        recommendations.push('Check for external factors affecting normal operation');
-        break;
-      case 'ml_prediction':
-        recommendations.push('Monitor device closely for potential issues');
-        break;
+        case 'threshold':
+          recommendations.push('Review device calibration and operating parameters');
+          break;
+        case 'statistical':
+          recommendations.push('Investigate recent changes in operating conditions');
+          break;
+        case 'pattern':
+          recommendations.push('Check for external factors affecting normal operation');
+          break;
+        case 'ml_prediction':
+          recommendations.push('Monitor device closely for potential issues');
+          break;
       }
     });
-    
+
     return [...new Set(recommendations)]; // Remove duplicates
   }
 
@@ -754,7 +775,7 @@ class IoTSmartMeterService {
     return Array.from({ length: 100 }, () => ({
       timestamp: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),
       power_demand: 5 + Math.random() * 2,
-      energy_production: 30 + Math.random() * 10
+      energy_production: 30 + Math.random() * 10,
     }));
   }
 
@@ -763,7 +784,7 @@ class IoTSmartMeterService {
     return Array.from({ length: 10 }, () => ({
       timestamp: new Date(Date.now() - Math.random() * 60 * 60 * 1000),
       power_demand: 5.5 + Math.random() * 2,
-      energy_production: 35 + Math.random() * 10
+      energy_production: 35 + Math.random() * 10,
     }));
   }
 }

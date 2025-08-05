@@ -39,150 +39,150 @@ const options = {
       contact: {
         name: 'QuantEnergx Team',
         url: 'https://github.com/akramahmed1/quantenergx',
-        email: 'support@quantenergx.com'
+        email: 'support@quantenergx.com',
       },
       license: {
         name: 'MIT',
-        url: 'https://opensource.org/licenses/MIT'
-      }
+        url: 'https://opensource.org/licenses/MIT',
+      },
     },
     servers: [
       {
         url: 'http://localhost:3001/api/v1',
-        description: 'Development server'
+        description: 'Development server',
       },
       {
         url: 'https://api.quantenergx.com/api/v1',
-        description: 'Production server'
-      }
+        description: 'Production server',
+      },
     ],
     components: {
       securitySchemes: {
         bearerAuth: {
           type: 'http',
           scheme: 'bearer',
-          bearerFormat: 'JWT'
-        }
+          bearerFormat: 'JWT',
+        },
       },
       schemas: {
         APIResponse: {
           type: 'object',
           properties: {
             success: {
-              type: 'boolean'
+              type: 'boolean',
             },
             data: {
-              type: 'object'
+              type: 'object',
             },
             timestamp: {
               type: 'string',
-              format: 'date-time'
-            }
+              format: 'date-time',
+            },
           },
-          required: ['success', 'timestamp']
+          required: ['success', 'timestamp'],
         },
         ErrorResponse: {
           type: 'object',
           properties: {
             success: {
               type: 'boolean',
-              example: false
+              example: false,
             },
             error: {
-              type: 'string'
+              type: 'string',
             },
             message: {
-              type: 'string'
+              type: 'string',
             },
             timestamp: {
               type: 'string',
-              format: 'date-time'
-            }
+              format: 'date-time',
+            },
           },
-          required: ['success', 'error', 'timestamp']
+          required: ['success', 'error', 'timestamp'],
         },
         Order: {
           type: 'object',
           properties: {
             id: {
-              type: 'string'
+              type: 'string',
             },
             commodity: {
               type: 'string',
-              enum: ['crude_oil', 'natural_gas', 'heating_oil', 'gasoline', 'electricity', 'coal']
+              enum: ['crude_oil', 'natural_gas', 'heating_oil', 'gasoline', 'electricity', 'coal'],
             },
             quantity: {
               type: 'number',
-              minimum: 1
+              minimum: 1,
             },
             price: {
               type: 'number',
-              minimum: 0
+              minimum: 0,
             },
             side: {
               type: 'string',
-              enum: ['buy', 'sell']
+              enum: ['buy', 'sell'],
             },
             orderType: {
               type: 'string',
-              enum: ['market', 'limit', 'stop', 'stop_limit']
+              enum: ['market', 'limit', 'stop', 'stop_limit'],
             },
             status: {
               type: 'string',
-              enum: ['pending', 'executed', 'cancelled', 'rejected']
+              enum: ['pending', 'executed', 'cancelled', 'rejected'],
             },
             timestamp: {
               type: 'string',
-              format: 'date-time'
-            }
+              format: 'date-time',
+            },
           },
-          required: ['commodity', 'quantity', 'side', 'orderType']
+          required: ['commodity', 'quantity', 'side', 'orderType'],
         },
         MarketData: {
           type: 'object',
           properties: {
             commodity: {
-              type: 'string'
+              type: 'string',
             },
             price: {
-              type: 'number'
+              type: 'number',
             },
             change: {
-              type: 'number'
+              type: 'number',
             },
             changePercent: {
-              type: 'number'
+              type: 'number',
             },
             volume: {
-              type: 'number'
+              type: 'number',
             },
             timestamp: {
               type: 'string',
-              format: 'date-time'
-            }
-          }
+              format: 'date-time',
+            },
+          },
         },
         Plugin: {
           type: 'object',
           properties: {
             name: {
-              type: 'string'
+              type: 'string',
             },
             type: {
               type: 'string',
-              enum: ['data_source', 'analytics', 'risk', 'compliance', 'execution']
+              enum: ['data_source', 'analytics', 'risk', 'compliance', 'execution'],
             },
             version: {
-              type: 'string'
+              type: 'string',
             },
             enabled: {
-              type: 'boolean'
+              type: 'boolean',
             },
             description: {
-              type: 'string'
-            }
-          }
-        }
+              type: 'string',
+            },
+          },
+        },
       },
       responses: {
         BadRequest: {
@@ -190,10 +190,10 @@ const options = {
           content: {
             'application/json': {
               schema: {
-                $ref: '#/components/schemas/ErrorResponse'
-              }
-            }
-          }
+                $ref: '#/components/schemas/ErrorResponse',
+              },
+            },
+          },
         },
         Unauthorized: {
           description: 'Unauthorized',
@@ -206,17 +206,17 @@ const options = {
                     type: 'object',
                     properties: {
                       error: {
-                        example: 'Unauthorized'
+                        example: 'Unauthorized',
                       },
                       message: {
-                        example: 'Invalid or expired token'
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
+                        example: 'Invalid or expired token',
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
         },
         NotFound: {
           description: 'Resource not found',
@@ -229,17 +229,17 @@ const options = {
                     type: 'object',
                     properties: {
                       error: {
-                        example: 'Not Found'
+                        example: 'Not Found',
                       },
                       message: {
-                        example: 'Resource not found'
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
+                        example: 'Resource not found',
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
         },
         InternalError: {
           description: 'Internal server error',
@@ -252,32 +252,32 @@ const options = {
                     type: 'object',
                     properties: {
                       error: {
-                        example: 'Internal Server Error'
+                        example: 'Internal Server Error',
                       },
                       message: {
-                        example: 'An unexpected error occurred'
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        }
-      }
+                        example: 'An unexpected error occurred',
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
     },
     security: [
       {
-        bearerAuth: []
-      }
+        bearerAuth: [],
+      },
     ],
-    paths: yamlPaths
+    paths: yamlPaths,
   },
   apis: [
     path.join(__dirname, '../routes/*.js'),
     path.join(__dirname, '../server.ts'),
-    path.join(__dirname, './openapi.yaml')
-  ]
+    path.join(__dirname, './openapi.yaml'),
+  ],
 };
 
 const specs = swaggerJsdoc(options);

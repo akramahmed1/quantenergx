@@ -21,7 +21,9 @@ export class WebSocketService {
     if (this.kafkaService) {
       this.subscribeToKafkaTopics();
     } else {
-      this.logger.info('Kafka service not available, WebSocket will work without Kafka integration');
+      this.logger.info(
+        'Kafka service not available, WebSocket will work without Kafka integration'
+      );
     }
   }
 
@@ -32,7 +34,7 @@ export class WebSocketService {
     this.io.on('connection', (socket: Socket) => {
       this.logger.info(`Client connected: ${socket.id}`, {
         socketId: socket.id,
-        clientIP: socket.handshake.address
+        clientIP: socket.handshake.address,
       });
 
       this.connectedClients.set(socket.id, socket);
@@ -77,7 +79,10 @@ export class WebSocketService {
   /**
    * Handle client authentication
    */
-  private async handleAuthentication(socket: Socket, data: { userId: string; token: string }): Promise<void> {
+  private async handleAuthentication(
+    socket: Socket,
+    data: { userId: string; token: string }
+  ): Promise<void> {
     try {
       // TODO: Implement proper JWT token validation
       // For now, we'll accept any non-empty token
@@ -88,17 +93,16 @@ export class WebSocketService {
 
       // Store user info in socket
       socket.data = { ...socket.data, userId: data.userId, authenticated: true };
-      
-      socket.emit('auth-success', { 
+
+      socket.emit('auth-success', {
         message: 'Authentication successful',
-        userId: data.userId 
+        userId: data.userId,
       });
 
       this.logger.info(`Client authenticated: ${socket.id}`, {
         socketId: socket.id,
-        userId: data.userId
+        userId: data.userId,
       });
-
     } catch (error) {
       this.logger.error('Authentication error:', error);
       socket.emit('auth-error', { message: 'Authentication failed' });
@@ -111,16 +115,16 @@ export class WebSocketService {
   private handleJoinTrading(socket: Socket, userId: string): void {
     const roomName = `trading-${userId}`;
     socket.join(roomName);
-    
-    socket.emit('trading-joined', { 
+
+    socket.emit('trading-joined', {
       room: roomName,
-      message: `Joined trading room for user ${userId}` 
+      message: `Joined trading room for user ${userId}`,
     });
 
     this.logger.info(`User ${userId} joined trading room`, {
       socketId: socket.id,
       userId,
-      room: roomName
+      room: roomName,
     });
   }
 
@@ -135,12 +139,12 @@ export class WebSocketService {
 
     socket.emit('market-subscribed', {
       commodities,
-      message: `Subscribed to market data for: ${commodities.join(', ')}`
+      message: `Subscribed to market data for: ${commodities.join(', ')}`,
     });
 
     this.logger.info(`Client subscribed to market data`, {
       socketId: socket.id,
-      commodities
+      commodities,
     });
   }
 
@@ -154,12 +158,12 @@ export class WebSocketService {
     socket.emit('orders-subscribed', {
       userId,
       room: roomName,
-      message: `Subscribed to order updates for user ${userId}`
+      message: `Subscribed to order updates for user ${userId}`,
     });
 
     this.logger.info(`Client subscribed to order updates`, {
       socketId: socket.id,
-      userId
+      userId,
     });
   }
 
@@ -173,12 +177,12 @@ export class WebSocketService {
     socket.emit('compliance-subscribed', {
       userId,
       room: roomName,
-      message: `Subscribed to compliance alerts for user ${userId}`
+      message: `Subscribed to compliance alerts for user ${userId}`,
     });
 
     this.logger.info(`Client subscribed to compliance alerts`, {
       socketId: socket.id,
-      userId
+      userId,
     });
   }
 
@@ -187,11 +191,11 @@ export class WebSocketService {
    */
   private handleDisconnection(socket: Socket, reason: string): void {
     this.connectedClients.delete(socket.id);
-    
+
     this.logger.info(`Client disconnected: ${socket.id}`, {
       socketId: socket.id,
       reason,
-      userId: socket.data?.userId
+      userId: socket.data?.userId,
     });
   }
 
@@ -203,7 +207,7 @@ export class WebSocketService {
       this.logger.warn('Kafka service not available, skipping topic subscriptions');
       return;
     }
-    
+
     try {
       // Subscribe to market data updates
       await this.kafkaService.subscribeToTopic(
@@ -241,7 +245,6 @@ export class WebSocketService {
       );
 
       this.logger.info('WebSocket service subscribed to all Kafka topics');
-
     } catch (error) {
       this.logger.error('Failed to subscribe to Kafka topics:', error);
     }
@@ -257,14 +260,14 @@ export class WebSocketService {
     const wsMessage: WebSocketMessage = {
       type: 'MARKET_UPDATE',
       payload: marketData,
-      timestamp: message.timestamp
+      timestamp: message.timestamp,
     };
 
     this.io.to(roomName).emit('market-update', wsMessage);
 
     this.logger.debug(`Market data broadcasted to room ${roomName}`, {
       commodity: marketData.commodity,
-      price: marketData.price
+      price: marketData.price,
     });
   }
 
@@ -279,14 +282,14 @@ export class WebSocketService {
       type: 'TRADE_UPDATE',
       payload: tradeData,
       timestamp: message.timestamp,
-      userId: tradeData.userId
+      userId: tradeData.userId,
     };
 
     this.io.to(roomName).emit('trade-update', wsMessage);
 
     this.logger.debug(`Trade update sent to user ${tradeData.userId}`, {
       tradeId: tradeData.id,
-      status: tradeData.status
+      status: tradeData.status,
     });
   }
 
@@ -301,14 +304,14 @@ export class WebSocketService {
       type: 'ORDER_UPDATE',
       payload: orderData,
       timestamp: message.timestamp,
-      userId: orderData.userId
+      userId: orderData.userId,
     };
 
     this.io.to(roomName).emit('order-update', wsMessage);
 
     this.logger.debug(`Order update sent to user ${orderData.userId}`, {
       orderId: orderData.id,
-      status: orderData.status
+      status: orderData.status,
     });
   }
 
@@ -321,7 +324,7 @@ export class WebSocketService {
     const wsMessage: WebSocketMessage = {
       type: 'SYSTEM_ALERT',
       payload: alertData,
-      timestamp: message.timestamp
+      timestamp: message.timestamp,
     };
 
     // Broadcast system alerts to all connected clients
@@ -329,7 +332,7 @@ export class WebSocketService {
 
     this.logger.info(`System alert broadcasted to all clients`, {
       alertType: alertData.alertType,
-      severity: alertData.severity
+      severity: alertData.severity,
     });
   }
 
@@ -344,17 +347,17 @@ export class WebSocketService {
       type: 'SYSTEM_ALERT',
       payload: {
         type: 'COMPLIANCE_ALERT',
-        ...complianceData
+        ...complianceData,
       },
       timestamp: message.timestamp,
-      userId: complianceData.userId
+      userId: complianceData.userId,
     };
 
     this.io.to(roomName).emit('compliance-alert', wsMessage);
 
     this.logger.warn(`Compliance alert sent to user ${complianceData.userId}`, {
       checkType: complianceData.checkType,
-      severity: complianceData.severity
+      severity: complianceData.severity,
     });
   }
 
@@ -382,7 +385,7 @@ export class WebSocketService {
     return {
       connectedClients: this.connectedClients.size,
       rooms: Array.from(this.io.sockets.adapter.rooms.keys()),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 }

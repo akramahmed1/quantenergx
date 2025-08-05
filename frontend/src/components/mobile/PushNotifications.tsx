@@ -14,7 +14,7 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  Divider
+  Divider,
 } from '@mui/material';
 import {
   Notifications,
@@ -23,7 +23,7 @@ import {
   TrendingUp,
   AttachMoney,
   Update,
-  Warning
+  Warning,
 } from '@mui/icons-material';
 import { useTranslation } from '../../i18n/I18nProvider';
 
@@ -48,9 +48,7 @@ interface PushNotificationsProps {
   onNotificationReceived?: (notification: PushNotification) => void;
 }
 
-export const PushNotifications: React.FC<PushNotificationsProps> = ({
-  onNotificationReceived
-}) => {
+export const PushNotifications: React.FC<PushNotificationsProps> = ({ onNotificationReceived }) => {
   const { t } = useTranslation();
   const [permission, setPermission] = useState<NotificationPermission>('default');
   const [settings, setSettings] = useState<NotificationSettings>({
@@ -58,10 +56,11 @@ export const PushNotifications: React.FC<PushNotificationsProps> = ({
     tradeAlerts: true,
     priceAlerts: true,
     marketUpdates: false,
-    systemAlerts: true
+    systemAlerts: true,
   });
   const [recentNotifications, setRecentNotifications] = useState<PushNotification[]>([]);
-  const [serviceWorkerRegistration, setServiceWorkerRegistration] = useState<ServiceWorkerRegistration | null>(null);
+  const [serviceWorkerRegistration, setServiceWorkerRegistration] =
+    useState<ServiceWorkerRegistration | null>(null);
 
   useEffect(() => {
     checkNotificationSupport();
@@ -128,17 +127,17 @@ export const PushNotifications: React.FC<PushNotificationsProps> = ({
 
     const permission = await Notification.requestPermission();
     setPermission(permission);
-    
+
     if (permission === 'granted') {
       const newSettings = { ...settings, enabled: true };
       saveNotificationSettings(newSettings);
-      
+
       // Subscribe to push notifications if service worker is available
       if (serviceWorkerRegistration) {
         await subscribeToPushNotifications();
       }
     }
-    
+
     return permission;
   };
 
@@ -151,18 +150,17 @@ export const PushNotifications: React.FC<PushNotificationsProps> = ({
     try {
       // You would replace this with your actual VAPID public key
       const vapidPublicKey = 'your-vapid-public-key-here';
-      
+
       const subscription = await serviceWorkerRegistration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: vapidPublicKey
+        applicationServerKey: vapidPublicKey,
       });
 
       // Send subscription to your backend
       console.log('Push subscription:', subscription);
-      
+
       // Store subscription info
       localStorage.setItem('quantenergx_push_subscription', JSON.stringify(subscription));
-      
     } catch (error) {
       console.error('Failed to subscribe to push notifications:', error);
     }
@@ -176,7 +174,7 @@ export const PushNotifications: React.FC<PushNotificationsProps> = ({
         badge: '/badge-72.png',
         tag: notification.id,
         timestamp: notification.timestamp,
-        requireInteraction: notification.type === 'system'
+        requireInteraction: notification.type === 'system',
       });
 
       browserNotification.onclick = () => {
@@ -203,7 +201,7 @@ export const PushNotifications: React.FC<PushNotificationsProps> = ({
   };
 
   const markNotificationAsRead = (id: string) => {
-    const updated = recentNotifications.map(notif => 
+    const updated = recentNotifications.map(notif =>
       notif.id === id ? { ...notif, read: true } : notif
     );
     setRecentNotifications(updated);
@@ -251,19 +249,13 @@ export const PushNotifications: React.FC<PushNotificationsProps> = ({
     <Card>
       <CardContent>
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-          <Typography variant="h6">
-            {t('mobile.pushNotifications')}
-          </Typography>
+          <Typography variant="h6">{t('mobile.pushNotifications')}</Typography>
           <Box display="flex" alignItems="center" gap={1}>
-            {unreadCount > 0 && (
-              <Chip 
-                label={unreadCount}
-                color="error"
-                size="small"
-              />
-            )}
-            <Chip 
-              label={settings.enabled ? t('notifications.pushEnabled') : t('notifications.pushDisabled')}
+            {unreadCount > 0 && <Chip label={unreadCount} color="error" size="small" />}
+            <Chip
+              label={
+                settings.enabled ? t('notifications.pushEnabled') : t('notifications.pushDisabled')
+              }
               color={settings.enabled ? 'success' : 'default'}
               size="small"
             />
@@ -287,7 +279,7 @@ export const PushNotifications: React.FC<PushNotificationsProps> = ({
             control={
               <Switch
                 checked={settings.enabled}
-                onChange={(e) => toggleNotifications(e.target.checked)}
+                onChange={e => toggleNotifications(e.target.checked)}
                 disabled={permission === 'denied'}
               />
             }
@@ -300,37 +292,37 @@ export const PushNotifications: React.FC<PushNotificationsProps> = ({
                 control={
                   <Switch
                     checked={settings.tradeAlerts}
-                    onChange={(e) => updateNotificationSetting('tradeAlerts', e.target.checked)}
+                    onChange={e => updateNotificationSetting('tradeAlerts', e.target.checked)}
                   />
                 }
                 label={t('notifications.tradeAlert')}
               />
-              
+
               <FormControlLabel
                 control={
                   <Switch
                     checked={settings.priceAlerts}
-                    onChange={(e) => updateNotificationSetting('priceAlerts', e.target.checked)}
+                    onChange={e => updateNotificationSetting('priceAlerts', e.target.checked)}
                   />
                 }
                 label={t('notifications.priceAlert')}
               />
-              
+
               <FormControlLabel
                 control={
                   <Switch
                     checked={settings.marketUpdates}
-                    onChange={(e) => updateNotificationSetting('marketUpdates', e.target.checked)}
+                    onChange={e => updateNotificationSetting('marketUpdates', e.target.checked)}
                   />
                 }
                 label={t('notifications.marketUpdate')}
               />
-              
+
               <FormControlLabel
                 control={
                   <Switch
                     checked={settings.systemAlerts}
-                    onChange={(e) => updateNotificationSetting('systemAlerts', e.target.checked)}
+                    onChange={e => updateNotificationSetting('systemAlerts', e.target.checked)}
                   />
                 }
                 label={t('notifications.systemAlert')}
@@ -351,7 +343,7 @@ export const PushNotifications: React.FC<PushNotificationsProps> = ({
                   body: 'This is a test notification',
                   type: 'system',
                   timestamp: Date.now(),
-                  read: false
+                  read: false,
                 };
                 sendLocalNotification(testNotification);
               }}
@@ -366,7 +358,7 @@ export const PushNotifications: React.FC<PushNotificationsProps> = ({
             <Typography variant="subtitle2" gutterBottom>
               Recent Notifications
             </Typography>
-            
+
             <List dense>
               {recentNotifications.slice(0, 5).map((notification, index) => (
                 <React.Fragment key={notification.id}>
@@ -375,12 +367,10 @@ export const PushNotifications: React.FC<PushNotificationsProps> = ({
                     onClick={() => markNotificationAsRead(notification.id)}
                     sx={{
                       backgroundColor: notification.read ? 'transparent' : 'action.hover',
-                      borderRadius: 1
+                      borderRadius: 1,
                     }}
                   >
-                    <ListItemIcon>
-                      {getNotificationIcon(notification.type)}
-                    </ListItemIcon>
+                    <ListItemIcon>{getNotificationIcon(notification.type)}</ListItemIcon>
                     <ListItemText
                       primary={notification.title}
                       secondary={
@@ -419,13 +409,15 @@ export const useNotifications = () => {
       body,
       type,
       timestamp: Date.now(),
-      read: false
+      read: false,
     };
 
     // This would trigger the notification component
-    window.dispatchEvent(new CustomEvent('quantenergx-notification', {
-      detail: notification
-    }));
+    window.dispatchEvent(
+      new CustomEvent('quantenergx-notification', {
+        detail: notification,
+      })
+    );
 
     return notification;
   };

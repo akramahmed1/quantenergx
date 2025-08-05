@@ -3,7 +3,7 @@ info:
   title: QuantEnergx API
   description: |
     Industry-disrupting energy trading platform with advanced features across 13 major categories.
-    
+
     ## Features
     - Real-time trading infrastructure
     - Multi-commodity support (Oil, Gas, Electricity, Renewables, Carbon Credits)
@@ -15,7 +15,7 @@ info:
     - Plugin architecture and webhook integrations
     - OCR document processing
     - IoT and SCADA integration
-    
+
   version: 2.0.0
   contact:
     name: QuantEnergx Team
@@ -40,7 +40,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      
+
   schemas:
     APIResponse:
       type: object
@@ -55,7 +55,7 @@ components:
       required:
         - success
         - timestamp
-        
+
     ErrorResponse:
       type: object
       properties:
@@ -73,7 +73,7 @@ components:
         - success
         - error
         - timestamp
-        
+
     Order:
       type: object
       properties:
@@ -123,9 +123,9 @@ components:
               - type: object
                 properties:
                   error:
-                    example: "Unauthorized"
+                    example: 'Unauthorized'
                   message:
-                    example: "Invalid or expired token"
+                    example: 'Invalid or expired token'
     NotFound:
       description: Resource not found
       content:
@@ -136,9 +136,9 @@ components:
               - type: object
                 properties:
                   error:
-                    example: "Not Found"
+                    example: 'Not Found'
                   message:
-                    example: "Resource not found"
+                    example: 'Resource not found'
     InternalError:
       description: Internal server error
       content:
@@ -149,9 +149,9 @@ components:
               - type: object
                 properties:
                   error:
-                    example: "Internal Server Error"
+                    example: 'Internal Server Error'
                   message:
-                    example: "An unexpected error occurred"
+                    example: 'An unexpected error occurred'
 
 paths:
   /health:
@@ -183,7 +183,7 @@ paths:
                         format: date-time
                       version:
                         type: string
-                        example: "1.0.0"
+                        example: '1.0.0'
                       services:
                         type: object
                         properties:
@@ -251,7 +251,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalError'
-          
+
     post:
       tags:
         - Trading
@@ -742,7 +742,7 @@ paths:
                               type: number
                             rho:
                               type: number
-                              
+
     post:
       tags:
         - Derivatives
@@ -805,7 +805,7 @@ paths:
       responses:
         '200':
           description: Settlement instructions retrieved successfully
-          
+
     post:
       tags:
         - Settlement

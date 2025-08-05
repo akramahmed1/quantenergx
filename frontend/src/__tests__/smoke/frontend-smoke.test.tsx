@@ -1,6 +1,6 @@
 /**
  * Frontend Smoke Tests for QuantEnergX
- * 
+ *
  * These tests verify that critical frontend functionality works without going into detail.
  * They should run quickly and catch major breaking changes.
  */
@@ -19,9 +19,11 @@ import App from '../../App';
 const createMockStore = (initialState = {}) => {
   return configureStore({
     reducer: {
-      auth: (state = { user: null, isAuthenticated: false, loading: false, error: null }, action) => state,
+      auth: (state = { user: null, isAuthenticated: false, loading: false, error: null }, action) =>
+        state,
       market: (state = { data: {}, loading: false, error: null }, action) => state,
-      trading: (state = { orders: [], positions: [], loading: false, error: null }, action) => state,
+      trading: (state = { orders: [], positions: [], loading: false, error: null }, action) =>
+        state,
       notifications: (state = { notifications: [], unreadCount: 0, settings: {} }, action) => state,
       settings: (state = { theme: 'light', language: 'en' }, action) => state,
       compliance: (state = { status: 'compliant', checks: [] }, action) => state,
@@ -42,9 +44,7 @@ const renderWithProviders = (
   return render(
     <Provider store={store}>
       <BrowserRouter>
-        <ThemeProvider theme={theme}>
-          {component}
-        </ThemeProvider>
+        <ThemeProvider theme={theme}>{component}</ThemeProvider>
       </BrowserRouter>
     </Provider>
   );
@@ -58,14 +58,14 @@ describe('Frontend Smoke Tests', () => {
 
     test('App component contains main layout elements', () => {
       renderWithProviders(<App />);
-      
+
       // Should have some basic layout structure
       expect(document.body).toBeInTheDocument();
     });
 
     test('Router is properly configured', () => {
       const { container } = renderWithProviders(<App />);
-      
+
       // Should render without router errors
       expect(container).toBeInTheDocument();
     });
@@ -74,7 +74,7 @@ describe('Frontend Smoke Tests', () => {
   describe('Redux Store Integration', () => {
     test('store connects to components without errors', () => {
       const store = createMockStore();
-      
+
       expect(() => {
         render(
           <Provider store={store}>
@@ -91,7 +91,7 @@ describe('Frontend Smoke Tests', () => {
     test('store has all required slices', () => {
       const store = createMockStore();
       const state = store.getState();
-      
+
       expect(state).toHaveProperty('auth');
       expect(state).toHaveProperty('market');
       expect(state).toHaveProperty('trading');
@@ -105,19 +105,19 @@ describe('Frontend Smoke Tests', () => {
     test('store initial state is properly structured', () => {
       const store = createMockStore();
       const state = store.getState();
-      
+
       // Auth slice
       expect(state.auth).toHaveProperty('user');
       expect(state.auth).toHaveProperty('isAuthenticated');
       expect(state.auth).toHaveProperty('loading');
       expect(state.auth).toHaveProperty('error');
-      
+
       // Trading slice
       expect(state.trading).toHaveProperty('orders');
       expect(state.trading).toHaveProperty('positions');
       expect(state.trading.orders).toBeInstanceOf(Array);
       expect(state.trading.positions).toBeInstanceOf(Array);
-      
+
       // Notifications slice
       expect(state.notifications).toHaveProperty('notifications');
       expect(state.notifications).toHaveProperty('unreadCount');
@@ -145,7 +145,7 @@ describe('Frontend Smoke Tests', () => {
           },
         },
       });
-      
+
       expect(customTheme.palette.primary.main).toBe('#1976d2');
     });
   });
@@ -163,7 +163,7 @@ describe('Frontend Smoke Tests', () => {
 
     test('routes are accessible without authentication errors', () => {
       const { container } = renderWithProviders(<App />);
-      
+
       // Should render some content without routing errors
       expect(container).toBeInTheDocument();
     });
@@ -196,7 +196,7 @@ describe('Frontend Smoke Tests', () => {
   describe('Store Slice Functionality', () => {
     test('auth slice actions work', () => {
       const store = createMockStore();
-      
+
       expect(() => {
         store.dispatch({ type: 'auth/login/pending' });
         store.dispatch({ type: 'auth/logout' });
@@ -205,27 +205,30 @@ describe('Frontend Smoke Tests', () => {
 
     test('trading slice actions work', () => {
       const store = createMockStore();
-      
+
       expect(() => {
         store.dispatch({ type: 'trading/placeOrder/pending' });
-        store.dispatch({ type: 'trading/updateOrderStatus', payload: { orderId: '123', status: 'filled' } });
+        store.dispatch({
+          type: 'trading/updateOrderStatus',
+          payload: { orderId: '123', status: 'filled' },
+        });
       }).not.toThrow();
     });
 
     test('notifications slice actions work', () => {
       const store = createMockStore();
-      
+
       expect(() => {
-        store.dispatch({ 
-          type: 'notifications/addNotification', 
-          payload: { 
-            id: '1', 
-            type: 'info', 
-            title: 'Test', 
+        store.dispatch({
+          type: 'notifications/addNotification',
+          payload: {
+            id: '1',
+            type: 'info',
+            title: 'Test',
             message: 'Test message',
             timestamp: new Date().toISOString(),
-            read: false
-          } 
+            read: false,
+          },
         });
         store.dispatch({ type: 'notifications/markAsRead', payload: '1' });
       }).not.toThrow();
@@ -265,7 +268,7 @@ describe('Frontend Smoke Tests', () => {
           ocr: () => ({}),
         },
       });
-      
+
       expect(() => {
         render(
           <Provider store={emptyStore}>
@@ -285,15 +288,15 @@ describe('Frontend Smoke Tests', () => {
       // Test arrow functions
       const arrow = () => 'test';
       expect(arrow()).toBe('test');
-      
+
       // Test async/await
       const asyncTest = async () => Promise.resolve('test');
       expect(asyncTest()).toBeInstanceOf(Promise);
-      
+
       // Test destructuring
       const { test } = { test: 'value' };
       expect(test).toBe('value');
-      
+
       // Test template literals
       const template = `Hello ${test}`;
       expect(template).toBe('Hello value');
@@ -307,12 +310,12 @@ describe('Frontend Smoke Tests', () => {
   describe('Performance Basics', () => {
     test('component renders in reasonable time', () => {
       const startTime = performance.now();
-      
+
       renderWithProviders(<App />);
-      
+
       const endTime = performance.now();
       const renderTime = endTime - startTime;
-      
+
       // Should render in less than 1 second (generous for CI)
       expect(renderTime).toBeLessThan(1000);
     });
@@ -320,13 +323,13 @@ describe('Frontend Smoke Tests', () => {
     test('store operations are synchronous', () => {
       const store = createMockStore();
       const startTime = performance.now();
-      
+
       store.dispatch({ type: 'test/action' });
       const state = store.getState();
-      
+
       const endTime = performance.now();
       const operationTime = endTime - startTime;
-      
+
       // Store operations should be very fast
       expect(operationTime).toBeLessThan(10);
       expect(state).toBeDefined();
@@ -336,13 +339,13 @@ describe('Frontend Smoke Tests', () => {
   describe('Memory Management', () => {
     test('components unmount cleanly', () => {
       const { unmount } = renderWithProviders(<App />);
-      
+
       expect(() => unmount()).not.toThrow();
     });
 
     test('store subscription cleanup works', () => {
       const store = createMockStore();
-      
+
       const unsubscribe = store.subscribe(() => {});
       expect(() => unsubscribe()).not.toThrow();
     });
@@ -357,7 +360,7 @@ describe('Frontend Smoke Tests', () => {
     test('Redux types work correctly', () => {
       const store = createMockStore();
       const state = store.getState();
-      
+
       // If this compiles and runs, types are working
       expect(typeof state).toBe('object');
     });

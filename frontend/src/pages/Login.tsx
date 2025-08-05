@@ -16,13 +16,7 @@ import {
   IconButton,
   InputAdornment,
 } from '@mui/material';
-import {
-  Visibility,
-  VisibilityOff,
-  Lock,
-  Person,
-  Security,
-} from '@mui/icons-material';
+import { Visibility, VisibilityOff, Lock, Person, Security } from '@mui/icons-material';
 import { login, selectAuth } from '../store/slices/authSlice';
 import type { RootState, AppDispatch } from '../store/store';
 
@@ -78,25 +72,27 @@ const Login: React.FC = () => {
     }
 
     try {
-      const resultAction = await dispatch(login({
-        username: formData.username,
-        password: formData.password,
-        mfaToken: formData.mfaToken || undefined,
-      }));
+      const resultAction = await dispatch(
+        login({
+          username: formData.username,
+          password: formData.password,
+          mfaToken: formData.mfaToken || undefined,
+        })
+      );
 
       if (login.fulfilled.match(resultAction)) {
         // Login successful, navigate to intended page
         navigate(from, { replace: true });
       } else {
         // Login failed
-        setError(resultAction.payload as string || 'Login failed');
+        setError((resultAction.payload as string) || 'Login failed');
       }
     } catch (err) {
       setError('Login failed. Please try again.');
     }
   };
 
-  const handleCredentialSelect = (credentials: typeof DEFAULT_CREDENTIALS[0]) => {
+  const handleCredentialSelect = (credentials: (typeof DEFAULT_CREDENTIALS)[0]) => {
     setFormData(prev => ({
       ...prev,
       username: credentials.username,
@@ -234,7 +230,7 @@ const Login: React.FC = () => {
                   <Link
                     href="#"
                     variant="body2"
-                    onClick={(e) => {
+                    onClick={e => {
                       e.preventDefault();
                       setShowCredentials(!showCredentials);
                     }}

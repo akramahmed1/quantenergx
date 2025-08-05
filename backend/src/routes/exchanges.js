@@ -14,7 +14,7 @@ const regulatoryService = new EnhancedRegulatoryService();
 router.get('/', async (req, res) => {
   try {
     const connectors = connectorRegistry.getRegisteredConnectors();
-    
+
     res.json({
       success: true,
       data: connectors,
@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
 router.get('/active', async (req, res) => {
   try {
     const connections = connectorRegistry.getActiveConnections();
-    
+
     res.json({
       success: true,
       data: connections,
@@ -60,7 +60,7 @@ router.get('/active', async (req, res) => {
 router.get('/health', async (req, res) => {
   try {
     const health = connectorRegistry.getSystemHealth();
-    
+
     res.json({
       success: true,
       data: health,
@@ -83,7 +83,7 @@ router.get('/region/:region', async (req, res) => {
   try {
     const { region } = req.params;
     const connectors = connectorRegistry.getConnectorsByRegion(region);
-    
+
     res.json({
       success: true,
       data: connectors,
@@ -108,7 +108,7 @@ router.get('/market/:market', async (req, res) => {
   try {
     const { market } = req.params;
     const connectors = connectorRegistry.getConnectorsByMarket(market);
-    
+
     res.json({
       success: true,
       data: connectors,
@@ -133,7 +133,7 @@ router.get('/regulation/:regulation', async (req, res) => {
   try {
     const { regulation } = req.params;
     const connectors = connectorRegistry.getConnectorsByRegulation(regulation);
-    
+
     res.json({
       success: true,
       data: connectors,
@@ -158,7 +158,7 @@ router.post('/:exchangeId/connect', async (req, res) => {
   try {
     const { exchangeId } = req.params;
     const credentials = req.body;
-    
+
     if (!credentials.apiKey || !credentials.apiSecret) {
       return res.status(400).json({
         success: false,
@@ -166,9 +166,9 @@ router.post('/:exchangeId/connect', async (req, res) => {
         timestamp: new Date().toISOString(),
       });
     }
-    
+
     const result = await connectorRegistry.connectToExchange(exchangeId, credentials);
-    
+
     res.json({
       success: true,
       data: result,
@@ -191,7 +191,7 @@ router.post('/:exchangeId/disconnect', async (req, res) => {
   try {
     const { exchangeId } = req.params;
     const result = await connectorRegistry.disconnectFromExchange(exchangeId);
-    
+
     res.json({
       success: true,
       data: result,
@@ -213,7 +213,7 @@ router.post('/:exchangeId/disconnect', async (req, res) => {
 router.post('/disconnect-all', async (req, res) => {
   try {
     const result = await connectorRegistry.disconnectAll();
-    
+
     res.json({
       success: true,
       data: result,
@@ -236,11 +236,11 @@ router.post('/:exchangeId/orders', async (req, res) => {
   try {
     const { exchangeId } = req.params;
     const orderData = req.body;
-    
+
     // Validate order data
     const requiredFields = ['symbol', 'quantity', 'price', 'side'];
     const missingFields = requiredFields.filter(field => !orderData[field]);
-    
+
     if (missingFields.length > 0) {
       return res.status(400).json({
         success: false,
@@ -248,9 +248,9 @@ router.post('/:exchangeId/orders', async (req, res) => {
         timestamp: new Date().toISOString(),
       });
     }
-    
+
     const result = await connectorRegistry.submitOrder(exchangeId, orderData);
-    
+
     res.json({
       success: true,
       data: result,
@@ -273,7 +273,7 @@ router.get('/:exchangeId/market-data/:symbol', async (req, res) => {
   try {
     const { exchangeId, symbol } = req.params;
     const result = await connectorRegistry.getMarketData(exchangeId, symbol);
-    
+
     res.json({
       success: true,
       data: result,
@@ -296,7 +296,7 @@ router.post('/:exchangeId/market-data/subscribe', async (req, res) => {
   try {
     const { exchangeId } = req.params;
     const { symbols } = req.body;
-    
+
     if (!symbols || !Array.isArray(symbols)) {
       return res.status(400).json({
         success: false,
@@ -304,15 +304,15 @@ router.post('/:exchangeId/market-data/subscribe', async (req, res) => {
         timestamp: new Date().toISOString(),
       });
     }
-    
+
     // Callback function for market data updates (would typically use WebSocket)
-    const callback = (marketData) => {
+    const callback = marketData => {
       console.log(`Market data update from ${exchangeId}:`, marketData);
       // In a real implementation, this would send data via WebSocket
     };
-    
+
     const result = await connectorRegistry.subscribeToMarketData(exchangeId, symbols, callback);
-    
+
     res.json({
       success: true,
       data: result,
@@ -335,7 +335,7 @@ router.post('/find-best', async (req, res) => {
   try {
     const criteria = req.body;
     const result = connectorRegistry.findBestExchange(criteria);
-    
+
     if (!result) {
       return res.status(404).json({
         success: false,
@@ -344,7 +344,7 @@ router.post('/find-best', async (req, res) => {
         timestamp: new Date().toISOString(),
       });
     }
-    
+
     res.json({
       success: true,
       data: result,
@@ -367,7 +367,7 @@ router.post('/find-best', async (req, res) => {
 router.post('/plugins/load', async (req, res) => {
   try {
     const { pluginPath, exchangeId } = req.body;
-    
+
     if (!pluginPath || !exchangeId) {
       return res.status(400).json({
         success: false,
@@ -375,9 +375,9 @@ router.post('/plugins/load', async (req, res) => {
         timestamp: new Date().toISOString(),
       });
     }
-    
+
     const result = await connectorRegistry.loadConnectorPlugin(pluginPath, exchangeId);
-    
+
     res.json({
       success: true,
       data: result,

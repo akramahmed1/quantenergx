@@ -14,7 +14,7 @@ class CarbonTrackingService {
       heating_oil: 317, // kg CO2 per barrel
       gasoline: 317, // kg CO2 per barrel
       diesel: 317, // kg CO2 per barrel
-      
+
       // Electricity (per MWh)
       electricity_grid: 495, // Average grid emission factor
       electricity_coal: 820,
@@ -24,19 +24,19 @@ class CarbonTrackingService {
       electricity_wind: 11,
       electricity_solar: 40,
       electricity_geothermal: 38,
-      
+
       // Transportation (per km)
       truck_transport: 0.62, // kg CO2 per km per ton
       rail_transport: 0.027,
       ship_transport: 0.014,
-      pipeline_transport: 0.002
+      pipeline_transport: 0.002,
     };
 
     // Blockchain configuration for carbon credits
     this.blockchainConfig = {
       network: 'hyperledger_fabric',
       channel: 'carbon_credits',
-      chaincode: 'carbon_tracking'
+      chaincode: 'carbon_tracking',
     };
   }
 
@@ -52,7 +52,8 @@ class CarbonTrackingService {
       const processingEmissions = this.calculateProcessingEmissions(transaction);
       const indirectEmissions = this.calculateIndirectEmissions(transaction);
 
-      const totalEmissions = productEmissions + transportEmissions + processingEmissions + indirectEmissions;
+      const totalEmissions =
+        productEmissions + transportEmissions + processingEmissions + indirectEmissions;
 
       const carbonIntensity = totalEmissions / transaction.quantity;
 
@@ -65,18 +66,18 @@ class CarbonTrackingService {
           product_emissions: productEmissions,
           transport_emissions: transportEmissions,
           processing_emissions: processingEmissions,
-          indirect_emissions: indirectEmissions
+          indirect_emissions: indirectEmissions,
         },
         methodology: 'GHG Protocol Corporate Standard',
         calculation_date: new Date().toISOString(),
         verification_status: 'calculated',
         offset_required: totalEmissions,
-        blockchain_hash: await this.recordOnBlockchain(transaction.id, totalEmissions)
+        blockchain_hash: await this.recordOnBlockchain(transaction.id, totalEmissions),
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -110,8 +111,9 @@ class CarbonTrackingService {
     const distance = transport.distance; // km
     const weight = transaction.quantity * (transaction.unit_weight || 1); // tons
 
-    const emissionFactor = this.emissionFactors[transportType] || this.emissionFactors.truck_transport;
-    
+    const emissionFactor =
+      this.emissionFactors[transportType] || this.emissionFactors.truck_transport;
+
     return distance * weight * emissionFactor;
   }
 
@@ -182,7 +184,7 @@ class CarbonTrackingService {
         project_location: creditData.location,
         issuance_date: new Date().toISOString(),
         status: 'active',
-        blockchain_record: await this.recordCreditOnBlockchain(creditData)
+        blockchain_record: await this.recordCreditOnBlockchain(creditData),
       };
 
       return {
@@ -190,12 +192,12 @@ class CarbonTrackingService {
         credit_id: creditRecord.id,
         credit_record: creditRecord,
         blockchain_hash: creditRecord.blockchain_record.hash,
-        verification_url: `${this.blockchainConfig.network}/tx/${creditRecord.blockchain_record.hash}`
+        verification_url: `${this.blockchainConfig.network}/tx/${creditRecord.blockchain_record.hash}`,
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -217,7 +219,7 @@ class CarbonTrackingService {
           transactionBreakdown.push({
             transaction_id: transaction.id,
             emissions: footprint.total_emissions,
-            commodity: transaction.commodity
+            commodity: transaction.commodity,
           });
         }
       }
@@ -232,12 +234,12 @@ class CarbonTrackingService {
         estimated_cost: offsetCost,
         transaction_breakdown: transactionBreakdown,
         recommended_projects: recommendedProjects,
-        compliance_status: this.checkComplianceStatus(totalEmissions)
+        compliance_status: this.checkComplianceStatus(totalEmissions),
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -256,7 +258,7 @@ class CarbonTrackingService {
       base_cost: Math.round(baseCost * 100) / 100,
       admin_fee: Math.round(baseCost * adminFee * 100) / 100,
       total_cost: Math.round(totalCost * 100) / 100,
-      currency: 'USD'
+      currency: 'USD',
     };
   }
 
@@ -273,7 +275,7 @@ class CarbonTrackingService {
         price_per_ton: 12,
         available_credits: 50000,
         verification: 'VCS + CCBS',
-        co_benefits: ['Biodiversity', 'Community Development']
+        co_benefits: ['Biodiversity', 'Community Development'],
       },
       {
         id: 'SOLAR_002',
@@ -283,7 +285,7 @@ class CarbonTrackingService {
         price_per_ton: 18,
         available_credits: 25000,
         verification: 'CDM',
-        co_benefits: ['Energy Access', 'Rural Development']
+        co_benefits: ['Energy Access', 'Rural Development'],
       },
       {
         id: 'METHANE_003',
@@ -293,8 +295,8 @@ class CarbonTrackingService {
         price_per_ton: 14,
         available_credits: 15000,
         verification: 'VCS',
-        co_benefits: ['Waste Management', 'Air Quality']
-      }
+        co_benefits: ['Waste Management', 'Air Quality'],
+      },
     ];
 
     // Filter projects that have sufficient credits
@@ -309,7 +311,7 @@ class CarbonTrackingService {
     const thresholds = {
       eu_ets: 10000, // tons CO2 per year
       california_cap_trade: 25000,
-      voluntary_target: 5000
+      voluntary_target: 5000,
     };
 
     const status = [];
@@ -320,7 +322,7 @@ class CarbonTrackingService {
         threshold: threshold,
         current_emissions: emissions,
         compliance_required: emissions > threshold,
-        surplus_deficit: threshold - emissions
+        surplus_deficit: threshold - emissions,
       });
     });
 
@@ -340,10 +342,10 @@ class CarbonTrackingService {
         total_transactions: 150,
         total_emissions: 12500.75, // tons CO2
         emissions_by_commodity: {
-          crude_oil: 8000.50,
+          crude_oil: 8000.5,
           natural_gas: 3500.25,
-          renewable_certificates: 15.00,
-          coal: 985.00
+          renewable_certificates: 15.0,
+          coal: 985.0,
         },
         monthly_trends: [
           { month: 'Jan', emissions: 1200 },
@@ -355,14 +357,14 @@ class CarbonTrackingService {
           {
             initiative: 'Increased renewable energy trading',
             reduction: 500, // tons CO2
-            percentage: 4.0
+            percentage: 4.0,
           },
           {
             initiative: 'Transport optimization',
             reduction: 250,
-            percentage: 2.0
-          }
-        ]
+            percentage: 2.0,
+          },
+        ],
       };
 
       return {
@@ -377,18 +379,18 @@ class CarbonTrackingService {
         targets: {
           net_zero_target: '2030',
           interim_target: '50% reduction by 2025',
-          progress: '15% reduction achieved'
+          progress: '15% reduction achieved',
         },
         verification: {
           verified_by: 'Third-party verifier',
           verification_date: new Date().toISOString(),
-          standard: 'ISO 14064-1'
-        }
+          standard: 'ISO 14064-1',
+        },
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -402,16 +404,16 @@ class CarbonTrackingService {
       transaction_id: transactionId,
       emissions: emissions,
       timestamp: new Date().toISOString(),
-      validator: 'QuantEnergx_Carbon_Oracle'
+      validator: 'QuantEnergx_Carbon_Oracle',
     };
 
     const hash = this.generateMockHash(JSON.stringify(record));
-    
+
     return {
       hash: hash,
       block_number: Math.floor(Date.now() / 1000),
       network: this.blockchainConfig.network,
-      status: 'confirmed'
+      status: 'confirmed',
     };
   }
 
@@ -422,16 +424,16 @@ class CarbonTrackingService {
     const record = {
       credit_data: creditData,
       timestamp: new Date().toISOString(),
-      issuer: 'QuantEnergx_Carbon_Registry'
+      issuer: 'QuantEnergx_Carbon_Registry',
     };
 
     const hash = this.generateMockHash(JSON.stringify(record));
-    
+
     return {
       hash: hash,
       block_number: Math.floor(Date.now() / 1000),
       network: this.blockchainConfig.network,
-      status: 'confirmed'
+      status: 'confirmed',
     };
   }
 
@@ -443,7 +445,7 @@ class CarbonTrackingService {
     let hash = 0;
     for (let i = 0; i < data.length; i++) {
       const char = data.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return Math.abs(hash).toString(16).padStart(16, '0');
@@ -459,24 +461,24 @@ class CarbonTrackingService {
       last_updated: new Date().toISOString(),
       markets: {
         eu_ets: {
-          price: 85.50,
+          price: 85.5,
           currency: 'EUR',
           change: '+2.5%',
-          volume: 125000
+          volume: 125000,
         },
         california_cap_trade: {
           price: 32.75,
           currency: 'USD',
           change: '+1.2%',
-          volume: 85000
+          volume: 85000,
         },
         voluntary_market: {
           price: 15.25,
           currency: 'USD',
           change: '+0.8%',
-          volume: 45000
-        }
-      }
+          volume: 45000,
+        },
+      },
     };
   }
 }

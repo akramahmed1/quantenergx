@@ -7,14 +7,14 @@ import type { RootState } from '../store/store';
 
 /**
  * ProtectedRoute Component
- * 
+ *
  * A higher-order component that protects routes requiring authentication.
  * Features:
  * - Redirects unauthenticated users to login page
  * - Preserves intended destination for post-login redirect
  * - Automatically restores authentication from localStorage
  * - Shows loading state during authentication check
- * 
+ *
  * @param children - React components to render when authenticated
  */
 interface ProtectedRouteProps {

@@ -24,7 +24,7 @@ import {
   TableHead,
   TableRow,
   IconButton,
-  Tooltip
+  Tooltip,
 } from '@mui/material';
 import {
   TrendingUp,
@@ -37,7 +37,7 @@ import {
   SmartToy,
   Analytics,
   Security,
-  Insights
+  Insights,
 } from '@mui/icons-material';
 
 interface AIDashboardData {
@@ -100,13 +100,13 @@ const AIDashboard: React.FC = () => {
     try {
       setRefreshing(true);
       const response = await fetch('/api/v1/ai/dashboard?timeframe=24h');
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const result = await response.json();
-      
+
       if (result.success) {
         setDashboardData(result.data);
         setError(null);
@@ -124,10 +124,10 @@ const AIDashboard: React.FC = () => {
 
   useEffect(() => {
     fetchDashboardData();
-    
+
     // Refresh every 5 minutes
     const interval = setInterval(fetchDashboardData, 5 * 60 * 1000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -184,8 +184,8 @@ const AIDashboard: React.FC = () => {
 
   if (error) {
     return (
-      <Alert 
-        severity="error" 
+      <Alert
+        severity="error"
         action={
           <Button color="inherit" size="small" onClick={fetchDashboardData}>
             Retry
@@ -198,11 +198,7 @@ const AIDashboard: React.FC = () => {
   }
 
   if (!dashboardData) {
-    return (
-      <Alert severity="warning">
-        No dashboard data available
-      </Alert>
-    );
+    return <Alert severity="warning">No dashboard data available</Alert>;
   }
 
   return (
@@ -231,7 +227,7 @@ const AIDashboard: React.FC = () => {
                 <SmartToy sx={{ mr: 1 }} />
                 <Typography variant="h6">LLM Service</Typography>
               </Box>
-              <Chip 
+              <Chip
                 label={dashboardData.system_status.llm_service}
                 color={getStatusColor(dashboardData.system_status.llm_service) as any}
                 size="small"
@@ -239,7 +235,7 @@ const AIDashboard: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
@@ -247,7 +243,7 @@ const AIDashboard: React.FC = () => {
                 <Analytics sx={{ mr: 1 }} />
                 <Typography variant="h6">Sentiment Analysis</Typography>
               </Box>
-              <Chip 
+              <Chip
                 label={dashboardData.system_status.sentiment_service}
                 color={getStatusColor(dashboardData.system_status.sentiment_service) as any}
                 size="small"
@@ -255,7 +251,7 @@ const AIDashboard: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
@@ -263,7 +259,7 @@ const AIDashboard: React.FC = () => {
                 <Security sx={{ mr: 1 }} />
                 <Typography variant="h6">Anomaly Detection</Typography>
               </Box>
-              <Chip 
+              <Chip
                 label={dashboardData.system_status.anomaly_service}
                 color={getStatusColor(dashboardData.system_status.anomaly_service) as any}
                 size="small"
@@ -271,7 +267,7 @@ const AIDashboard: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
@@ -316,13 +312,16 @@ const AIDashboard: React.FC = () => {
                       Success Rate
                     </Typography>
                     <Box display="flex" alignItems="center">
-                      <LinearProgress 
-                        variant="determinate" 
+                      <LinearProgress
+                        variant="determinate"
                         value={dashboardData.recommendations.performance_summary.success_rate * 100}
                         sx={{ flexGrow: 1, mr: 1 }}
                       />
                       <Typography variant="body2">
-                        {(dashboardData.recommendations.performance_summary.success_rate * 100).toFixed(1)}%
+                        {(
+                          dashboardData.recommendations.performance_summary.success_rate * 100
+                        ).toFixed(1)}
+                        %
                       </Typography>
                     </Box>
                   </Box>
@@ -331,7 +330,10 @@ const AIDashboard: React.FC = () => {
                       Average Return
                     </Typography>
                     <Typography variant="h4" color="primary">
-                      {(dashboardData.recommendations.performance_summary.avg_return * 100).toFixed(1)}%
+                      {(dashboardData.recommendations.performance_summary.avg_return * 100).toFixed(
+                        1
+                      )}
+                      %
                     </Typography>
                   </Box>
                 </CardContent>
@@ -429,7 +431,7 @@ const AIDashboard: React.FC = () => {
                   <Typography variant="body2" color="text.secondary" mb={2}>
                     Real-time news sentiment analysis for energy markets
                   </Typography>
-                  
+
                   {dashboardData.sentiment.alerts.length > 0 ? (
                     <TableContainer>
                       <Table>
@@ -464,9 +466,7 @@ const AIDashboard: React.FC = () => {
                       </Table>
                     </TableContainer>
                   ) : (
-                    <Alert severity="info">
-                      No sentiment alerts in the last 24 hours
-                    </Alert>
+                    <Alert severity="info">No sentiment alerts in the last 24 hours</Alert>
                   )}
                 </CardContent>
               </Card>
@@ -486,7 +486,7 @@ const AIDashboard: React.FC = () => {
                   <Typography variant="body2" color="text.secondary" mb={2}>
                     Unusual patterns detected in trading data
                   </Typography>
-                  
+
                   {dashboardData.anomalies.recent.length > 0 ? (
                     <TableContainer>
                       <Table>
@@ -520,7 +520,9 @@ const AIDashboard: React.FC = () => {
                                 {anomaly.value ? anomaly.value.toFixed(2) : 'N/A'}
                               </TableCell>
                               <TableCell>
-                                {new Date(anomaly.timestamp || anomaly.detected_at).toLocaleTimeString()}
+                                {new Date(
+                                  anomaly.timestamp || anomaly.detected_at
+                                ).toLocaleTimeString()}
                               </TableCell>
                               <TableCell>
                                 <Tooltip title="View Details">
@@ -535,9 +537,7 @@ const AIDashboard: React.FC = () => {
                       </Table>
                     </TableContainer>
                   ) : (
-                    <Alert severity="success">
-                      No anomalies detected in the last 24 hours
-                    </Alert>
+                    <Alert severity="success">No anomalies detected in the last 24 hours</Alert>
                   )}
                 </CardContent>
               </Card>
@@ -557,10 +557,14 @@ const AIDashboard: React.FC = () => {
                   <Typography variant="body2" color="text.secondary" mb={2}>
                     LLM-powered trading insights and recommendations
                   </Typography>
-                  
+
                   <Alert severity="info" sx={{ mb: 2 }}>
-                    Currently showing {dashboardData.recommendations.total_active} active recommendations.
-                    Success rate: {(dashboardData.recommendations.performance_summary.success_rate * 100).toFixed(1)}%
+                    Currently showing {dashboardData.recommendations.total_active} active
+                    recommendations. Success rate:{' '}
+                    {(dashboardData.recommendations.performance_summary.success_rate * 100).toFixed(
+                      1
+                    )}
+                    %
                   </Alert>
 
                   <Button variant="contained" color="primary">

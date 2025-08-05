@@ -6,7 +6,7 @@ import {
   SpeedDialIcon,
   SpeedDialAction,
   Snackbar,
-  Alert
+  Alert,
 } from '@mui/material';
 import {
   PhoneAndroid,
@@ -14,7 +14,7 @@ import {
   CloudOff,
   Notifications,
   Settings,
-  Sync
+  Sync,
 } from '@mui/icons-material';
 import { useTranslation } from '../../i18n/I18nProvider';
 import { useNotifications } from './PushNotifications';
@@ -31,12 +31,12 @@ export const MobileIntegration: React.FC<MobileIntegrationProps> = ({
   onOpenMobileSettings,
   onOpenBiometricAuth,
   onOpenOfflineTrading,
-  onOpenNotifications
+  onOpenNotifications,
 }) => {
   const { t } = useTranslation();
   const { sendNotification } = useNotifications();
   const { getOfflineOrders } = useOfflineOrders();
-  
+
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [offlineOrdersCount, setOfflineOrdersCount] = useState(0);
   const [notificationCount, setNotificationCount] = useState(0);
@@ -49,11 +49,15 @@ export const MobileIntegration: React.FC<MobileIntegrationProps> = ({
       setShowOfflineAlert(false);
       sendNotification('Connection Restored', 'You are now online. Syncing data...', 'system');
     };
-    
+
     const handleOffline = () => {
       setIsOnline(false);
       setShowOfflineAlert(true);
-      sendNotification('Offline Mode', 'You are now offline. Offline features are available.', 'system');
+      sendNotification(
+        'Offline Mode',
+        'You are now offline. Offline features are available.',
+        'system'
+      );
     };
 
     window.addEventListener('online', handleOnline);
@@ -73,7 +77,7 @@ export const MobileIntegration: React.FC<MobileIntegrationProps> = ({
     };
 
     updateOfflineCount();
-    
+
     // Set up periodic check
     const interval = setInterval(updateOfflineCount, 10000);
     return () => clearInterval(interval);
@@ -86,9 +90,12 @@ export const MobileIntegration: React.FC<MobileIntegrationProps> = ({
     };
 
     window.addEventListener('quantenergx-notification', handleCustomNotification as EventListener);
-    
+
     return () => {
-      window.removeEventListener('quantenergx-notification', handleCustomNotification as EventListener);
+      window.removeEventListener(
+        'quantenergx-notification',
+        handleCustomNotification as EventListener
+      );
     };
   }, []);
 
@@ -96,12 +103,12 @@ export const MobileIntegration: React.FC<MobileIntegrationProps> = ({
     {
       icon: <Settings />,
       name: t('mobile.mobileSettings'),
-      onClick: onOpenMobileSettings
+      onClick: onOpenMobileSettings,
     },
     {
       icon: <Fingerprint />,
       name: t('mobile.biometricAuth'),
-      onClick: onOpenBiometricAuth
+      onClick: onOpenBiometricAuth,
     },
     {
       icon: (
@@ -110,7 +117,7 @@ export const MobileIntegration: React.FC<MobileIntegrationProps> = ({
         </Badge>
       ),
       name: t('mobile.offlineTrading'),
-      onClick: onOpenOfflineTrading
+      onClick: onOpenOfflineTrading,
     },
     {
       icon: (
@@ -119,8 +126,8 @@ export const MobileIntegration: React.FC<MobileIntegrationProps> = ({
         </Badge>
       ),
       name: t('mobile.pushNotifications'),
-      onClick: onOpenNotifications
-    }
+      onClick: onOpenNotifications,
+    },
   ];
 
   return (
@@ -132,12 +139,12 @@ export const MobileIntegration: React.FC<MobileIntegrationProps> = ({
           position: 'fixed',
           bottom: 16,
           right: 16,
-          zIndex: 1300
+          zIndex: 1300,
         }}
         icon={<SpeedDialIcon icon={<PhoneAndroid />} />}
         direction="up"
       >
-        {speedDialActions.map((action) => (
+        {speedDialActions.map(action => (
           <SpeedDialAction
             key={action.name}
             icon={action.icon}
@@ -156,7 +163,7 @@ export const MobileIntegration: React.FC<MobileIntegrationProps> = ({
             position: 'fixed',
             bottom: 16,
             left: 16,
-            zIndex: 1300
+            zIndex: 1300,
           }}
           onClick={onOpenOfflineTrading}
         >
@@ -176,7 +183,7 @@ export const MobileIntegration: React.FC<MobileIntegrationProps> = ({
             bottom: 88,
             left: 16,
             zIndex: 1300,
-            animation: 'pulse 2s infinite'
+            animation: 'pulse 2s infinite',
           }}
           onClick={onOpenOfflineTrading}
         >
