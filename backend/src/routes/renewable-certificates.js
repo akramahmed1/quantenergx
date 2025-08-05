@@ -189,7 +189,7 @@ router.get('/types', (req, res) => {
         },
         geothermal: {
           name: 'Geothermal',
-          description: "Heat from earth's core for electricity",
+          description: 'Heat from earth\'s core for electricity',
           typical_capacity_factor: '70-95%',
           carbon_offset: '0.88 tons CO2 per MWh',
         },
