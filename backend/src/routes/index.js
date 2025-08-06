@@ -24,6 +24,7 @@ const esgRoutes = require('./esg');
 const carbonRoutes = require('./carbon');
 const renewableCertificatesRoutes = require('./renewable-certificates');
 const iotRoutes = require('./iot');
+const quantumRoutes = require('./quantum');
 
 // API Documentation route
 router.get('/', (req, res) => {
@@ -56,6 +57,7 @@ router.get('/', (req, res) => {
       esg: '/api/v1/esg',
       carbon: '/api/v1/carbon',
       'renewable-certificates': '/api/v1/renewable-certificates',
+      quantum: '/api/v1/quantum',
     },
     features: {
       derivatives_trading: [
@@ -219,6 +221,14 @@ router.get('/', (req, res) => {
         'IoT anomaly detection',
         'Multiple protocol support (MQTT, MODBUS, OPC-UA)',
       ],
+      quantum_trading: [
+        'Quantum-enhanced LSTM price forecasting',
+        'Post-quantum cryptographic security',
+        'Quantum random number generation',
+        'IBM Quantum hardware integration with fallback',
+        'Quantum vs classical performance benchmarking',
+        'Quantum-resistant smart contracts (QRLTrade)',
+      ],
     },
     supported_commodities: [
       'Crude Oil (WTI, Brent)',
@@ -298,5 +308,6 @@ router.use('/esg', esgRoutes);
 router.use('/carbon', carbonRoutes);
 router.use('/renewable-certificates', renewableCertificatesRoutes);
 router.use('/iot', iotRoutes);
+router.use('/quantum', quantumRoutes);
 
 module.exports = router;
