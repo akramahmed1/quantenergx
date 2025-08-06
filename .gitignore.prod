@@ -1,0 +1,7 @@
+deployment-verification-report.json
+compliance-validation-report.json
+*.log
+temp/
+logs/
+.env.production
+.env.local
