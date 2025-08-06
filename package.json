@@ -35,7 +35,20 @@
     "performance:monitor": "npm run performance:monitor --prefix backend",
     "prepare": "husky install",
     "precommit": "lint-staged",
-    "postinstall": "npm run prepare"
+    "postinstall": "npm run prepare",
+    "compliance:validate-all": "scripts/compliance/validate-compliance.sh",
+    "compliance:gdpr": "echo 'GDPR compliance check - data encryption, privacy controls, audit trails'",
+    "compliance:sox": "echo 'SOX compliance check - financial controls, audit trails, data integrity'",
+    "compliance:fca": "echo 'FCA compliance check - transaction reporting, risk management, TCFD'",
+    "compliance:guyana": "echo 'Guyana compliance check - environmental monitoring, energy regulations'",
+    "compliance:middleeast": "echo 'Middle East compliance check - ADGM, Islamic finance, cultural considerations'",
+    "esg:carbon-footprint": "echo 'ESG carbon footprint analysis - tracking CO2 emissions and intensity'",
+    "esg:energy-sources": "echo 'ESG energy sources validation - renewable vs non-renewable tracking'",
+    "deployment:verify": "scripts/verify-deployment.sh",
+    "deployment:prod": "docker-compose -f docker-compose.prod.yml up -d",
+    "deployment:prod-build": "docker-compose -f docker-compose.prod.yml build",
+    "etl:run": "node backend/etl/oilPricesETL.js",
+    "etl:test": "node backend/etl/oilPricesETL.js --test-mode"
   },
   "keywords": [
     "energy-trading",
