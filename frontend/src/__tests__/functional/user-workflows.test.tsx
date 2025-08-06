@@ -1,6 +1,6 @@
 /**
  * Frontend Functional Tests for QuantEnergX
- * 
+ *
  * These tests verify that complete user workflows work correctly.
  */
 
@@ -17,16 +17,8 @@ const MockLoginPage = () => (
   <div data-testid="login-page">
     <h1>Login</h1>
     <form data-testid="login-form">
-      <input 
-        type="email" 
-        placeholder="Email" 
-        data-testid="email-input"
-      />
-      <input 
-        type="password" 
-        placeholder="Password" 
-        data-testid="password-input"
-      />
+      <input type="email" placeholder="Email" data-testid="email-input" />
+      <input type="password" placeholder="Password" data-testid="password-input" />
       <button type="submit" data-testid="login-button">
         Login
       </button>
@@ -56,21 +48,21 @@ const MockDashboard = () => (
 
 const MockTradingPage = () => {
   const [orders, setOrders] = React.useState([]);
-  
+
   const handleSubmitOrder = (e: React.FormEvent) => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
-    
+
     const newOrder = {
       id: `order-${Date.now()}`,
       symbol: formData.get('symbol') as string,
       side: formData.get('side') as string,
       quantity: Number(formData.get('quantity')),
       price: Number(formData.get('price')),
-      status: 'pending'
+      status: 'pending',
     };
-    
+
     setOrders(prev => [...prev, newOrder]);
     form.reset();
   };
@@ -87,13 +79,13 @@ const MockTradingPage = () => {
             <option value="NATURAL_GAS">Natural Gas</option>
             <option value="HEATING_OIL">Heating Oil</option>
           </select>
-          
+
           <select name="side" data-testid="side-select" defaultValue="">
             <option value="">Select Side</option>
             <option value="buy">Buy</option>
             <option value="sell">Sell</option>
           </select>
-          
+
           <input
             type="number"
             name="quantity"
@@ -101,7 +93,7 @@ const MockTradingPage = () => {
             data-testid="quantity-input"
             min="1"
           />
-          
+
           <input
             type="number"
             name="price"
@@ -110,13 +102,13 @@ const MockTradingPage = () => {
             step="0.01"
             min="0"
           />
-          
+
           <button type="submit" data-testid="submit-order-button">
             Place Order
           </button>
         </form>
       </div>
-      
+
       <div data-testid="orders-list">
         <h2>Your Orders</h2>
         {orders.length === 0 ? (
@@ -189,25 +181,16 @@ const MockApp = () => {
     <div data-testid="app">
       {isAuthenticated && (
         <nav data-testid="navigation">
-          <button 
-            onClick={() => setCurrentPage('dashboard')}
-            data-testid="nav-dashboard"
-          >
+          <button onClick={() => setCurrentPage('dashboard')} data-testid="nav-dashboard">
             Dashboard
           </button>
-          <button 
-            onClick={() => setCurrentPage('trading')}
-            data-testid="nav-trading"
-          >
+          <button onClick={() => setCurrentPage('trading')} data-testid="nav-trading">
             Trading
           </button>
-          <button 
-            onClick={() => setCurrentPage('market')}
-            data-testid="nav-market"
-          >
+          <button onClick={() => setCurrentPage('market')} data-testid="nav-market">
             Market
           </button>
-          <button 
+          <button
             onClick={() => setIsAuthenticated(false) || setCurrentPage('login')}
             data-testid="nav-logout"
           >
@@ -215,17 +198,11 @@ const MockApp = () => {
           </button>
         </nav>
       )}
-      
-      <main data-testid="main-content">
-        {renderPage()}
-      </main>
-      
+
+      <main data-testid="main-content">{renderPage()}</main>
+
       {currentPage === 'login' && (
-        <button 
-          onClick={handleLogin}
-          data-testid="mock-login-success"
-          style={{ display: 'none' }}
-        >
+        <button onClick={handleLogin} data-testid="mock-login-success" style={{ display: 'none' }}>
           Mock Login Success
         </button>
       )}
@@ -271,9 +248,7 @@ const renderWithProviders = (
   return render(
     <Provider store={store}>
       <BrowserRouter>
-        <ThemeProvider theme={theme}>
-          {component}
-        </ThemeProvider>
+        <ThemeProvider theme={theme}>{component}</ThemeProvider>
       </BrowserRouter>
     </Provider>
   );
@@ -319,7 +294,7 @@ describe('QuantEnergX Functional Tests', () => {
 
       // Login first
       await user.click(screen.getByTestId('mock-login-success'));
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('dashboard')).toBeInTheDocument();
       });
@@ -344,7 +319,7 @@ describe('QuantEnergX Functional Tests', () => {
 
       // Login
       await user.click(screen.getByTestId('mock-login-success'));
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('dashboard')).toBeInTheDocument();
       });
@@ -367,7 +342,7 @@ describe('QuantEnergX Functional Tests', () => {
 
       // Login and navigate to trading
       await user.click(screen.getByTestId('mock-login-success'));
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('dashboard')).toBeInTheDocument();
       });
@@ -634,7 +609,7 @@ describe('QuantEnergX Functional Tests', () => {
 
       // Login
       fireEvent.click(screen.getByTestId('mock-login-success'));
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('dashboard')).toBeInTheDocument();
       });

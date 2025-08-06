@@ -26,7 +26,7 @@ export class PluginManager {
       await this.ensurePluginsDirectory();
       await this.loadPluginConfigurations();
       await this.loadPlugins();
-      
+
       this.logger.info(`Plugin manager initialized with ${this.plugins.size} plugins`);
     } catch (error) {
       this.logger.error('Failed to initialize plugin manager:', error);
@@ -52,11 +52,11 @@ export class PluginManager {
   private async loadPluginConfigurations(): Promise<void> {
     try {
       const configPath = path.join(this.pluginsDirectory, 'plugin-config.json');
-      
+
       try {
         const configData = await fs.readFile(configPath, 'utf-8');
         const configs = JSON.parse(configData);
-        
+
         for (const [name, config] of Object.entries(configs)) {
           this.pluginConfigs.set(name, config as PluginConfig);
         }
@@ -80,8 +80,8 @@ export class PluginManager {
         version: '1.0.0',
         settings: {
           updateInterval: 30000,
-          retryAttempts: 3
-        }
+          retryAttempts: 3,
+        },
       },
       'basic-analytics': {
         enabled: true,
@@ -89,8 +89,8 @@ export class PluginManager {
         version: '1.0.0',
         settings: {
           windowSize: 100,
-          smoothingFactor: 0.3
-        }
+          smoothingFactor: 0.3,
+        },
       },
       'email-notifications': {
         enabled: false,
@@ -98,9 +98,9 @@ export class PluginManager {
         version: '1.0.0',
         settings: {
           smtpHost: 'localhost',
-          smtpPort: 587
-        }
-      }
+          smtpPort: 587,
+        },
+      },
     };
 
     await fs.writeFile(configPath, JSON.stringify(defaultConfig, null, 2));
@@ -128,7 +128,7 @@ export class PluginManager {
   private async loadPlugin(name: string, config: PluginConfig): Promise<void> {
     try {
       const pluginPath = path.join(this.pluginsDirectory, name);
-      
+
       // Check if plugin exists
       try {
         await fs.access(pluginPath);
@@ -140,26 +140,25 @@ export class PluginManager {
       // Dynamically import the plugin
       const pluginModule = await import(pluginPath);
       const PluginClass = pluginModule.default || pluginModule[name];
-      
+
       if (!PluginClass) {
         throw new Error(`Plugin class not found in ${pluginPath}`);
       }
 
       // Instantiate and initialize the plugin
       const plugin: PluginInterface = new PluginClass(config.settings, this.logger);
-      
+
       // Validate plugin interface
       this.validatePluginInterface(plugin);
-      
+
       await plugin.initialize();
-      
+
       this.plugins.set(name, plugin);
-      
+
       this.logger.info(`Plugin loaded successfully: ${name}`, {
         type: plugin.type,
-        version: plugin.version
+        version: plugin.version,
       });
-
     } catch (error) {
       this.logger.error(`Failed to load plugin ${name}:`, error);
       throw error;
@@ -192,7 +191,7 @@ export class PluginManager {
   private async createSamplePlugin(name: string, config: PluginConfig): Promise<void> {
     const pluginTemplate = this.generatePluginTemplate(name, config);
     const pluginPath = path.join(this.pluginsDirectory, `${name}.ts`);
-    
+
     await fs.writeFile(pluginPath, pluginTemplate);
     this.logger.info(`Created sample plugin: ${name}`);
   }
@@ -201,9 +200,10 @@ export class PluginManager {
    * Generate plugin template based on type
    */
   private generatePluginTemplate(name: string, config: PluginConfig): string {
-    const className = name.split('-').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join('');
+    const className = name
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join('');
 
     return `import { PluginInterface } from '@types/index';
 import winston from 'winston';
@@ -285,22 +285,22 @@ export default class ${className}Plugin implements PluginInterface {
         return `// Setup data source connections
       // Configure polling intervals
       // Validate data source availability`;
-      
+
       case 'analytics':
         return `// Initialize analytics models
       // Setup computation engines
       // Load historical data if needed`;
-      
+
       case 'notification':
         return `// Setup notification channels
       // Validate credentials
       // Test connectivity`;
-      
+
       case 'compliance':
         return `// Load compliance rules
       // Setup monitoring systems
       // Initialize audit logging`;
-      
+
       default:
         return '// Plugin-specific initialization';
     }
@@ -317,28 +317,28 @@ export default class ${className}Plugin implements PluginInterface {
         timestamp: new Date(),
         source: this.name
       };`;
-      
+
       case 'analytics':
         return `const result = {
         analysis: await this.performAnalysis(input.data),
         confidence: 0.85,
         timestamp: new Date()
       };`;
-      
+
       case 'notification':
         return `const result = {
         sent: await this.sendNotification(input.message, input.recipients),
         timestamp: new Date(),
         channel: this.settings.channel || 'default'
       };`;
-      
+
       case 'compliance':
         return `const result = {
         compliant: await this.checkCompliance(input.transaction),
         violations: [],
         timestamp: new Date()
       };`;
-      
+
       default:
         return `const result = { processed: true, input, timestamp: new Date() };`;
     }
@@ -353,22 +353,22 @@ export default class ${className}Plugin implements PluginInterface {
         return `// Close database connections
       // Stop polling timers
       // Clear cached data`;
-      
+
       case 'analytics':
         return `// Save analytics state
       // Close model connections
       // Clear computation caches`;
-      
+
       case 'notification':
         return `// Close notification channels
       // Flush pending notifications
       // Clear credential caches`;
-      
+
       case 'compliance':
         return `// Save audit logs
       // Close monitoring connections
       // Archive compliance data`;
-      
+
       default:
         return '// Plugin-specific cleanup';
     }
@@ -385,10 +385,10 @@ export default class ${className}Plugin implements PluginInterface {
 
     try {
       const result = await plugin.execute(input);
-      
+
       this.logger.debug(`Plugin executed successfully: ${name}`, {
         input: typeof input,
-        output: typeof result
+        output: typeof result,
       });
 
       return result;
@@ -411,11 +411,11 @@ export default class ${className}Plugin implements PluginInterface {
   getPluginInfo(name: string): { plugin: PluginInterface; config: PluginConfig } | null {
     const plugin = this.plugins.get(name);
     const config = this.pluginConfigs.get(name);
-    
+
     if (plugin && config) {
       return { plugin, config };
     }
-    
+
     return null;
   }
 
@@ -427,7 +427,7 @@ export default class ${className}Plugin implements PluginInterface {
       name,
       type: config.type,
       version: config.version,
-      enabled: config.enabled && this.plugins.has(name)
+      enabled: config.enabled && this.plugins.has(name),
     }));
   }
 
@@ -436,8 +436,8 @@ export default class ${className}Plugin implements PluginInterface {
    */
   async shutdown(): Promise<void> {
     this.logger.info('Shutting down plugin manager...');
-    
-    const cleanupPromises = Array.from(this.plugins.values()).map(async (plugin) => {
+
+    const cleanupPromises = Array.from(this.plugins.values()).map(async plugin => {
       try {
         await plugin.cleanup();
       } catch (error) {
@@ -447,7 +447,7 @@ export default class ${className}Plugin implements PluginInterface {
 
     await Promise.allSettled(cleanupPromises);
     this.plugins.clear();
-    
+
     this.logger.info('Plugin manager shutdown complete');
   }
 }

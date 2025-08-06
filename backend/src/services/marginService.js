@@ -15,13 +15,13 @@ class MarginService extends EventEmitter {
 
     // Margin calculation configuration
     this.config = {
-      defaultInitialMarginRate: 0.10, // 10%
+      defaultInitialMarginRate: 0.1, // 10%
       defaultMaintenanceMarginRate: 0.075, // 7.5%
       marginCallThreshold: 0.05, // 5% below maintenance
       maxLeverage: 10,
       riskFreeRate: 0.025, // 2.5%
       marginCallGracePeriod: 24, // 24 hours
-      supported_calculation_methods: ['span', 'portfolio', 'standard']
+      supported_calculation_methods: ['span', 'portfolio', 'standard'],
     };
 
     // Risk model parameters
@@ -29,15 +29,15 @@ class MarginService extends EventEmitter {
       commodityVolatilities: {
         crude_oil: 0.35,
         natural_gas: 0.45,
-        heating_oil: 0.30,
+        heating_oil: 0.3,
         gasoline: 0.32,
         renewable_certificates: 0.25,
-        carbon_credits: 0.40,
-        electricity: 0.50,
-        coal: 0.28
+        carbon_credits: 0.4,
+        electricity: 0.5,
+        coal: 0.28,
       },
       lookbackPeriod: 252, // trading days
-      confidenceLevel: 0.99
+      confidenceLevel: 0.99,
     };
 
     // Initialize correlation matrix after volatilities are defined
@@ -51,7 +51,7 @@ class MarginService extends EventEmitter {
     // Simplified correlation matrix for demo
     const commodities = Object.keys(this.riskParameters.commodityVolatilities);
     const matrix = {};
-    
+
     commodities.forEach(commodity1 => {
       matrix[commodity1] = {};
       commodities.forEach(commodity2 => {
@@ -102,7 +102,7 @@ class MarginService extends EventEmitter {
         currency: contract.currency,
         calculationMethod: marginRules.portfolioMarginingEnabled ? 'portfolio' : 'standard',
         lastCalculated: new Date(),
-        region
+        region,
       };
 
       this.marginRequirements.set(marginId, marginRecord);
@@ -115,12 +115,12 @@ class MarginService extends EventEmitter {
 
   async calculateFutureMargin(contract, marginRules) {
     const { notionalAmount, underlyingCommodity } = contract;
-    const volatility = this.riskParameters.commodityVolatilities[underlyingCommodity] || 0.30;
-    
+    const volatility = this.riskParameters.commodityVolatilities[underlyingCommodity] || 0.3;
+
     // SPAN-like calculation
     const riskArray = this.calculateRiskArray(contract);
     const commodityRisk = Math.max(...riskArray);
-    
+
     const initialMarginRate = Math.max(
       marginRules.defaultInitialMarginRate,
       volatility * 2 // 2 standard deviations
@@ -135,32 +135,35 @@ class MarginService extends EventEmitter {
       initial: notionalAmount * initialMarginRate,
       maintenance: notionalAmount * maintenanceMarginRate,
       commodityRisk,
-      riskArray
+      riskArray,
     };
   }
 
   async calculateOptionMargin(contract, marginRules) {
     const { notionalAmount, optionType, premium } = contract;
-    
+
     // For short options, margin is higher
     const isShort = contract.position === 'short'; // Assume this field exists
-    
+
     if (isShort) {
       // Short option margin: premium + percentage of underlying
-      const underlyingMargin = await this.calculateFutureMargin({
-        ...contract,
-        type: 'future'
-      }, marginRules);
-      
+      const underlyingMargin = await this.calculateFutureMargin(
+        {
+          ...contract,
+          type: 'future',
+        },
+        marginRules
+      );
+
       return {
         initial: premium + underlyingMargin.initial * 0.5,
-        maintenance: premium + underlyingMargin.maintenance * 0.5
+        maintenance: premium + underlyingMargin.maintenance * 0.5,
       };
     } else {
       // Long option margin is just the premium
       return {
         initial: premium,
-        maintenance: premium
+        maintenance: premium,
       };
     }
   }
@@ -168,38 +171,38 @@ class MarginService extends EventEmitter {
   async calculateSwapMargin(contract, marginRules) {
     const { notionalAmount, maturityDate } = contract;
     const timeToMaturity = this.calculateTimeToMaturity(maturityDate);
-    
+
     // Swap margin based on duration and notional
     const durationRisk = Math.sqrt(timeToMaturity) * 0.01; // 1% per sqrt(year)
-    
+
     return {
       initial: notionalAmount * durationRisk * 2,
-      maintenance: notionalAmount * durationRisk * 1.5
+      maintenance: notionalAmount * durationRisk * 1.5,
     };
   }
 
   async calculateStructuredNoteMargin(contract, marginRules) {
     const { notionalAmount, principalProtection } = contract;
-    
+
     // Margin based on principal protection level
     const riskLevel = (100 - principalProtection) / 100;
     const marginRate = marginRules.defaultInitialMarginRate * (1 + riskLevel);
-    
+
     return {
       initial: notionalAmount * marginRate,
-      maintenance: notionalAmount * marginRate * 0.75
+      maintenance: notionalAmount * marginRate * 0.75,
     };
   }
 
   calculateRiskArray(contract) {
     // SPAN-like risk array calculation
     const { underlyingCommodity, notionalAmount } = contract;
-    const volatility = this.riskParameters.commodityVolatilities[underlyingCommodity] || 0.30;
-    
+    const volatility = this.riskParameters.commodityVolatilities[underlyingCommodity] || 0.3;
+
     // Price scenarios: -3σ, -2σ, -1σ, 0, +1σ, +2σ, +3σ
     const scenarios = [-3, -2, -1, 0, 1, 2, 3];
     const riskArray = scenarios.map(sigma => {
-      const priceChange = sigma * volatility * Math.sqrt(1/252); // Daily volatility
+      const priceChange = sigma * volatility * Math.sqrt(1 / 252); // Daily volatility
       const risk = Math.abs(notionalAmount * priceChange);
       return risk;
     });
@@ -240,7 +243,7 @@ class MarginService extends EventEmitter {
     return {
       totalInitialMargin,
       totalMaintenanceMargin,
-      method: 'simple'
+      method: 'simple',
     };
   }
 
@@ -274,7 +277,7 @@ class MarginService extends EventEmitter {
       totalMaintenanceMargin: diversifiedRisk,
       method: 'portfolio',
       commodityRisks,
-      diversificationFactor
+      diversificationFactor,
     };
   }
 
@@ -286,7 +289,7 @@ class MarginService extends EventEmitter {
     contracts.forEach(contract => {
       const position = contract.notionalAmount * (contract.side === 'buy' ? 1 : -1);
       netPosition += position;
-      
+
       const marginReq = this.marginRequirements.get(contract.id);
       if (marginReq) {
         totalRisk += marginReq.initialMargin;
@@ -294,7 +297,8 @@ class MarginService extends EventEmitter {
     });
 
     // Netting benefit
-    const nettingFactor = Math.abs(netPosition) / contracts.reduce((sum, c) => sum + c.notionalAmount, 0);
+    const nettingFactor =
+      Math.abs(netPosition) / contracts.reduce((sum, c) => sum + c.notionalAmount, 0);
     return totalRisk * (0.5 + 0.5 * nettingFactor); // 50% netting benefit
   }
 
@@ -322,7 +326,7 @@ class MarginService extends EventEmitter {
     try {
       const portfolioMargin = await this.calculatePortfolioMargin(userId, region);
       const userCollateral = this.getUserCollateral(userId, region);
-      
+
       const availableMargin = userCollateral.cash + userCollateral.securities * 0.8; // 80% haircut on securities
       const marginDeficit = portfolioMargin.totalMaintenanceMargin - availableMargin;
 
@@ -332,7 +336,7 @@ class MarginService extends EventEmitter {
           status: 'margin_call',
           deficit: marginDeficit,
           availableMargin,
-          requiredMargin: portfolioMargin.totalMaintenanceMargin
+          requiredMargin: portfolioMargin.totalMaintenanceMargin,
         };
       }
 
@@ -340,7 +344,7 @@ class MarginService extends EventEmitter {
         status: 'adequate',
         excessMargin: availableMargin - portfolioMargin.totalMaintenanceMargin,
         availableMargin,
-        requiredMargin: portfolioMargin.totalMaintenanceMargin
+        requiredMargin: portfolioMargin.totalMaintenanceMargin,
       };
     } catch (error) {
       throw new Error(`Failed to check margin requirements: ${error.message}`);
@@ -350,7 +354,8 @@ class MarginService extends EventEmitter {
   async issueMarginCall(userId, amount, region = 'US') {
     const marginCallId = uuidv4();
     const regionConfig = await this.regionConfigService.getRegionConfig(region);
-    const gracePeriod = regionConfig?.marginRules?.marginCallGracePeriod || this.config.marginCallGracePeriod;
+    const gracePeriod =
+      regionConfig?.marginRules?.marginCallGracePeriod || this.config.marginCallGracePeriod;
 
     const marginCall = {
       id: marginCallId,
@@ -361,7 +366,7 @@ class MarginService extends EventEmitter {
       dueDate: new Date(Date.now() + gracePeriod * 60 * 60 * 1000), // Grace period in hours
       status: 'pending',
       region,
-      createdAt: new Date()
+      createdAt: new Date(),
     };
 
     this.marginCalls.set(marginCallId, marginCall);
@@ -372,7 +377,7 @@ class MarginService extends EventEmitter {
       marginCallId,
       amount,
       dueDate: marginCall.dueDate,
-      region
+      region,
     });
 
     return marginCall;
@@ -380,22 +385,24 @@ class MarginService extends EventEmitter {
 
   getUserCollateral(userId, region) {
     const key = `${userId}-${region}`;
-    return this.userCollateral.get(key) || {
-      cash: 0,
-      securities: 0,
-      commodities: 0,
-      currency: 'USD'
-    };
+    return (
+      this.userCollateral.get(key) || {
+        cash: 0,
+        securities: 0,
+        commodities: 0,
+        currency: 'USD',
+      }
+    );
   }
 
   async updateUserCollateral(userId, collateralUpdate, region = 'US') {
     const key = `${userId}-${region}`;
     const existing = this.getUserCollateral(userId, region);
-    
+
     const updated = {
       ...existing,
       ...collateralUpdate,
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
     };
 
     this.userCollateral.set(key, updated);
@@ -456,16 +463,16 @@ class MarginService extends EventEmitter {
       marginCallThreshold: this.config.marginCallThreshold,
       crossMarginingEnabled: true,
       portfolioMarginingEnabled: true,
-      riskModelParameters: this.riskParameters
+      riskModelParameters: this.riskParameters,
     };
   }
 
   async getUserContracts(userId, region) {
     // In production, this would query the database
     const contracts = Array.from(this.marginRequirements.values())
-      .filter(margin => region ? margin.region === region : true)
+      .filter(margin => (region ? margin.region === region : true))
       .map(margin => ({ id: margin.contractId, userId })); // Simplified
-    
+
     return contracts;
   }
 
@@ -481,7 +488,7 @@ class MarginService extends EventEmitter {
       portfolioMargin,
       collateral,
       marginStatus,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -502,7 +509,7 @@ class MarginService extends EventEmitter {
       marginCallId,
       userId: marginCall.userId,
       resolution,
-      region: marginCall.region
+      region: marginCall.region,
     });
 
     return marginCall;

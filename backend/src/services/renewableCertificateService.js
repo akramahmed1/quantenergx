@@ -10,7 +10,7 @@ class RenewableCertificateService {
       REGO: 'Renewable Energy Guarantees of Origin',
       GO: 'Guarantees of Origin',
       I_REC: 'International Renewable Energy Certificate',
-      TIGR: 'The International Go Registry'
+      TIGR: 'The International Go Registry',
     };
 
     this.energySources = {
@@ -23,13 +23,13 @@ class RenewableCertificateService {
       biogas: 'Biogas',
       geothermal: 'Geothermal',
       wave: 'Wave energy',
-      tidal: 'Tidal energy'
+      tidal: 'Tidal energy',
     };
 
     this.blockchainConfig = {
       network: 'hyperledger_fabric',
       channel: 'renewable_certificates',
-      chaincode: 'rec_trading'
+      chaincode: 'rec_trading',
     };
   }
 
@@ -41,7 +41,7 @@ class RenewableCertificateService {
   async issueCertificate(certificateData) {
     try {
       const certificateId = this.generateCertificateId(certificateData);
-      
+
       const certificate = {
         id: certificateId,
         type: certificateData.type || 'REC',
@@ -51,28 +51,28 @@ class RenewableCertificateService {
           name: certificateData.facility_name,
           location: certificateData.facility_location,
           capacity: certificateData.facility_capacity,
-          commissioning_date: certificateData.commissioning_date
+          commissioning_date: certificateData.commissioning_date,
         },
         generation_period: {
           start_date: certificateData.generation_start,
           end_date: certificateData.generation_end,
-          energy_generated: certificateData.energy_generated // MWh
+          energy_generated: certificateData.energy_generated, // MWh
         },
         certificate_details: {
           vintage: new Date(certificateData.generation_start).getFullYear(),
           quantity: certificateData.energy_generated, // 1 certificate = 1 MWh
           unit: 'MWh',
           country: certificateData.country,
-          region: certificateData.region
+          region: certificateData.region,
         },
         issuance: {
           issuer: 'QuantEnergx Renewable Registry',
           issuance_date: new Date().toISOString(),
           registry: certificateData.registry || 'QuantEnergx',
-          status: 'active'
+          status: 'active',
         },
         environmental_attributes: this.calculateEnvironmentalAttributes(certificateData),
-        blockchain_record: await this.recordCertificateOnBlockchain(certificateId, certificateData)
+        blockchain_record: await this.recordCertificateOnBlockchain(certificateId, certificateData),
       };
 
       return {
@@ -80,12 +80,12 @@ class RenewableCertificateService {
         certificate_id: certificateId,
         certificate: certificate,
         blockchain_hash: certificate.blockchain_record.hash,
-        verification_url: this.getVerificationUrl(certificate.blockchain_record.hash)
+        verification_url: this.getVerificationUrl(certificate.blockchain_record.hash),
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -98,9 +98,12 @@ class RenewableCertificateService {
   async tradeCertificates(tradeData) {
     try {
       const tradeId = this.generateTradeId();
-      
+
       // Validate certificate ownership and availability
-      const ownershipValidation = await this.validateOwnership(tradeData.seller_id, tradeData.certificate_ids);
+      const ownershipValidation = await this.validateOwnership(
+        tradeData.seller_id,
+        tradeData.certificate_ids
+      );
       if (!ownershipValidation.valid) {
         throw new Error('Invalid certificate ownership or availability');
       }
@@ -114,48 +117,52 @@ class RenewableCertificateService {
         price: {
           amount: tradeData.price_per_mwh,
           currency: tradeData.currency || 'USD',
-          total_value: tradeData.price_per_mwh * tradeData.quantity
+          total_value: tradeData.price_per_mwh * tradeData.quantity,
         },
         parties: {
           seller: {
             id: tradeData.seller_id,
             name: tradeData.seller_name,
-            type: tradeData.seller_type
+            type: tradeData.seller_type,
           },
           buyer: {
             id: tradeData.buyer_id,
             name: tradeData.buyer_name,
-            type: tradeData.buyer_type
-          }
+            type: tradeData.buyer_type,
+          },
         },
         trade_details: {
           execution_time: new Date().toISOString(),
           settlement_date: tradeData.settlement_date,
           delivery_terms: tradeData.delivery_terms || 'electronic',
-          payment_terms: tradeData.payment_terms || 'immediate'
+          payment_terms: tradeData.payment_terms || 'immediate',
         },
         compliance: {
           regulatory_framework: tradeData.regulatory_framework,
           additionality_verified: tradeData.additionality_verified || false,
-          green_claims_eligible: this.checkGreenClaimsEligibility(tradeData)
+          green_claims_eligible: this.checkGreenClaimsEligibility(tradeData),
         },
-        blockchain_record: await this.recordTradeOnBlockchain(tradeId, tradeData)
+        blockchain_record: await this.recordTradeOnBlockchain(tradeId, tradeData),
       };
 
       // Update certificate ownership
-      await this.transferOwnership(tradeData.certificate_ids, tradeData.seller_id, tradeData.buyer_id);
+      await this.transferOwnership(
+        tradeData.certificate_ids,
+        tradeData.seller_id,
+        tradeData.buyer_id
+      );
 
       return {
         success: true,
         trade_id: tradeId,
         trade: trade,
         blockchain_hash: trade.blockchain_record.hash,
-        settlement_instructions: this.generateSettlementInstructions(trade)
+        settlement_instructions: this.generateSettlementInstructions(trade),
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -168,7 +175,7 @@ class RenewableCertificateService {
   async retireCertificates(retirementData) {
     try {
       const retirementId = this.generateRetirementId();
-      
+
       const retirement = {
         id: retirementId,
         certificate_ids: retirementData.certificate_ids,
@@ -176,21 +183,21 @@ class RenewableCertificateService {
         retired_by: {
           id: retirementData.owner_id,
           name: retirementData.owner_name,
-          type: retirementData.owner_type
+          type: retirementData.owner_type,
         },
         retirement_details: {
           retirement_date: new Date().toISOString(),
           purpose: retirementData.purpose || 'voluntary_green_claim',
           beneficiary: retirementData.beneficiary,
-          reporting_period: retirementData.reporting_period
+          reporting_period: retirementData.reporting_period,
         },
         environmental_claim: {
           claim_type: retirementData.claim_type,
           scope: retirementData.scope || 'scope_2',
           methodology: 'Market-based method',
-          verification_standard: retirementData.verification_standard
+          verification_standard: retirementData.verification_standard,
         },
-        blockchain_record: await this.recordRetirementOnBlockchain(retirementId, retirementData)
+        blockchain_record: await this.recordRetirementOnBlockchain(retirementId, retirementData),
       };
 
       // Update certificate status to retired
@@ -201,12 +208,12 @@ class RenewableCertificateService {
         retirement_id: retirementId,
         retirement: retirement,
         blockchain_hash: retirement.blockchain_record.hash,
-        green_claim_certificate: this.generateGreenClaimCertificate(retirement)
+        green_claim_certificate: this.generateGreenClaimCertificate(retirement),
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -226,21 +233,21 @@ class RenewableCertificateService {
           issued_date: '2024-01-15T10:00:00Z',
           issuer: 'QuantEnergx Renewable Registry',
           facility_name: 'Sunfield Solar Farm',
-          generation_period: '2024-01-01 to 2024-01-31'
+          generation_period: '2024-01-01 to 2024-01-31',
         },
         ownership_history: [
           {
             owner: 'Sunfield Solar LLC',
             from_date: '2024-01-15T10:00:00Z',
             to_date: '2024-02-20T14:30:00Z',
-            transfer_type: 'issuance'
+            transfer_type: 'issuance',
           },
           {
             owner: 'GreenEnergy Corp',
             from_date: '2024-02-20T14:30:00Z',
             to_date: null,
-            transfer_type: 'purchase'
-          }
+            transfer_type: 'purchase',
+          },
         ],
         trades: [
           {
@@ -248,41 +255,41 @@ class RenewableCertificateService {
             date: '2024-02-20T14:30:00Z',
             seller: 'Sunfield Solar LLC',
             buyer: 'GreenEnergy Corp',
-            price: 25.50,
-            currency: 'USD'
-          }
+            price: 25.5,
+            currency: 'USD',
+          },
         ],
         environmental_attributes: {
           carbon_offset: 0.85, // tons CO2 per MWh
           additionality_verified: true,
-          local_benefits: ['Job creation', 'Energy independence']
+          local_benefits: ['Job creation', 'Energy independence'],
         },
         blockchain_records: [
           {
             event: 'issuance',
             hash: '0x1234567890abcdef',
             block_number: 123456,
-            timestamp: '2024-01-15T10:00:00Z'
+            timestamp: '2024-01-15T10:00:00Z',
           },
           {
             event: 'trade',
             hash: '0xabcdef1234567890',
             block_number: 125678,
-            timestamp: '2024-02-20T14:30:00Z'
-          }
-        ]
+            timestamp: '2024-02-20T14:30:00Z',
+          },
+        ],
       };
 
       return {
         success: true,
         lifecycle: lifecycle,
         verification_status: 'verified',
-        transparency_score: this.calculateTransparencyScore(lifecycle)
+        transparency_score: this.calculateTransparencyScore(lifecycle),
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -303,9 +310,9 @@ class RenewableCertificateService {
           quantity: 1000,
           vintage: 2024,
           location: 'Texas, USA',
-          price: 25.50,
+          price: 25.5,
           seller: 'Sunfield Solar LLC',
-          facility_name: 'Sunfield Solar Farm'
+          facility_name: 'Sunfield Solar Farm',
         },
         {
           id: 'REGO_EU_WIND_001',
@@ -316,7 +323,7 @@ class RenewableCertificateService {
           location: 'North Sea, UK',
           price: 45.75,
           seller: 'Atlantic Wind Power',
-          facility_name: 'Atlantic Wind Farm'
+          facility_name: 'Atlantic Wind Farm',
         },
         {
           id: 'GO_EU_HYDRO_001',
@@ -327,27 +334,27 @@ class RenewableCertificateService {
           location: 'Bavaria, Germany',
           price: 30.25,
           seller: 'Alpine Hydro GmbH',
-          facility_name: 'Bavarian Run-of-River'
-        }
+          facility_name: 'Bavarian Run-of-River',
+        },
       ];
 
       // Apply filters
       let filteredCertificates = certificates;
-      
+
       if (filters.energy_source) {
-        filteredCertificates = filteredCertificates.filter(cert => 
-          cert.energy_source === filters.energy_source
+        filteredCertificates = filteredCertificates.filter(
+          cert => cert.energy_source === filters.energy_source
         );
       }
-      
+
       if (filters.vintage) {
-        filteredCertificates = filteredCertificates.filter(cert => 
-          cert.vintage === filters.vintage
+        filteredCertificates = filteredCertificates.filter(
+          cert => cert.vintage === filters.vintage
         );
       }
-      
+
       if (filters.location) {
-        filteredCertificates = filteredCertificates.filter(cert => 
+        filteredCertificates = filteredCertificates.filter(cert =>
           cert.location.toLowerCase().includes(filters.location.toLowerCase())
         );
       }
@@ -357,12 +364,12 @@ class RenewableCertificateService {
         total_certificates: filteredCertificates.length,
         total_quantity: filteredCertificates.reduce((sum, cert) => sum + cert.quantity, 0),
         certificates: filteredCertificates,
-        market_statistics: this.getMarketStatistics()
+        market_statistics: this.getMarketStatistics(),
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -390,7 +397,7 @@ class RenewableCertificateService {
       carbon_offset: this.getCarbonOffsetFactor(data.energy_source) * data.energy_generated,
       air_quality_improvement: true,
       water_conservation: this.getWaterConservationBenefit(data.energy_source),
-      land_use_efficiency: this.getLandUseEfficiency(data.energy_source)
+      land_use_efficiency: this.getLandUseEfficiency(data.energy_source),
     };
 
     return baseAttributes;
@@ -399,13 +406,13 @@ class RenewableCertificateService {
   getCarbonOffsetFactor(energySource) {
     const factors = {
       solar: 0.85,
-      wind_onshore: 0.90,
+      wind_onshore: 0.9,
       wind_offshore: 0.95,
-      hydro_large: 0.80,
+      hydro_large: 0.8,
       hydro_small: 0.85,
-      biomass: 0.70,
+      biomass: 0.7,
       biogas: 0.75,
-      geothermal: 0.88
+      geothermal: 0.88,
     };
     return factors[energySource] || 0.75;
   }
@@ -419,7 +426,7 @@ class RenewableCertificateService {
       hydro_small: 'High - Run-of-river operation',
       biomass: 'Low - Some water required',
       biogas: 'Medium - Waste management benefit',
-      geothermal: 'Medium - Closed loop systems'
+      geothermal: 'Medium - Closed loop systems',
     };
     return waterSaving[energySource] || 'Medium';
   }
@@ -433,7 +440,7 @@ class RenewableCertificateService {
       hydro_small: 'High - Minimal land impact',
       biomass: 'Low - Requires feedstock land',
       biogas: 'High - Uses waste materials',
-      geothermal: 'High - Small surface footprint'
+      geothermal: 'High - Small surface footprint',
     };
     return efficiency[energySource] || 'Medium';
   }
@@ -443,7 +450,7 @@ class RenewableCertificateService {
     return {
       valid: true,
       certificates_owned: certificateIds.length,
-      verification_method: 'blockchain_registry'
+      verification_method: 'blockchain_registry',
     };
   }
 
@@ -453,7 +460,7 @@ class RenewableCertificateService {
       additionality: tradeData.additionality_verified || false,
       temporal_matching: true, // Simplified
       geographic_relevance: true,
-      tracking_system: true
+      tracking_system: true,
     };
 
     return Object.values(criteria).every(criterion => criterion === true);
@@ -466,7 +473,7 @@ class RenewableCertificateService {
       certificates_transferred: certificateIds.length,
       from: fromId,
       to: toId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -475,7 +482,7 @@ class RenewableCertificateService {
     return {
       success: true,
       certificates_updated: certificateIds.length,
-      new_status: status
+      new_status: status,
     };
   }
 
@@ -487,7 +494,7 @@ class RenewableCertificateService {
       payment_currency: trade.price.currency,
       delivery_method: 'electronic_transfer',
       registry_transfer_required: true,
-      compliance_documentation: ['Trade confirmation', 'Ownership transfer certificate']
+      compliance_documentation: ['Trade confirmation', 'Ownership transfer certificate'],
     };
   }
 
@@ -497,22 +504,22 @@ class RenewableCertificateService {
       claim_statement: `${retirement.quantity} MWh of renewable energy consumed`,
       verification_standard: retirement.environmental_claim.verification_standard,
       retirement_date: retirement.retirement_details.retirement_date,
-      validity: 'Valid for environmental reporting and disclosure'
+      validity: 'Valid for environmental reporting and disclosure',
     };
   }
 
   calculateTransparencyScore(lifecycle) {
     let score = 0;
-    
+
     // Blockchain records presence
     if (lifecycle.blockchain_records.length > 0) score += 40;
-    
+
     // Complete ownership history
     if (lifecycle.ownership_history.length > 0) score += 30;
-    
+
     // Environmental attributes verified
     if (lifecycle.environmental_attributes.additionality_verified) score += 20;
-    
+
     // Trade transparency
     if (lifecycle.trades.length > 0) score += 10;
 
@@ -522,14 +529,14 @@ class RenewableCertificateService {
   getMarketStatistics() {
     return {
       total_volume_last_30_days: 125000, // MWh
-      average_price: 32.50,
+      average_price: 32.5,
       price_range: {
         min: 18.75,
-        max: 65.00
+        max: 65.0,
       },
       top_energy_sources: ['wind_offshore', 'solar', 'hydro_small'],
       active_traders: 85,
-      certificates_issued_this_month: 50000
+      certificates_issued_this_month: 50000,
     };
   }
 
@@ -555,16 +562,16 @@ class RenewableCertificateService {
       event_type: eventType,
       data: data,
       timestamp: new Date().toISOString(),
-      network: this.blockchainConfig.network
+      network: this.blockchainConfig.network,
     };
 
     const hash = this.generateHash(JSON.stringify(record));
-    
+
     return {
       hash: hash,
       block_number: Math.floor(Date.now() / 1000),
       transaction_id: `0x${hash}`,
-      status: 'confirmed'
+      status: 'confirmed',
     };
   }
 
@@ -573,7 +580,7 @@ class RenewableCertificateService {
     let hash = 0;
     for (let i = 0; i < data.length; i++) {
       const char = data.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash;
     }
     return Math.abs(hash).toString(16).padStart(16, '0');

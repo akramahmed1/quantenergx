@@ -28,11 +28,11 @@ router.get('/', (req, res) => {
       'execute-settlement': 'PUT /settlement/instructions/:settlementId/execute',
       'cancel-settlement': 'PUT /settlement/instructions/:settlementId/cancel',
       'workflow-status': 'GET /settlement/workflows/:workflowId',
-      'settlement-history': 'GET /settlement/history'
+      'settlement-history': 'GET /settlement/history',
     },
     serviceStatus: settlementService ? 'online' : 'offline',
     supportedSettlementTypes: ['cash', 'physical', 'net_cash'],
-    supportedRegions: ['US', 'EU', 'UK', 'APAC', 'CA']
+    supportedRegions: ['US', 'EU', 'UK', 'APAC', 'CA'],
   });
 });
 
@@ -42,13 +42,26 @@ router.post(
   authenticateToken,
   [
     body('contractId').isUUID().withMessage('Valid contract ID is required'),
-    body('settlementType').isIn(['cash', 'physical', 'net_cash']).withMessage('Invalid settlement type'),
+    body('settlementType')
+      .isIn(['cash', 'physical', 'net_cash'])
+      .withMessage('Invalid settlement type'),
     body('amount').isNumeric().isFloat({ min: 0.01 }).withMessage('Amount must be positive'),
-    body('currency').optional().isString().isLength({ min: 3, max: 3 }).withMessage('Currency must be 3 characters'),
+    body('currency')
+      .optional()
+      .isString()
+      .isLength({ min: 3, max: 3 })
+      .withMessage('Currency must be 3 characters'),
     body('settlementDate').optional().isISO8601().withMessage('Invalid settlement date'),
-    body('region').optional().isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code'),
-    body('deliveryInstructions').optional().isObject().withMessage('Delivery instructions must be an object'),
-    body('autoSettle').optional().isBoolean().withMessage('Auto settle must be boolean')
+    body('region')
+      .optional()
+      .isString()
+      .isLength({ min: 2, max: 10 })
+      .withMessage('Invalid region code'),
+    body('deliveryInstructions')
+      .optional()
+      .isObject()
+      .withMessage('Delivery instructions must be an object'),
+    body('autoSettle').optional().isBoolean().withMessage('Auto settle must be boolean'),
   ],
   async (req, res) => {
     try {
@@ -57,14 +70,14 @@ router.post(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!settlementService) {
         return res.status(503).json({
           success: false,
-          error: 'Settlement service unavailable'
+          error: 'Settlement service unavailable',
         });
       }
 
@@ -76,7 +89,7 @@ router.post(
         settlementDate,
         region = 'US',
         deliveryInstructions,
-        autoSettle = false
+        autoSettle = false,
       } = req.body;
 
       const instruction = await settlementService.createSettlementInstruction({
@@ -88,20 +101,19 @@ router.post(
         settlementDate,
         region,
         deliveryInstructions,
-        autoSettle
+        autoSettle,
       });
 
       res.status(201).json({
         success: true,
         data: instruction,
-        message: 'Settlement instruction created successfully'
+        message: 'Settlement instruction created successfully',
       });
-
     } catch (error) {
       console.error('Settlement instruction creation error:', error);
       res.status(400).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -112,11 +124,24 @@ router.get(
   '/instructions',
   authenticateToken,
   [
-    query('region').optional().isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code'),
-    query('status').optional().isIn(['pending', 'processing', 'settled', 'failed', 'cancelled']).withMessage('Invalid status'),
-    query('settlementType').optional().isIn(['cash', 'physical', 'net_cash']).withMessage('Invalid settlement type'),
+    query('region')
+      .optional()
+      .isString()
+      .isLength({ min: 2, max: 10 })
+      .withMessage('Invalid region code'),
+    query('status')
+      .optional()
+      .isIn(['pending', 'processing', 'settled', 'failed', 'cancelled'])
+      .withMessage('Invalid status'),
+    query('settlementType')
+      .optional()
+      .isIn(['cash', 'physical', 'net_cash'])
+      .withMessage('Invalid settlement type'),
     query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
-    query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100')
+    query('limit')
+      .optional()
+      .isInt({ min: 1, max: 100 })
+      .withMessage('Limit must be between 1 and 100'),
   ],
   async (req, res) => {
     try {
@@ -125,14 +150,14 @@ router.get(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!settlementService) {
         return res.status(503).json({
           success: false,
-          error: 'Settlement service unavailable'
+          error: 'Settlement service unavailable',
         });
       }
 
@@ -146,7 +171,9 @@ router.get(
         instructions = instructions.filter(instruction => instruction.status === status);
       }
       if (settlementType) {
-        instructions = instructions.filter(instruction => instruction.settlementType === settlementType);
+        instructions = instructions.filter(
+          instruction => instruction.settlementType === settlementType
+        );
       }
 
       // Sort by creation date (newest first)
@@ -165,16 +192,15 @@ router.get(
             page: parseInt(page),
             limit: parseInt(limit),
             total: instructions.length,
-            hasMore: endIndex < instructions.length
-          }
-        }
+            hasMore: endIndex < instructions.length,
+          },
+        },
       });
-
     } catch (error) {
       console.error('Get settlement instructions error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -184,9 +210,7 @@ router.get(
 router.get(
   '/instructions/:settlementId',
   authenticateToken,
-  [
-    param('settlementId').isUUID().withMessage('Invalid settlement ID')
-  ],
+  [param('settlementId').isUUID().withMessage('Invalid settlement ID')],
   async (req, res) => {
     try {
       const errors = validationResult(req);
@@ -194,14 +218,14 @@ router.get(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!settlementService) {
         return res.status(503).json({
           success: false,
-          error: 'Settlement service unavailable'
+          error: 'Settlement service unavailable',
         });
       }
 
@@ -211,7 +235,7 @@ router.get(
       if (!instruction) {
         return res.status(404).json({
           success: false,
-          error: 'Settlement instruction not found'
+          error: 'Settlement instruction not found',
         });
       }
 
@@ -219,27 +243,27 @@ router.get(
       if (instruction.userId !== req.user.id) {
         return res.status(403).json({
           success: false,
-          error: 'Access denied'
+          error: 'Access denied',
         });
       }
 
       // Get associated workflow
-      const workflow = Array.from(settlementService.settlementWorkflows.values())
-        .find(w => w.settlementId === settlementId);
+      const workflow = Array.from(settlementService.settlementWorkflows.values()).find(
+        w => w.settlementId === settlementId
+      );
 
       res.json({
         success: true,
         data: {
           instruction,
-          workflow
-        }
+          workflow,
+        },
       });
-
     } catch (error) {
       console.error('Get settlement instruction details error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -249,9 +273,7 @@ router.get(
 router.put(
   '/instructions/:settlementId/execute',
   authenticateToken,
-  [
-    param('settlementId').isUUID().withMessage('Invalid settlement ID')
-  ],
+  [param('settlementId').isUUID().withMessage('Invalid settlement ID')],
   async (req, res) => {
     try {
       const errors = validationResult(req);
@@ -259,14 +281,14 @@ router.put(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!settlementService) {
         return res.status(503).json({
           success: false,
-          error: 'Settlement service unavailable'
+          error: 'Settlement service unavailable',
         });
       }
 
@@ -276,7 +298,7 @@ router.put(
       if (!instruction) {
         return res.status(404).json({
           success: false,
-          error: 'Settlement instruction not found'
+          error: 'Settlement instruction not found',
         });
       }
 
@@ -284,14 +306,14 @@ router.put(
       if (instruction.userId !== req.user.id) {
         return res.status(403).json({
           success: false,
-          error: 'Access denied'
+          error: 'Access denied',
         });
       }
 
       if (instruction.status !== 'pending') {
         return res.status(400).json({
           success: false,
-          error: `Cannot execute settlement in status: ${instruction.status}`
+          error: `Cannot execute settlement in status: ${instruction.status}`,
         });
       }
 
@@ -300,14 +322,13 @@ router.put(
       res.json({
         success: true,
         data: executedInstruction,
-        message: 'Settlement execution initiated successfully'
+        message: 'Settlement execution initiated successfully',
       });
-
     } catch (error) {
       console.error('Settlement execution error:', error);
       res.status(400).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -319,7 +340,7 @@ router.put(
   authenticateToken,
   [
     param('settlementId').isUUID().withMessage('Invalid settlement ID'),
-    body('reason').optional().isString().withMessage('Reason must be a string')
+    body('reason').optional().isString().withMessage('Reason must be a string'),
   ],
   async (req, res) => {
     try {
@@ -328,14 +349,14 @@ router.put(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!settlementService) {
         return res.status(503).json({
           success: false,
-          error: 'Settlement service unavailable'
+          error: 'Settlement service unavailable',
         });
       }
 
@@ -347,7 +368,7 @@ router.put(
       if (!instruction) {
         return res.status(404).json({
           success: false,
-          error: 'Settlement instruction not found'
+          error: 'Settlement instruction not found',
         });
       }
 
@@ -355,7 +376,7 @@ router.put(
       if (instruction.userId !== req.user.id) {
         return res.status(403).json({
           success: false,
-          error: 'Access denied'
+          error: 'Access denied',
         });
       }
 
@@ -364,14 +385,13 @@ router.put(
       res.json({
         success: true,
         data: cancelledInstruction,
-        message: 'Settlement cancelled successfully'
+        message: 'Settlement cancelled successfully',
       });
-
     } catch (error) {
       console.error('Settlement cancellation error:', error);
       res.status(400).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -381,9 +401,7 @@ router.put(
 router.get(
   '/workflows/:workflowId',
   authenticateToken,
-  [
-    param('workflowId').isUUID().withMessage('Invalid workflow ID')
-  ],
+  [param('workflowId').isUUID().withMessage('Invalid workflow ID')],
   async (req, res) => {
     try {
       const errors = validationResult(req);
@@ -391,14 +409,14 @@ router.get(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!settlementService) {
         return res.status(503).json({
           success: false,
-          error: 'Settlement service unavailable'
+          error: 'Settlement service unavailable',
         });
       }
 
@@ -408,30 +426,29 @@ router.get(
       if (!workflow) {
         return res.status(404).json({
           success: false,
-          error: 'Settlement workflow not found'
+          error: 'Settlement workflow not found',
         });
       }
 
       // Get associated settlement instruction to verify ownership
       const instruction = await settlementService.getSettlementInstruction(workflow.settlementId);
-      
+
       if (!instruction || instruction.userId !== req.user.id) {
         return res.status(403).json({
           success: false,
-          error: 'Access denied'
+          error: 'Access denied',
         });
       }
 
       res.json({
         success: true,
-        data: workflow
+        data: workflow,
       });
-
     } catch (error) {
       console.error('Get workflow status error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -442,12 +459,22 @@ router.get(
   '/history',
   authenticateToken,
   [
-    query('region').optional().isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code'),
-    query('settlementType').optional().isIn(['cash', 'physical', 'net_cash']).withMessage('Invalid settlement type'),
+    query('region')
+      .optional()
+      .isString()
+      .isLength({ min: 2, max: 10 })
+      .withMessage('Invalid region code'),
+    query('settlementType')
+      .optional()
+      .isIn(['cash', 'physical', 'net_cash'])
+      .withMessage('Invalid settlement type'),
     query('fromDate').optional().isISO8601().withMessage('Invalid from date'),
     query('toDate').optional().isISO8601().withMessage('Invalid to date'),
     query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
-    query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100')
+    query('limit')
+      .optional()
+      .isInt({ min: 1, max: 100 })
+      .withMessage('Limit must be between 1 and 100'),
   ],
   async (req, res) => {
     try {
@@ -456,37 +483,33 @@ router.get(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!settlementService) {
         return res.status(503).json({
           success: false,
-          error: 'Settlement service unavailable'
+          error: 'Settlement service unavailable',
         });
       }
 
-      const { 
-        region, 
-        settlementType, 
-        fromDate, 
-        toDate, 
-        page = 1, 
-        limit = 20 
-      } = req.query;
+      const { region, settlementType, fromDate, toDate, page = 1, limit = 20 } = req.query;
       const userId = req.user.id;
 
       // Get settled instructions from history
-      let settlements = Array.from(settlementService.settlementHistory.values())
-        .filter(settlement => settlement.userId === userId);
+      let settlements = Array.from(settlementService.settlementHistory.values()).filter(
+        settlement => settlement.userId === userId
+      );
 
       // Apply filters
       if (region) {
         settlements = settlements.filter(settlement => settlement.region === region);
       }
       if (settlementType) {
-        settlements = settlements.filter(settlement => settlement.settlementType === settlementType);
+        settlements = settlements.filter(
+          settlement => settlement.settlementType === settlementType
+        );
       }
       if (fromDate) {
         const from = new Date(fromDate);
@@ -512,9 +535,9 @@ router.get(
         byType: {
           cash: settlements.filter(s => s.settlementType === 'cash').length,
           physical: settlements.filter(s => s.settlementType === 'physical').length,
-          net_cash: settlements.filter(s => s.settlementType === 'net_cash').length
+          net_cash: settlements.filter(s => s.settlementType === 'net_cash').length,
         },
-        byRegion: {}
+        byRegion: {},
       };
 
       // Count by region
@@ -531,16 +554,15 @@ router.get(
             page: parseInt(page),
             limit: parseInt(limit),
             total: settlements.length,
-            hasMore: endIndex < settlements.length
-          }
-        }
+            hasMore: endIndex < settlements.length,
+          },
+        },
       });
-
     } catch (error) {
       console.error('Get settlement history error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -549,9 +571,7 @@ router.get(
 // Get Settlement Rules for Region (Public endpoint)
 router.get(
   '/rules/:region',
-  [
-    param('region').isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code')
-  ],
+  [param('region').isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code')],
   async (req, res) => {
     try {
       const errors = validationResult(req);
@@ -559,14 +579,14 @@ router.get(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!regionConfigService) {
         return res.status(503).json({
           success: false,
-          error: 'Region config service unavailable'
+          error: 'Region config service unavailable',
         });
       }
 
@@ -576,7 +596,7 @@ router.get(
       if (!settlementRules) {
         return res.status(404).json({
           success: false,
-          error: 'Settlement rules not found for region'
+          error: 'Settlement rules not found for region',
         });
       }
 
@@ -588,19 +608,18 @@ router.get(
         cashSettlementEnabled: settlementRules.cashSettlementEnabled,
         nettingEnabled: settlementRules.nettingEnabled,
         cutoffTimes: settlementRules.cutoffTimes,
-        region
+        region,
       };
 
       res.json({
         success: true,
-        data: publicSettlementRules
+        data: publicSettlementRules,
       });
-
     } catch (error) {
       console.error('Get settlement rules error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -611,10 +630,19 @@ router.get(
   '/admin/status/:status',
   authenticateToken,
   [
-    param('status').isIn(['pending', 'processing', 'settled', 'failed', 'cancelled']).withMessage('Invalid status'),
-    query('region').optional().isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code'),
+    param('status')
+      .isIn(['pending', 'processing', 'settled', 'failed', 'cancelled'])
+      .withMessage('Invalid status'),
+    query('region')
+      .optional()
+      .isString()
+      .isLength({ min: 2, max: 10 })
+      .withMessage('Invalid region code'),
     query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
-    query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100')
+    query('limit')
+      .optional()
+      .isInt({ min: 1, max: 100 })
+      .withMessage('Limit must be between 1 and 100'),
   ],
   async (req, res) => {
     try {
@@ -623,14 +651,14 @@ router.get(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!settlementService) {
         return res.status(503).json({
           success: false,
-          error: 'Settlement service unavailable'
+          error: 'Settlement service unavailable',
         });
       }
 
@@ -638,7 +666,7 @@ router.get(
       if (req.user.role !== 'admin') {
         return res.status(403).json({
           success: false,
-          error: 'Admin access required'
+          error: 'Admin access required',
         });
       }
 
@@ -660,28 +688,27 @@ router.get(
             page: parseInt(page),
             limit: parseInt(limit),
             total: settlements.length,
-            hasMore: endIndex < settlements.length
-          }
-        }
+            hasMore: endIndex < settlements.length,
+          },
+        },
       });
-
     } catch (error) {
       console.error('Get settlements by status error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
 );
 
 // Error handling middleware
-router.use((error, req, res, next) => {
+router.use((error, req, res, _next) => {
   console.error('Settlement API error:', error);
   res.status(500).json({
     success: false,
     error: 'Internal server error',
-    message: 'An unexpected error occurred in the settlement service'
+    message: 'An unexpected error occurred in the settlement service',
   });
 });
 

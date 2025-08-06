@@ -93,7 +93,10 @@ const initialState: AuthState = {
 // Async thunks
 export const login = createAsyncThunk(
   'auth/login',
-  async ({ username, password, mfaToken }: { username: string; password: string; mfaToken?: string }, { rejectWithValue }) => {
+  async (
+    { username, password, mfaToken }: { username: string; password: string; mfaToken?: string },
+    { rejectWithValue }
+  ) => {
     try {
       const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
       const response = await fetch(`${API_URL}/api/v1/users/auth/login`, {
@@ -105,7 +108,7 @@ export const login = createAsyncThunk(
       });
 
       const data = await response.json();
-      
+
       if (!response.ok || !data.success) {
         return rejectWithValue(data.error || 'Login failed');
       }

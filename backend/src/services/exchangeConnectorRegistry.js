@@ -1,9 +1,9 @@
 const BaseExchangeConnector = require('./baseExchangeConnector');
-const { 
-  NYMEXConnector, 
-  DMEConnector, 
-  OPECConnector, 
-  GuyanaConnector 
+const {
+  NYMEXConnector,
+  DMEConnector,
+  OPECConnector,
+  GuyanaConnector,
 } = require('./exchangeConnectors');
 
 /**
@@ -26,7 +26,7 @@ class ExchangeConnectorRegistry {
     this.registerConnector('DME', DMEConnector);
     this.registerConnector('OPEC', OPECConnector);
     this.registerConnector('GUYANA_NDR', GuyanaConnector);
-    
+
     // Legacy connectors from MultiExchangeConnector can be registered here
     this.registerLegacyConnectors();
   }
@@ -66,7 +66,7 @@ class ExchangeConnectorRegistry {
     if (removed) {
       console.log(`Unregistered exchange connector: ${exchangeId}`);
     }
-    
+
     return removed;
   }
 
@@ -75,7 +75,7 @@ class ExchangeConnectorRegistry {
    */
   getConnector(exchangeId) {
     const connectorInfo = this.connectors.get(exchangeId);
-    
+
     if (!connectorInfo) {
       throw new Error(`Exchange connector not found: ${exchangeId}`);
     }
@@ -98,10 +98,10 @@ class ExchangeConnectorRegistry {
     }
 
     const connector = this.getConnector(exchangeId);
-    
+
     try {
       const connectionResult = await connector.connect(credentials);
-      
+
       this.activeConnections.set(exchangeId, {
         connector,
         connectionInfo: connectionResult,
@@ -120,7 +120,7 @@ class ExchangeConnectorRegistry {
    */
   async disconnectFromExchange(exchangeId) {
     const connectionInfo = this.activeConnections.get(exchangeId);
-    
+
     if (!connectionInfo) {
       throw new Error(`No active connection to ${exchangeId}`);
     }
@@ -128,7 +128,7 @@ class ExchangeConnectorRegistry {
     try {
       const disconnectionResult = await connectionInfo.connector.disconnect();
       this.activeConnections.delete(exchangeId);
-      
+
       return disconnectionResult;
     } catch (error) {
       throw new Error(`Failed to disconnect from ${exchangeId}: ${error.message}`);
@@ -140,7 +140,7 @@ class ExchangeConnectorRegistry {
    */
   async submitOrder(exchangeId, orderData) {
     const connectionInfo = this.activeConnections.get(exchangeId);
-    
+
     if (!connectionInfo) {
       throw new Error(`Not connected to ${exchangeId}`);
     }
@@ -157,7 +157,7 @@ class ExchangeConnectorRegistry {
    */
   async getMarketData(exchangeId, symbol) {
     const connectionInfo = this.activeConnections.get(exchangeId);
-    
+
     if (!connectionInfo) {
       throw new Error(`Not connected to ${exchangeId}`);
     }
@@ -174,7 +174,7 @@ class ExchangeConnectorRegistry {
    */
   async subscribeToMarketData(exchangeId, symbols, callback) {
     const connectionInfo = this.activeConnections.get(exchangeId);
-    
+
     if (!connectionInfo) {
       throw new Error(`Not connected to ${exchangeId}`);
     }
@@ -191,7 +191,7 @@ class ExchangeConnectorRegistry {
    */
   getRegisteredConnectors() {
     const result = [];
-    
+
     for (const [exchangeId, connectorInfo] of this.connectors) {
       const connector = connectorInfo.instance || new connectorInfo.ConnectorClass();
       result.push({
@@ -201,7 +201,7 @@ class ExchangeConnectorRegistry {
         connected: this.activeConnections.has(exchangeId),
       });
     }
-    
+
     return result;
   }
 
@@ -210,7 +210,7 @@ class ExchangeConnectorRegistry {
    */
   getActiveConnections() {
     const result = [];
-    
+
     for (const [exchangeId, connectionInfo] of this.activeConnections) {
       result.push({
         exchangeId,
@@ -219,7 +219,7 @@ class ExchangeConnectorRegistry {
         info: connectionInfo.connector.getInfo(),
       });
     }
-    
+
     return result;
   }
 
@@ -228,7 +228,7 @@ class ExchangeConnectorRegistry {
    */
   getConnectorsByRegion(region) {
     const result = [];
-    
+
     for (const [exchangeId, connectorInfo] of this.connectors) {
       const connector = connectorInfo.instance || new connectorInfo.ConnectorClass();
       if (connector.region === region) {
@@ -239,7 +239,7 @@ class ExchangeConnectorRegistry {
         });
       }
     }
-    
+
     return result;
   }
 
@@ -248,7 +248,7 @@ class ExchangeConnectorRegistry {
    */
   getConnectorsByMarket(market) {
     const result = [];
-    
+
     for (const [exchangeId, connectorInfo] of this.connectors) {
       const connector = connectorInfo.instance || new connectorInfo.ConnectorClass();
       if (connector.supportsMarket(market)) {
@@ -259,7 +259,7 @@ class ExchangeConnectorRegistry {
         });
       }
     }
-    
+
     return result;
   }
 
@@ -268,7 +268,7 @@ class ExchangeConnectorRegistry {
    */
   getConnectorsByRegulation(regulation) {
     const result = [];
-    
+
     for (const [exchangeId, connectorInfo] of this.connectors) {
       const connector = connectorInfo.instance || new connectorInfo.ConnectorClass();
       if (connector.supportsRegulation(regulation)) {
@@ -279,7 +279,7 @@ class ExchangeConnectorRegistry {
         });
       }
     }
-    
+
     return result;
   }
 
@@ -307,7 +307,7 @@ class ExchangeConnectorRegistry {
 
     // Filter by connection status (prefer connected exchanges)
     const connectedCandidates = candidates.filter(c => c.connected);
-    
+
     if (connectedCandidates.length > 0) {
       return connectedCandidates[0]; // Return first connected candidate
     }
@@ -321,7 +321,7 @@ class ExchangeConnectorRegistry {
   async loadConnectorPlugin(pluginPath, exchangeId) {
     try {
       const ConnectorPlugin = require(pluginPath);
-      
+
       // Validate plugin
       const pluginInstance = new ConnectorPlugin();
       if (!(pluginInstance instanceof BaseExchangeConnector)) {
@@ -329,7 +329,7 @@ class ExchangeConnectorRegistry {
       }
 
       this.registerConnector(exchangeId, ConnectorPlugin);
-      
+
       return {
         success: true,
         exchangeId,
@@ -406,22 +406,28 @@ class ExchangeConnectorRegistry {
         });
       }
 
-      async initialize() { /* Implementation */ }
-      async connect(credentials) { 
+      async initialize() {
+        /* Implementation */
+      }
+      async connect(credentials) {
         this.status = 'connected';
         return { exchangeId: this.id, status: 'connected', timestamp: new Date().toISOString() };
       }
-      async disconnect() { 
+      async disconnect() {
         this.status = 'disconnected';
         return { exchangeId: this.id, status: 'disconnected', timestamp: new Date().toISOString() };
       }
-      async submitOrder(orderData) { 
-        return { orderId: `ICE_${Date.now()}`, status: 'submitted', timestamp: new Date().toISOString() };
+      async submitOrder(orderData) {
+        return {
+          orderId: `ICE_${Date.now()}`,
+          status: 'submitted',
+          timestamp: new Date().toISOString(),
+        };
       }
-      async getMarketData(symbol) { 
+      async getMarketData(symbol) {
         return { exchangeId: this.id, symbol, price: 75.5, timestamp: new Date().toISOString() };
       }
-      async subscribeToMarketData(symbols, callback) { 
+      async subscribeToMarketData(symbols, callback) {
         return { subscriptionId: `ICE_SUB_${Date.now()}`, symbols };
       }
     }
@@ -444,22 +450,28 @@ class ExchangeConnectorRegistry {
         });
       }
 
-      async initialize() { /* Implementation */ }
-      async connect(credentials) { 
+      async initialize() {
+        /* Implementation */
+      }
+      async connect(credentials) {
         this.status = 'connected';
         return { exchangeId: this.id, status: 'connected', timestamp: new Date().toISOString() };
       }
-      async disconnect() { 
+      async disconnect() {
         this.status = 'disconnected';
         return { exchangeId: this.id, status: 'disconnected', timestamp: new Date().toISOString() };
       }
-      async submitOrder(orderData) { 
-        return { orderId: `EEX_${Date.now()}`, status: 'submitted', timestamp: new Date().toISOString() };
+      async submitOrder(orderData) {
+        return {
+          orderId: `EEX_${Date.now()}`,
+          status: 'submitted',
+          timestamp: new Date().toISOString(),
+        };
       }
-      async getMarketData(symbol) { 
+      async getMarketData(symbol) {
         return { exchangeId: this.id, symbol, price: 45.75, timestamp: new Date().toISOString() };
       }
-      async subscribeToMarketData(symbols, callback) { 
+      async subscribeToMarketData(symbols, callback) {
         return { subscriptionId: `EEX_SUB_${Date.now()}`, symbols };
       }
     }
@@ -482,22 +494,28 @@ class ExchangeConnectorRegistry {
         });
       }
 
-      async initialize() { /* Implementation */ }
-      async connect(credentials) { 
+      async initialize() {
+        /* Implementation */
+      }
+      async connect(credentials) {
         this.status = 'connected';
         return { exchangeId: this.id, status: 'connected', timestamp: new Date().toISOString() };
       }
-      async disconnect() { 
+      async disconnect() {
         this.status = 'disconnected';
         return { exchangeId: this.id, status: 'disconnected', timestamp: new Date().toISOString() };
       }
-      async submitOrder(orderData) { 
-        return { orderId: `CME_${Date.now()}`, status: 'submitted', timestamp: new Date().toISOString() };
+      async submitOrder(orderData) {
+        return {
+          orderId: `CME_${Date.now()}`,
+          status: 'submitted',
+          timestamp: new Date().toISOString(),
+        };
       }
-      async getMarketData(symbol) { 
+      async getMarketData(symbol) {
         return { exchangeId: this.id, symbol, price: 73.25, timestamp: new Date().toISOString() };
       }
-      async subscribeToMarketData(symbols, callback) { 
+      async subscribeToMarketData(symbols, callback) {
         return { subscriptionId: `CME_SUB_${Date.now()}`, symbols };
       }
     }
@@ -513,7 +531,7 @@ class ExchangeConnectorRegistry {
    */
   async disconnectAll() {
     const results = [];
-    
+
     for (const exchangeId of this.activeConnections.keys()) {
       try {
         const result = await this.disconnectFromExchange(exchangeId);
@@ -522,7 +540,7 @@ class ExchangeConnectorRegistry {
         results.push({ exchangeId, success: false, error: error.message });
       }
     }
-    
+
     return {
       disconnected: results.filter(r => r.success).length,
       failed: results.filter(r => !r.success).length,

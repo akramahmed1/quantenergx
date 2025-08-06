@@ -32,14 +32,9 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemIcon
+  ListItemIcon,
 } from '@mui/material';
-import {
-  CheckCircle,
-  Cancel,
-  Info,
-  Bookmark
-} from '@mui/icons-material';
+import { CheckCircle, Cancel, Info, Bookmark } from '@mui/icons-material';
 import { useTranslation } from '../i18n/I18nProvider';
 
 interface ShariaComplianceResult {
@@ -102,7 +97,7 @@ const ShariaComplianceDashboard: React.FC = () => {
     type: 'spot',
     volatility: 20,
     allows_short_selling: false,
-    max_leverage: 1
+    max_leverage: 1,
   });
   const [showCertificateDialog, setShowCertificateDialog] = useState(false);
   const [selectedCertificate, setSelectedCertificate] = useState<ShariaCertificate | null>(null);
@@ -149,7 +144,7 @@ const ShariaComplianceDashboard: React.FC = () => {
         body: JSON.stringify(selectedInstrument),
       });
       const result = await response.json();
-      
+
       if (result.success) {
         setComplianceResults([result, ...complianceResults]);
       }
@@ -161,11 +156,7 @@ const ShariaComplianceDashboard: React.FC = () => {
   };
 
   const getComplianceIcon = (compliant: boolean) => {
-    return compliant ? (
-      <CheckCircle color="success" />
-    ) : (
-      <Cancel color="error" />
-    );
+    return compliant ? <CheckCircle color="success" /> : <Cancel color="error" />;
   };
 
   const getComplianceColor = (compliant: boolean) => {
@@ -191,10 +182,7 @@ const ShariaComplianceDashboard: React.FC = () => {
 
       {/* Trading Time Status */}
       {tradingTimeStatus && (
-        <Alert 
-          severity={tradingTimeStatus.valid ? 'success' : 'warning'}
-          sx={{ mb: 3 }}
-        >
+        <Alert severity={tradingTimeStatus.valid ? 'success' : 'warning'} sx={{ mb: 3 }}>
           {tradingTimeStatus.reason}
         </Alert>
       )}
@@ -207,24 +195,28 @@ const ShariaComplianceDashboard: React.FC = () => {
               <Typography variant="h6" gutterBottom>
                 {t('sharia.check')}
               </Typography>
-              
+
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
                     label={t('trading.commodity')}
                     value={selectedInstrument.name}
-                    onChange={(e) => setSelectedInstrument({...selectedInstrument, name: e.target.value})}
+                    onChange={e =>
+                      setSelectedInstrument({ ...selectedInstrument, name: e.target.value })
+                    }
                   />
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
                     select
                     label="Sector"
                     value={selectedInstrument.sector}
-                    onChange={(e) => setSelectedInstrument({...selectedInstrument, sector: e.target.value})}
+                    onChange={e =>
+                      setSelectedInstrument({ ...selectedInstrument, sector: e.target.value })
+                    }
                   >
                     <MenuItem value="solar_energy">Solar Energy</MenuItem>
                     <MenuItem value="wind_energy">Wind Energy</MenuItem>
@@ -241,7 +233,12 @@ const ShariaComplianceDashboard: React.FC = () => {
                     select
                     label="Contract Structure"
                     value={selectedInstrument.contract_structure}
-                    onChange={(e) => setSelectedInstrument({...selectedInstrument, contract_structure: e.target.value})}
+                    onChange={e =>
+                      setSelectedInstrument({
+                        ...selectedInstrument,
+                        contract_structure: e.target.value,
+                      })
+                    }
                   >
                     <MenuItem value="murabaha">Murabaha</MenuItem>
                     <MenuItem value="ijara">Ijara</MenuItem>
@@ -258,7 +255,12 @@ const ShariaComplianceDashboard: React.FC = () => {
                     type="number"
                     label="Interest Rate (%)"
                     value={selectedInstrument.interest_rate}
-                    onChange={(e) => setSelectedInstrument({...selectedInstrument, interest_rate: parseFloat(e.target.value)})}
+                    onChange={e =>
+                      setSelectedInstrument({
+                        ...selectedInstrument,
+                        interest_rate: parseFloat(e.target.value),
+                      })
+                    }
                     inputProps={{ step: 0.1, min: 0 }}
                   />
                 </Grid>
@@ -269,7 +271,12 @@ const ShariaComplianceDashboard: React.FC = () => {
                     type="number"
                     label="Asset Backing Ratio"
                     value={selectedInstrument.asset_backing_ratio}
-                    onChange={(e) => setSelectedInstrument({...selectedInstrument, asset_backing_ratio: parseFloat(e.target.value)})}
+                    onChange={e =>
+                      setSelectedInstrument({
+                        ...selectedInstrument,
+                        asset_backing_ratio: parseFloat(e.target.value),
+                      })
+                    }
                     inputProps={{ step: 0.1, min: 0, max: 1 }}
                     helperText="Minimum 0.51 (51%) required"
                   />
@@ -298,7 +305,7 @@ const ShariaComplianceDashboard: React.FC = () => {
               <Typography variant="h6" gutterBottom>
                 {t('sharia.products')}
               </Typography>
-              
+
               <List>
                 {shariaProducts.map((product, index) => (
                   <ListItem key={index}>
@@ -323,7 +330,7 @@ const ShariaComplianceDashboard: React.FC = () => {
               <Typography variant="h6" gutterBottom>
                 Compliance Results
               </Typography>
-              
+
               {complianceResults.length === 0 ? (
                 <Typography color="textSecondary" align="center" sx={{ py: 4 }}>
                   No compliance checks performed yet
@@ -351,7 +358,11 @@ const ShariaComplianceDashboard: React.FC = () => {
                           <TableCell>
                             <Chip
                               icon={getComplianceIcon(result.is_sharia_compliant)}
-                              label={result.is_sharia_compliant ? t('sharia.compliant') : t('sharia.nonCompliant')}
+                              label={
+                                result.is_sharia_compliant
+                                  ? t('sharia.compliant')
+                                  : t('sharia.nonCompliant')
+                              }
                               color={getComplianceColor(result.is_sharia_compliant)}
                               variant="outlined"
                             />
@@ -413,7 +424,7 @@ const ShariaComplianceDashboard: React.FC = () => {
                 <Typography variant="h6" gutterBottom>
                   {t('sharia.recommendations')}
                 </Typography>
-                
+
                 <List>
                   {complianceResults[0].recommendations.map((recommendation, index) => (
                     <ListItem key={index}>
@@ -431,7 +442,12 @@ const ShariaComplianceDashboard: React.FC = () => {
       </Grid>
 
       {/* Certificate Dialog */}
-      <Dialog open={showCertificateDialog} onClose={() => setShowCertificateDialog(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        open={showCertificateDialog}
+        onClose={() => setShowCertificateDialog(false)}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>{t('sharia.certificate')}</DialogTitle>
         <DialogContent>
           {selectedCertificate && (
@@ -443,14 +459,16 @@ const ShariaComplianceDashboard: React.FC = () => {
                 <strong>Certifying Authority:</strong> {selectedCertificate.certifying_authority}
               </Typography>
               <Typography variant="body1" gutterBottom>
-                <strong>Issued Date:</strong> {new Date(selectedCertificate.issued_date).toLocaleDateString()}
+                <strong>Issued Date:</strong>{' '}
+                {new Date(selectedCertificate.issued_date).toLocaleDateString()}
               </Typography>
               <Typography variant="body1" gutterBottom>
-                <strong>Valid Until:</strong> {new Date(selectedCertificate.valid_until).toLocaleDateString()}
+                <strong>Valid Until:</strong>{' '}
+                {new Date(selectedCertificate.valid_until).toLocaleDateString()}
               </Typography>
-              
+
               <Divider sx={{ my: 2 }} />
-              
+
               <Alert severity="success">
                 This instrument has been certified as Sharia-compliant by our Islamic finance board.
               </Alert>
@@ -458,9 +476,7 @@ const ShariaComplianceDashboard: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowCertificateDialog(false)}>
-            Close
-          </Button>
+          <Button onClick={() => setShowCertificateDialog(false)}>Close</Button>
         </DialogActions>
       </Dialog>
     </Box>

@@ -76,11 +76,11 @@ class BaseExchangeConnector {
   validateCredentials(credentials) {
     const required = ['apiKey', 'apiSecret'];
     const missing = required.filter(field => !credentials[field]);
-    
+
     if (missing.length > 0) {
       throw new Error(`Missing required credentials: ${missing.join(', ')}`);
     }
-    
+
     return true;
   }
 

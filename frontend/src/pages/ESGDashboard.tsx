@@ -33,9 +33,22 @@ import {
   BusinessCenter,
   // TrendingUp,
   // Star,
-  Lightbulb
+  Lightbulb,
 } from '@mui/icons-material';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+} from 'recharts';
 import { useTranslation } from '../i18n/I18nProvider';
 
 interface ESGScore {
@@ -99,7 +112,7 @@ const ESGDashboard: React.FC = () => {
     name: '',
     sector: 'renewable_energy',
     carbon_intensity: 5,
-    renewable_energy_ratio: 0.8
+    renewable_energy_ratio: 0.8,
   });
   const [trendData, setTrendData] = useState<any>(null);
 
@@ -116,7 +129,7 @@ const ESGDashboard: React.FC = () => {
         body: JSON.stringify(selectedEntity),
       });
       const result = await response.json();
-      
+
       if (result.success) {
         setESGResults([result, ...esgResults]);
         // Load trend data for this entity
@@ -172,29 +185,33 @@ const ESGDashboard: React.FC = () => {
     }
   };
 
-  const radarData = esgResults.length > 0 ? [
-    {
-      factor: 'Environmental',
-      score: esgResults[0].scores.environmental.score,
-    },
-    {
-      factor: 'Social',
-      score: esgResults[0].scores.social.score,
-    },
-    {
-      factor: 'Governance',
-      score: esgResults[0].scores.governance.score,
-    },
-  ] : [];
+  const radarData =
+    esgResults.length > 0
+      ? [
+          {
+            factor: 'Environmental',
+            score: esgResults[0].scores.environmental.score,
+          },
+          {
+            factor: 'Social',
+            score: esgResults[0].scores.social.score,
+          },
+          {
+            factor: 'Governance',
+            score: esgResults[0].scores.governance.score,
+          },
+        ]
+      : [];
 
-  const trendChartData = trendData ? 
-    trendData.trend_data.overall.map((score: number, index: number) => ({
-      month: `Month ${index + 1}`,
-      environmental: trendData.trend_data.environmental[index],
-      social: trendData.trend_data.social[index],
-      governance: trendData.trend_data.governance[index],
-      overall: score
-    })) : [];
+  const trendChartData = trendData
+    ? trendData.trend_data.overall.map((score: number, index: number) => ({
+        month: `Month ${index + 1}`,
+        environmental: trendData.trend_data.environmental[index],
+        social: trendData.trend_data.social[index],
+        governance: trendData.trend_data.governance[index],
+        overall: score,
+      }))
+    : [];
 
   return (
     <Box sx={{ p: 3, direction: isRTL ? 'rtl' : 'ltr' }}>
@@ -210,24 +227,24 @@ const ESGDashboard: React.FC = () => {
               <Typography variant="h6" gutterBottom>
                 Calculate ESG Score
               </Typography>
-              
+
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
                     label="Entity Name"
                     value={selectedEntity.name}
-                    onChange={(e) => setSelectedEntity({...selectedEntity, name: e.target.value})}
+                    onChange={e => setSelectedEntity({ ...selectedEntity, name: e.target.value })}
                   />
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
                     select
                     label="Sector"
                     value={selectedEntity.sector}
-                    onChange={(e) => setSelectedEntity({...selectedEntity, sector: e.target.value})}
+                    onChange={e => setSelectedEntity({ ...selectedEntity, sector: e.target.value })}
                     SelectProps={{ native: true }}
                   >
                     <option value="renewable_energy">Renewable Energy</option>
@@ -244,7 +261,12 @@ const ESGDashboard: React.FC = () => {
                     type="number"
                     label="Carbon Intensity (kg CO2/unit)"
                     value={selectedEntity.carbon_intensity}
-                    onChange={(e) => setSelectedEntity({...selectedEntity, carbon_intensity: parseFloat(e.target.value)})}
+                    onChange={e =>
+                      setSelectedEntity({
+                        ...selectedEntity,
+                        carbon_intensity: parseFloat(e.target.value),
+                      })
+                    }
                     inputProps={{ step: 0.1, min: 0 }}
                   />
                 </Grid>
@@ -255,7 +277,12 @@ const ESGDashboard: React.FC = () => {
                     type="number"
                     label="Renewable Energy Ratio (0-1)"
                     value={selectedEntity.renewable_energy_ratio}
-                    onChange={(e) => setSelectedEntity({...selectedEntity, renewable_energy_ratio: parseFloat(e.target.value)})}
+                    onChange={e =>
+                      setSelectedEntity({
+                        ...selectedEntity,
+                        renewable_energy_ratio: parseFloat(e.target.value),
+                      })
+                    }
                     inputProps={{ step: 0.1, min: 0, max: 1 }}
                     helperText="Percentage of renewable energy in operations"
                   />
@@ -285,7 +312,7 @@ const ESGDashboard: React.FC = () => {
                 <Typography variant="h6" gutterBottom>
                   ESG Score Overview
                 </Typography>
-                
+
                 <Box sx={{ textAlign: 'center', mb: 3 }}>
                   <Typography variant="h2" color="primary">
                     {esgResults[0].overall_score}
@@ -308,9 +335,7 @@ const ESGDashboard: React.FC = () => {
                       <Typography variant="h6">
                         {Math.round(esgResults[0].scores.environmental.score)}
                       </Typography>
-                      <Typography variant="body2">
-                        {t('esg.environmental')}
-                      </Typography>
+                      <Typography variant="body2">{t('esg.environmental')}</Typography>
                       <LinearProgress
                         variant="determinate"
                         value={esgResults[0].scores.environmental.score}
@@ -319,16 +344,14 @@ const ESGDashboard: React.FC = () => {
                       />
                     </Box>
                   </Grid>
-                  
+
                   <Grid item xs={4}>
                     <Box sx={{ textAlign: 'center' }}>
                       <People color="info" sx={{ fontSize: 40, mb: 1 }} />
                       <Typography variant="h6">
                         {Math.round(esgResults[0].scores.social.score)}
                       </Typography>
-                      <Typography variant="body2">
-                        {t('esg.social')}
-                      </Typography>
+                      <Typography variant="body2">{t('esg.social')}</Typography>
                       <LinearProgress
                         variant="determinate"
                         value={esgResults[0].scores.social.score}
@@ -337,16 +360,14 @@ const ESGDashboard: React.FC = () => {
                       />
                     </Box>
                   </Grid>
-                  
+
                   <Grid item xs={4}>
                     <Box sx={{ textAlign: 'center' }}>
                       <BusinessCenter color="warning" sx={{ fontSize: 40, mb: 1 }} />
                       <Typography variant="h6">
                         {Math.round(esgResults[0].scores.governance.score)}
                       </Typography>
-                      <Typography variant="body2">
-                        {t('esg.governance')}
-                      </Typography>
+                      <Typography variant="body2">{t('esg.governance')}</Typography>
                       <LinearProgress
                         variant="determinate"
                         value={esgResults[0].scores.governance.score}
@@ -369,7 +390,7 @@ const ESGDashboard: React.FC = () => {
                 <Typography variant="h6" gutterBottom>
                   {t('esg.trends')}
                 </Typography>
-                
+
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={trendChartData}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -377,17 +398,21 @@ const ESGDashboard: React.FC = () => {
                     <YAxis domain={[0, 100]} />
                     <Tooltip />
                     <Line type="monotone" dataKey="overall" stroke="#2196f3" strokeWidth={3} />
-                    <Line type="monotone" dataKey="environmental" stroke="#4caf50" strokeWidth={2} />
+                    <Line
+                      type="monotone"
+                      dataKey="environmental"
+                      stroke="#4caf50"
+                      strokeWidth={2}
+                    />
                     <Line type="monotone" dataKey="social" stroke="#ff9800" strokeWidth={2} />
                     <Line type="monotone" dataKey="governance" stroke="#9c27b0" strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer>
-                
+
                 <Alert severity="info" sx={{ mt: 2 }}>
-                  {trendData.trend_analysis.direction === 'improving' ? 
-                    `Improving trend: ${trendData.trend_analysis.rate_of_change}` :
-                    'ESG performance trend analysis'
-                  }
+                  {trendData.trend_analysis.direction === 'improving'
+                    ? `Improving trend: ${trendData.trend_analysis.rate_of_change}`
+                    : 'ESG performance trend analysis'}
                 </Alert>
               </CardContent>
             </Card>
@@ -402,7 +427,7 @@ const ESGDashboard: React.FC = () => {
                 <Typography variant="h6" gutterBottom>
                   ESG Profile
                 </Typography>
-                
+
                 <ResponsiveContainer width="100%" height={300}>
                   <RadarChart data={radarData}>
                     <PolarGrid />
@@ -430,12 +455,12 @@ const ESGDashboard: React.FC = () => {
                 <Typography variant="h6" gutterBottom>
                   {t('esg.benchmarks')}
                 </Typography>
-                
+
                 <Box sx={{ mb: 3 }}>
                   <Typography variant="body2" color="textSecondary" gutterBottom>
                     Industry Average vs Your Score
                   </Typography>
-                  
+
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                     <Typography variant="body2" sx={{ minWidth: 120 }}>
                       Your Score:
@@ -450,7 +475,7 @@ const ESGDashboard: React.FC = () => {
                       {esgResults[0].benchmark_comparison.entity_score}
                     </Typography>
                   </Box>
-                  
+
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Typography variant="body2" sx={{ minWidth: 120 }}>
                       Industry Avg:
@@ -466,11 +491,11 @@ const ESGDashboard: React.FC = () => {
                     </Typography>
                   </Box>
                 </Box>
-                
+
                 <Alert severity="success">
                   <Typography variant="body2">
-                    <strong>Ranking:</strong> {esgResults[0].benchmark_comparison.ranking} 
-                    ({esgResults[0].benchmark_comparison.percentile}th percentile)
+                    <strong>Ranking:</strong> {esgResults[0].benchmark_comparison.ranking}(
+                    {esgResults[0].benchmark_comparison.percentile}th percentile)
                   </Typography>
                 </Alert>
               </CardContent>
@@ -486,7 +511,7 @@ const ESGDashboard: React.FC = () => {
                 <Typography variant="h6" gutterBottom>
                   {t('esg.recommendations')}
                 </Typography>
-                
+
                 <List>
                   {esgResults[0].recommendations.map((recommendation, index) => (
                     <ListItem key={index}>
@@ -496,9 +521,7 @@ const ESGDashboard: React.FC = () => {
                       <ListItemText
                         primary={
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Typography variant="body1">
-                              {recommendation.action}
-                            </Typography>
+                            <Typography variant="body1">{recommendation.action}</Typography>
                             <Chip
                               label={recommendation.priority}
                               size="small"
@@ -524,39 +547,42 @@ const ESGDashboard: React.FC = () => {
                 <Typography variant="h6" gutterBottom>
                   {t('esg.factors')}
                 </Typography>
-                
+
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMore />}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Nature color="success" />
                       <Typography>Environmental Factors</Typography>
-                      <Chip 
-                        label={Math.round(esgResults[0].scores.environmental.score)} 
-                        size="small" 
+                      <Chip
+                        label={Math.round(esgResults[0].scores.environmental.score)}
+                        size="small"
                         color={getScoreColor(esgResults[0].scores.environmental.score)}
                       />
                     </Box>
                   </AccordionSummary>
                   <AccordionDetails>
                     <Grid container spacing={2}>
-                      {Object.entries(esgResults[0].scores.environmental.factors).map(([key, factor]) => (
-                        <Grid item xs={12} sm={6} md={4} key={key}>
-                          <Box>
-                            <Typography variant="body2" gutterBottom>
-                              {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                            </Typography>
-                            <LinearProgress
-                              variant="determinate"
-                              value={factor.score}
-                              color={getScoreColor(factor.score)}
-                              sx={{ mb: 1 }}
-                            />
-                            <Typography variant="caption" color="textSecondary">
-                              Score: {Math.round(factor.score)} (Weight: {Math.round(factor.weight * 100)}%)
-                            </Typography>
-                          </Box>
-                        </Grid>
-                      ))}
+                      {Object.entries(esgResults[0].scores.environmental.factors).map(
+                        ([key, factor]) => (
+                          <Grid item xs={12} sm={6} md={4} key={key}>
+                            <Box>
+                              <Typography variant="body2" gutterBottom>
+                                {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                              </Typography>
+                              <LinearProgress
+                                variant="determinate"
+                                value={factor.score}
+                                color={getScoreColor(factor.score)}
+                                sx={{ mb: 1 }}
+                              />
+                              <Typography variant="caption" color="textSecondary">
+                                Score: {Math.round(factor.score)} (Weight:{' '}
+                                {Math.round(factor.weight * 100)}%)
+                              </Typography>
+                            </Box>
+                          </Grid>
+                        )
+                      )}
                     </Grid>
                   </AccordionDetails>
                 </Accordion>
@@ -566,9 +592,9 @@ const ESGDashboard: React.FC = () => {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <People color="info" />
                       <Typography>Social Factors</Typography>
-                      <Chip 
-                        label={Math.round(esgResults[0].scores.social.score)} 
-                        size="small" 
+                      <Chip
+                        label={Math.round(esgResults[0].scores.social.score)}
+                        size="small"
                         color={getScoreColor(esgResults[0].scores.social.score)}
                       />
                     </Box>
@@ -588,7 +614,8 @@ const ESGDashboard: React.FC = () => {
                               sx={{ mb: 1 }}
                             />
                             <Typography variant="caption" color="textSecondary">
-                              Score: {Math.round(factor.score)} (Weight: {Math.round(factor.weight * 100)}%)
+                              Score: {Math.round(factor.score)} (Weight:{' '}
+                              {Math.round(factor.weight * 100)}%)
                             </Typography>
                           </Box>
                         </Grid>
@@ -602,33 +629,36 @@ const ESGDashboard: React.FC = () => {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <BusinessCenter color="warning" />
                       <Typography>Governance Factors</Typography>
-                      <Chip 
-                        label={Math.round(esgResults[0].scores.governance.score)} 
-                        size="small" 
+                      <Chip
+                        label={Math.round(esgResults[0].scores.governance.score)}
+                        size="small"
                         color={getScoreColor(esgResults[0].scores.governance.score)}
                       />
                     </Box>
                   </AccordionSummary>
                   <AccordionDetails>
                     <Grid container spacing={2}>
-                      {Object.entries(esgResults[0].scores.governance.factors).map(([key, factor]) => (
-                        <Grid item xs={12} sm={6} md={4} key={key}>
-                          <Box>
-                            <Typography variant="body2" gutterBottom>
-                              {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                            </Typography>
-                            <LinearProgress
-                              variant="determinate"
-                              value={factor.score}
-                              color={getScoreColor(factor.score)}
-                              sx={{ mb: 1 }}
-                            />
-                            <Typography variant="caption" color="textSecondary">
-                              Score: {Math.round(factor.score)} (Weight: {Math.round(factor.weight * 100)}%)
-                            </Typography>
-                          </Box>
-                        </Grid>
-                      ))}
+                      {Object.entries(esgResults[0].scores.governance.factors).map(
+                        ([key, factor]) => (
+                          <Grid item xs={12} sm={6} md={4} key={key}>
+                            <Box>
+                              <Typography variant="body2" gutterBottom>
+                                {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                              </Typography>
+                              <LinearProgress
+                                variant="determinate"
+                                value={factor.score}
+                                color={getScoreColor(factor.score)}
+                                sx={{ mb: 1 }}
+                              />
+                              <Typography variant="caption" color="textSecondary">
+                                Score: {Math.round(factor.score)} (Weight:{' '}
+                                {Math.round(factor.weight * 100)}%)
+                              </Typography>
+                            </Box>
+                          </Grid>
+                        )
+                      )}
                     </Grid>
                   </AccordionDetails>
                 </Accordion>

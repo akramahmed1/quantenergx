@@ -26,13 +26,13 @@ router.get('/', (req, res) => {
       'margin-requirements': 'POST /margin/calculate',
       'margin-calls': 'GET /margin/calls',
       'margin-call-details': 'GET /margin/calls/:marginCallId',
-      'collateral': 'GET /margin/collateral',
+      collateral: 'GET /margin/collateral',
       'update-collateral': 'PUT /margin/collateral',
-      'margin-reports': 'GET /margin/reports'
+      'margin-reports': 'GET /margin/reports',
     },
     serviceStatus: marginService ? 'online' : 'offline',
     supportedCalculationMethods: ['span', 'portfolio', 'standard'],
-    supportedRegions: ['US', 'EU', 'UK', 'APAC', 'CA']
+    supportedRegions: ['US', 'EU', 'UK', 'APAC', 'CA'],
   });
 });
 
@@ -41,8 +41,15 @@ router.get(
   '/portfolio',
   authenticateToken,
   [
-    query('region').optional().isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code'),
-    query('method').optional().isIn(['simple', 'portfolio']).withMessage('Invalid calculation method')
+    query('region')
+      .optional()
+      .isString()
+      .isLength({ min: 2, max: 10 })
+      .withMessage('Invalid region code'),
+    query('method')
+      .optional()
+      .isIn(['simple', 'portfolio'])
+      .withMessage('Invalid calculation method'),
   ],
   async (req, res) => {
     try {
@@ -51,14 +58,14 @@ router.get(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!marginService) {
         return res.status(503).json({
           success: false,
-          error: 'Margin service unavailable'
+          error: 'Margin service unavailable',
         });
       }
 
@@ -75,15 +82,14 @@ router.get(
           marginStatus,
           userId,
           region,
-          calculatedAt: new Date()
-        }
+          calculatedAt: new Date(),
+        },
       });
-
     } catch (error) {
       console.error('Portfolio margin calculation error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -94,12 +100,24 @@ router.post(
   '/calculate',
   authenticateToken,
   [
-    body('contractType').isIn(['future', 'option', 'swap', 'structured_note']).withMessage('Invalid contract type'),
-    body('underlyingCommodity').isString().notEmpty().withMessage('Underlying commodity is required'),
-    body('notionalAmount').isNumeric().isFloat({ min: 1000 }).withMessage('Notional amount must be at least $1,000'),
-    body('region').optional().isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code'),
+    body('contractType')
+      .isIn(['future', 'option', 'swap', 'structured_note'])
+      .withMessage('Invalid contract type'),
+    body('underlyingCommodity')
+      .isString()
+      .notEmpty()
+      .withMessage('Underlying commodity is required'),
+    body('notionalAmount')
+      .isNumeric()
+      .isFloat({ min: 1000 })
+      .withMessage('Notional amount must be at least $1,000'),
+    body('region')
+      .optional()
+      .isString()
+      .isLength({ min: 2, max: 10 })
+      .withMessage('Invalid region code'),
     body('maturityDate').optional().isISO8601().withMessage('Invalid maturity date'),
-    body('contractDetails').optional().isObject().withMessage('Contract details must be an object')
+    body('contractDetails').optional().isObject().withMessage('Contract details must be an object'),
   ],
   async (req, res) => {
     try {
@@ -108,14 +126,14 @@ router.post(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!marginService) {
         return res.status(503).json({
           success: false,
-          error: 'Margin service unavailable'
+          error: 'Margin service unavailable',
         });
       }
 
@@ -125,7 +143,7 @@ router.post(
         notionalAmount,
         region = 'US',
         maturityDate,
-        contractDetails = {}
+        contractDetails = {},
       } = req.body;
 
       // Create a mock contract for margin calculation
@@ -134,13 +152,15 @@ router.post(
         underlyingCommodity,
         notionalAmount,
         currency: 'USD',
-        maturityDate: maturityDate ? new Date(maturityDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days default
-        ...contractDetails
+        maturityDate: maturityDate
+          ? new Date(maturityDate)
+          : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days default
+        ...contractDetails,
       };
 
       const marginRequirement = await marginService.calculateInitialMargin(mockContract, region);
       const regionConfig = await regionConfigService.getRegionConfig(region);
-      
+
       res.json({
         success: true,
         data: {
@@ -150,15 +170,14 @@ router.post(
           notionalAmount,
           region,
           marginRules: regionConfig?.marginRules,
-          calculatedAt: new Date()
-        }
+          calculatedAt: new Date(),
+        },
       });
-
     } catch (error) {
       console.error('Margin calculation error:', error);
       res.status(400).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -169,10 +188,20 @@ router.get(
   '/calls',
   authenticateToken,
   [
-    query('region').optional().isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code'),
-    query('status').optional().isIn(['pending', 'met', 'overdue', 'defaulted']).withMessage('Invalid status'),
+    query('region')
+      .optional()
+      .isString()
+      .isLength({ min: 2, max: 10 })
+      .withMessage('Invalid region code'),
+    query('status')
+      .optional()
+      .isIn(['pending', 'met', 'overdue', 'defaulted'])
+      .withMessage('Invalid status'),
     query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
-    query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100')
+    query('limit')
+      .optional()
+      .isInt({ min: 1, max: 100 })
+      .withMessage('Limit must be between 1 and 100'),
   ],
   async (req, res) => {
     try {
@@ -181,14 +210,14 @@ router.get(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!marginService) {
         return res.status(503).json({
           success: false,
-          error: 'Margin service unavailable'
+          error: 'Margin service unavailable',
         });
       }
 
@@ -196,8 +225,9 @@ router.get(
       const userId = req.user.id;
 
       // Get all margin calls for user
-      let marginCalls = Array.from(marginService.marginCalls.values())
-        .filter(call => call.userId === userId);
+      let marginCalls = Array.from(marginService.marginCalls.values()).filter(
+        call => call.userId === userId
+      );
 
       // Apply filters
       if (region) {
@@ -223,16 +253,15 @@ router.get(
             page: parseInt(page),
             limit: parseInt(limit),
             total: marginCalls.length,
-            hasMore: endIndex < marginCalls.length
-          }
-        }
+            hasMore: endIndex < marginCalls.length,
+          },
+        },
       });
-
     } catch (error) {
       console.error('Get margin calls error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -242,9 +271,7 @@ router.get(
 router.get(
   '/calls/:marginCallId',
   authenticateToken,
-  [
-    param('marginCallId').isUUID().withMessage('Invalid margin call ID')
-  ],
+  [param('marginCallId').isUUID().withMessage('Invalid margin call ID')],
   async (req, res) => {
     try {
       const errors = validationResult(req);
@@ -252,14 +279,14 @@ router.get(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!marginService) {
         return res.status(503).json({
           success: false,
-          error: 'Margin service unavailable'
+          error: 'Margin service unavailable',
         });
       }
 
@@ -269,7 +296,7 @@ router.get(
       if (!marginCall) {
         return res.status(404).json({
           success: false,
-          error: 'Margin call not found'
+          error: 'Margin call not found',
         });
       }
 
@@ -277,20 +304,19 @@ router.get(
       if (marginCall.userId !== req.user.id) {
         return res.status(403).json({
           success: false,
-          error: 'Access denied'
+          error: 'Access denied',
         });
       }
 
       res.json({
         success: true,
-        data: marginCall
+        data: marginCall,
       });
-
     } catch (error) {
       console.error('Get margin call details error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -302,8 +328,10 @@ router.put(
   authenticateToken,
   [
     param('marginCallId').isUUID().withMessage('Invalid margin call ID'),
-    body('resolution').isIn(['met', 'defaulted']).withMessage('Resolution must be met or defaulted'),
-    body('notes').optional().isString().withMessage('Notes must be a string')
+    body('resolution')
+      .isIn(['met', 'defaulted'])
+      .withMessage('Resolution must be met or defaulted'),
+    body('notes').optional().isString().withMessage('Notes must be a string'),
   ],
   async (req, res) => {
     try {
@@ -312,14 +340,14 @@ router.put(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!marginService) {
         return res.status(503).json({
           success: false,
-          error: 'Margin service unavailable'
+          error: 'Margin service unavailable',
         });
       }
 
@@ -330,7 +358,7 @@ router.put(
       if (!marginCall) {
         return res.status(404).json({
           success: false,
-          error: 'Margin call not found'
+          error: 'Margin call not found',
         });
       }
 
@@ -338,7 +366,7 @@ router.put(
       if (marginCall.userId !== req.user.id) {
         return res.status(403).json({
           success: false,
-          error: 'Access denied'
+          error: 'Access denied',
         });
       }
 
@@ -346,7 +374,7 @@ router.put(
       if (resolution === 'defaulted' && req.user.role !== 'admin') {
         return res.status(403).json({
           success: false,
-          error: 'Only admin can mark margin call as defaulted'
+          error: 'Only admin can mark margin call as defaulted',
         });
       }
 
@@ -358,14 +386,13 @@ router.put(
       res.json({
         success: true,
         data: resolvedCall,
-        message: `Margin call ${resolution} successfully`
+        message: `Margin call ${resolution} successfully`,
       });
-
     } catch (error) {
       console.error('Resolve margin call error:', error);
       res.status(400).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -376,7 +403,11 @@ router.get(
   '/collateral',
   authenticateToken,
   [
-    query('region').optional().isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code')
+    query('region')
+      .optional()
+      .isString()
+      .isLength({ min: 2, max: 10 })
+      .withMessage('Invalid region code'),
   ],
   async (req, res) => {
     try {
@@ -385,14 +416,14 @@ router.get(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!marginService) {
         return res.status(503).json({
           success: false,
-          error: 'Margin service unavailable'
+          error: 'Margin service unavailable',
         });
       }
 
@@ -408,15 +439,14 @@ router.get(
           collateral,
           marginStatus,
           userId,
-          region
-        }
+          region,
+        },
       });
-
     } catch (error) {
       console.error('Get collateral error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -427,11 +457,31 @@ router.put(
   '/collateral',
   authenticateToken,
   [
-    body('cash').optional().isNumeric().isFloat({ min: 0 }).withMessage('Cash amount must be positive'),
-    body('securities').optional().isNumeric().isFloat({ min: 0 }).withMessage('Securities value must be positive'),
-    body('commodities').optional().isNumeric().isFloat({ min: 0 }).withMessage('Commodities value must be positive'),
-    body('region').optional().isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code'),
-    body('currency').optional().isString().isLength({ min: 3, max: 3 }).withMessage('Currency must be 3 characters')
+    body('cash')
+      .optional()
+      .isNumeric()
+      .isFloat({ min: 0 })
+      .withMessage('Cash amount must be positive'),
+    body('securities')
+      .optional()
+      .isNumeric()
+      .isFloat({ min: 0 })
+      .withMessage('Securities value must be positive'),
+    body('commodities')
+      .optional()
+      .isNumeric()
+      .isFloat({ min: 0 })
+      .withMessage('Commodities value must be positive'),
+    body('region')
+      .optional()
+      .isString()
+      .isLength({ min: 2, max: 10 })
+      .withMessage('Invalid region code'),
+    body('currency')
+      .optional()
+      .isString()
+      .isLength({ min: 3, max: 3 })
+      .withMessage('Currency must be 3 characters'),
   ],
   async (req, res) => {
     try {
@@ -440,33 +490,36 @@ router.put(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!marginService) {
         return res.status(503).json({
           success: false,
-          error: 'Margin service unavailable'
+          error: 'Margin service unavailable',
         });
       }
 
       const { region = 'US', ...collateralUpdate } = req.body;
       const userId = req.user.id;
 
-      const updatedCollateral = await marginService.updateUserCollateral(userId, collateralUpdate, region);
+      const updatedCollateral = await marginService.updateUserCollateral(
+        userId,
+        collateralUpdate,
+        region
+      );
 
       res.json({
         success: true,
         data: updatedCollateral,
-        message: 'Collateral updated successfully'
+        message: 'Collateral updated successfully',
       });
-
     } catch (error) {
       console.error('Update collateral error:', error);
       res.status(400).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -477,8 +530,12 @@ router.get(
   '/reports',
   authenticateToken,
   [
-    query('region').optional().isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code'),
-    query('includeHistory').optional().isBoolean().withMessage('Include history must be boolean')
+    query('region')
+      .optional()
+      .isString()
+      .isLength({ min: 2, max: 10 })
+      .withMessage('Invalid region code'),
+    query('includeHistory').optional().isBoolean().withMessage('Include history must be boolean'),
   ],
   async (req, res) => {
     try {
@@ -487,14 +544,14 @@ router.get(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!marginService) {
         return res.status(503).json({
           success: false,
-          error: 'Margin service unavailable'
+          error: 'Margin service unavailable',
         });
       }
 
@@ -508,20 +565,19 @@ router.get(
         const historicalCalls = Array.from(marginService.marginCalls.values())
           .filter(call => call.userId === userId && call.region === region)
           .sort((a, b) => b.createdAt - a.createdAt);
-        
+
         marginReport.historicalMarginCalls = historicalCalls;
       }
 
       res.json({
         success: true,
-        data: marginReport
+        data: marginReport,
       });
-
     } catch (error) {
       console.error('Get margin report error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -530,9 +586,7 @@ router.get(
 // Get Margin Rules for Region (Public endpoint)
 router.get(
   '/rules/:region',
-  [
-    param('region').isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code')
-  ],
+  [param('region').isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code')],
   async (req, res) => {
     try {
       const errors = validationResult(req);
@@ -540,14 +594,14 @@ router.get(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!regionConfigService) {
         return res.status(503).json({
           success: false,
-          error: 'Region config service unavailable'
+          error: 'Region config service unavailable',
         });
       }
 
@@ -557,7 +611,7 @@ router.get(
       if (!marginRules) {
         return res.status(404).json({
           success: false,
-          error: 'Margin rules not found for region'
+          error: 'Margin rules not found for region',
         });
       }
 
@@ -569,19 +623,18 @@ router.get(
         marginCallThreshold: marginRules.marginCallThreshold,
         crossMarginingEnabled: marginRules.crossMarginingEnabled,
         portfolioMarginingEnabled: marginRules.portfolioMarginingEnabled,
-        region
+        region,
       };
 
       res.json({
         success: true,
-        data: publicMarginRules
+        data: publicMarginRules,
       });
-
     } catch (error) {
       console.error('Get margin rules error:', error);
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -594,8 +647,12 @@ router.post(
   [
     body('userId').isString().notEmpty().withMessage('User ID is required'),
     body('amount').isNumeric().isFloat({ min: 1 }).withMessage('Amount must be positive'),
-    body('region').optional().isString().isLength({ min: 2, max: 10 }).withMessage('Invalid region code'),
-    body('reason').optional().isString().withMessage('Reason must be a string')
+    body('region')
+      .optional()
+      .isString()
+      .isLength({ min: 2, max: 10 })
+      .withMessage('Invalid region code'),
+    body('reason').optional().isString().withMessage('Reason must be a string'),
   ],
   async (req, res) => {
     try {
@@ -604,14 +661,14 @@ router.post(
         return res.status(400).json({
           success: false,
           error: 'Validation failed',
-          details: errors.array()
+          details: errors.array(),
         });
       }
 
       if (!marginService) {
         return res.status(503).json({
           success: false,
-          error: 'Margin service unavailable'
+          error: 'Margin service unavailable',
         });
       }
 
@@ -619,7 +676,7 @@ router.post(
       if (req.user.role !== 'admin') {
         return res.status(403).json({
           success: false,
-          error: 'Admin access required'
+          error: 'Admin access required',
         });
       }
 
@@ -632,26 +689,25 @@ router.post(
       res.status(201).json({
         success: true,
         data: marginCall,
-        message: 'Margin call issued successfully'
+        message: 'Margin call issued successfully',
       });
-
     } catch (error) {
       console.error('Force margin call error:', error);
       res.status(400).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
 );
 
 // Error handling middleware
-router.use((error, req, res, next) => {
+router.use((error, req, res, _next) => {
   console.error('Margin API error:', error);
   res.status(500).json({
     success: false,
     error: 'Internal server error',
-    message: 'An unexpected error occurred in the margin service'
+    message: 'An unexpected error occurred in the margin service',
   });
 });
 

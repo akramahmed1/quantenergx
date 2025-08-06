@@ -26,7 +26,7 @@ class MarketplaceService {
         permissions: ['risk:read', 'risk:write'],
         rating: 4.8,
         downloads: 1250,
-        verified: true
+        verified: true,
       },
       {
         id: 'esg-scoring-engine',
@@ -42,8 +42,8 @@ class MarketplaceService {
         permissions: ['esg:read', 'esg:write'],
         rating: 4.5,
         downloads: 890,
-        verified: true
-      }
+        verified: true,
+      },
     ];
 
     samplePlugins.forEach(plugin => {
@@ -64,8 +64,8 @@ class MarketplaceService {
             rating: 5,
             comment: 'Excellent weather risk integration',
             date: new Date('2024-07-15'),
-            verified_purchase: true
-          }
+            verified_purchase: true,
+          },
         ],
         screenshots: ['/screenshots/weather-risk-1.png'],
         documentation_url: 'https://weathertech.com/docs/risk-analytics',
@@ -74,8 +74,8 @@ class MarketplaceService {
         pricing_details: {
           monthly: 299,
           annual: 2990,
-          currency: 'USD'
-        }
+          currency: 'USD',
+        },
       },
       {
         plugin_id: 'esg-scoring-engine',
@@ -89,11 +89,11 @@ class MarketplaceService {
         support_url: 'https://greenanalytics.com/support',
         pricing_model: 'usage_based',
         pricing_details: {
-          per_calculation: 0.50,
+          per_calculation: 0.5,
           monthly_cap: 500,
-          currency: 'USD'
-        }
-      }
+          currency: 'USD',
+        },
+      },
     ];
 
     marketplaceEntries.forEach(entry => {
@@ -120,7 +120,8 @@ class MarketplaceService {
       const plugin = this.plugins.get(entry.plugin_id);
       if (!plugin) return false;
 
-      const searchText = `${plugin.name} ${plugin.description} ${entry.marketplace_category}`.toLowerCase();
+      const searchText =
+        `${plugin.name} ${plugin.description} ${entry.marketplace_category}`.toLowerCase();
       return searchText.includes(query.toLowerCase());
     });
 
@@ -140,15 +141,17 @@ class MarketplaceService {
 
     const fullReview = {
       ...review,
-      date: new Date()
+      date: new Date(),
     };
 
     marketplaceEntry.reviews.push(fullReview);
-    
+
     // Update plugin rating
     const plugin = this.plugins.get(pluginId);
     if (plugin) {
-      const avgRating = marketplaceEntry.reviews.reduce((sum, r) => sum + r.rating, 0) / marketplaceEntry.reviews.length;
+      const avgRating =
+        marketplaceEntry.reviews.reduce((sum, r) => sum + r.rating, 0) /
+        marketplaceEntry.reviews.length;
       plugin.rating = Math.round(avgRating * 10) / 10;
     }
 
@@ -174,18 +177,18 @@ class MarketplaceService {
 
   getPluginStatistics() {
     const plugins = Array.from(this.plugins.values());
-    
+
     return {
       total_plugins: plugins.length,
       by_status: {
         active: plugins.filter(p => p.status === 'active').length,
         installed: plugins.filter(p => p.status === 'installed').length,
         disabled: plugins.filter(p => p.status === 'disabled').length,
-        error: plugins.filter(p => p.status === 'error').length
+        error: plugins.filter(p => p.status === 'error').length,
       },
       by_type: {
         internal: plugins.filter(p => p.type === 'internal').length,
-        third_party: plugins.filter(p => p.type === 'third_party').length
+        third_party: plugins.filter(p => p.type === 'third_party').length,
       },
       by_category: plugins.reduce((acc, plugin) => {
         acc[plugin.category] = (acc[plugin.category] || 0) + 1;
@@ -194,17 +197,16 @@ class MarketplaceService {
       marketplace_stats: {
         total_listings: this.marketplace.size,
         featured_count: Array.from(this.marketplace.values()).filter(e => e.featured).length,
-        average_rating: this.calculateAverageMarketplaceRating()
-      }
+        average_rating: this.calculateAverageMarketplaceRating(),
+      },
     };
   }
 
   calculateAverageMarketplaceRating() {
-    const allReviews = Array.from(this.marketplace.values())
-      .flatMap(entry => entry.reviews);
-    
+    const allReviews = Array.from(this.marketplace.values()).flatMap(entry => entry.reviews);
+
     if (allReviews.length === 0) return 0;
-    
+
     const totalRating = allReviews.reduce((sum, review) => sum + review.rating, 0);
     return Math.round((totalRating / allReviews.length) * 10) / 10;
   }

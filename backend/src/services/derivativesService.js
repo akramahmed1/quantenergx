@@ -24,11 +24,11 @@ class DerivativesService extends EventEmitter {
         'renewable_certificates',
         'carbon_credits',
         'electricity',
-        'coal'
+        'coal',
       ],
       maxNotionalPerContract: 100000000, // $100M
       minNotionalPerContract: 1000, // $1K
-      defaultCurrency: 'USD'
+      defaultCurrency: 'USD',
     };
 
     this.initializeMarketData();
@@ -42,7 +42,7 @@ class DerivativesService extends EventEmitter {
         volatility: 0.2 + Math.random() * 0.3, // 20-50%
         riskFreeRate: 0.025, // 2.5%
         dividendYield: 0,
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       });
     });
   }
@@ -56,9 +56,9 @@ class DerivativesService extends EventEmitter {
       renewable_certificates: 50,
       carbon_credits: 25,
       electricity: 45,
-      coal: 85
+      coal: 85,
     };
-    
+
     const basePrice = basePrices[commodity] || 50;
     return basePrice * (0.9 + Math.random() * 0.2); // ±10% variation
   }
@@ -72,12 +72,12 @@ class DerivativesService extends EventEmitter {
         deliveryDate,
         settlementType = 'cash',
         region = 'US',
-        userId
+        userId,
       } = params;
 
       // Validate parameters
       this.validateDerivativeParams(params);
-      
+
       // Check region-specific rules
       const regionConfig = await this.regionConfigService.getRegionConfig(region);
       if (!regionConfig || !regionConfig.isActive) {
@@ -100,12 +100,15 @@ class DerivativesService extends EventEmitter {
         contractSize: this.getContractSize(underlyingCommodity),
         marginRequirement: 0, // Will be calculated by margin service
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       // Calculate margin requirements
       if (this.marginService) {
-        contract.marginRequirement = await this.marginService.calculateInitialMargin(contract, region);
+        contract.marginRequirement = await this.marginService.calculateInitialMargin(
+          contract,
+          region
+        );
       }
 
       this.contracts.set(contractId, contract);
@@ -115,7 +118,7 @@ class DerivativesService extends EventEmitter {
         contractId,
         type: 'future',
         userId,
-        region
+        region,
       });
 
       return contract;
@@ -135,11 +138,11 @@ class DerivativesService extends EventEmitter {
         expirationDate,
         exerciseStyle = 'european',
         region = 'US',
-        userId
+        userId,
       } = params;
 
       this.validateDerivativeParams(params);
-      
+
       const regionConfig = await this.regionConfigService.getRegionConfig(region);
       if (!regionConfig || !regionConfig.isActive) {
         throw new Error(`Trading not supported in region: ${region}`);
@@ -147,7 +150,7 @@ class DerivativesService extends EventEmitter {
 
       const contractId = uuidv4();
       const marketData = this.marketData.get(underlyingCommodity);
-      
+
       // Calculate option premium using Black-Scholes approximation
       const premium = this.calculateOptionPremium({
         spot: marketData.spot,
@@ -155,7 +158,7 @@ class DerivativesService extends EventEmitter {
         timeToExpiry: this.calculateTimeToExpiry(expirationDate),
         volatility: marketData.volatility,
         riskFreeRate: marketData.riskFreeRate,
-        optionType
+        optionType,
       });
 
       const contract = {
@@ -178,7 +181,7 @@ class DerivativesService extends EventEmitter {
         theta: 0,
         vega: 0,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       // Calculate Greeks
@@ -190,7 +193,7 @@ class DerivativesService extends EventEmitter {
         contractId,
         type: 'option',
         userId,
-        region
+        region,
       });
 
       return contract;
@@ -211,11 +214,11 @@ class DerivativesService extends EventEmitter {
         paymentFrequency = 'quarterly',
         maturityDate,
         region = 'US',
-        userId
+        userId,
       } = params;
 
       this.validateDerivativeParams(params);
-      
+
       const regionConfig = await this.regionConfigService.getRegionConfig(region);
       if (!regionConfig || !regionConfig.isActive) {
         throw new Error(`Trading not supported in region: ${region}`);
@@ -238,7 +241,7 @@ class DerivativesService extends EventEmitter {
         region,
         status: 'active',
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       this.contracts.set(contractId, contract);
@@ -247,7 +250,7 @@ class DerivativesService extends EventEmitter {
         contractId,
         type: 'swap',
         userId,
-        region
+        region,
       });
 
       return contract;
@@ -267,11 +270,11 @@ class DerivativesService extends EventEmitter {
         maturityDate,
         payoffStructure,
         region = 'US',
-        userId
+        userId,
       } = params;
 
       this.validateDerivativeParams(params);
-      
+
       const regionConfig = await this.regionConfigService.getRegionConfig(region);
       if (!regionConfig || !regionConfig.isActive) {
         throw new Error(`Trading not supported in region: ${region}`);
@@ -291,7 +294,7 @@ class DerivativesService extends EventEmitter {
         region,
         status: 'active',
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       this.contracts.set(contractId, contract);
@@ -300,7 +303,7 @@ class DerivativesService extends EventEmitter {
         contractId,
         type: 'structured_note',
         userId,
-        region
+        region,
       });
 
       return contract;
@@ -317,9 +320,13 @@ class DerivativesService extends EventEmitter {
       throw new Error(`Unsupported commodity: ${underlyingCommodity}`);
     }
 
-    if (notionalAmount < this.config.minNotionalPerContract || 
-        notionalAmount > this.config.maxNotionalPerContract) {
-      throw new Error(`Notional amount must be between ${this.config.minNotionalPerContract} and ${this.config.maxNotionalPerContract}`);
+    if (
+      notionalAmount < this.config.minNotionalPerContract ||
+      notionalAmount > this.config.maxNotionalPerContract
+    ) {
+      throw new Error(
+        `Notional amount must be between ${this.config.minNotionalPerContract} and ${this.config.maxNotionalPerContract}`
+      );
     }
   }
 
@@ -332,7 +339,7 @@ class DerivativesService extends EventEmitter {
       renewable_certificates: 0.01,
       carbon_credits: 0.01,
       electricity: 0.01,
-      coal: 0.01
+      coal: 0.01,
     };
     return tickSizes[commodity] || 0.01;
   }
@@ -346,7 +353,7 @@ class DerivativesService extends EventEmitter {
       renewable_certificates: 1, // 1 MWh
       carbon_credits: 1, // 1 metric ton CO2
       electricity: 1, // 1 MWh
-      coal: 1 // 1 metric ton
+      coal: 1, // 1 metric ton
     };
     return contractSizes[commodity] || 1;
   }
@@ -360,11 +367,12 @@ class DerivativesService extends EventEmitter {
 
   calculateOptionPremium({ spot, strike, timeToExpiry, volatility, riskFreeRate, optionType }) {
     // Simplified Black-Scholes calculation
-    const d1 = (Math.log(spot / strike) + (riskFreeRate + 0.5 * volatility * volatility) * timeToExpiry) / 
-               (volatility * Math.sqrt(timeToExpiry));
+    const d1 =
+      (Math.log(spot / strike) + (riskFreeRate + 0.5 * volatility * volatility) * timeToExpiry) /
+      (volatility * Math.sqrt(timeToExpiry));
     const d2 = d1 - volatility * Math.sqrt(timeToExpiry);
 
-    const N = (x) => 0.5 * (1 + this.erf(x / Math.sqrt(2)));
+    const N = x => 0.5 * (1 + this.erf(x / Math.sqrt(2)));
 
     if (optionType === 'call') {
       return spot * N(d1) - strike * Math.exp(-riskFreeRate * timeToExpiry) * N(d2);
@@ -386,7 +394,7 @@ class DerivativesService extends EventEmitter {
     contract.gamma = 0.01; // Simplified
 
     // Theta (time decay)
-    contract.theta = -contract.premium * 0.1 / 365; // Simplified
+    contract.theta = (-contract.premium * 0.1) / 365; // Simplified
 
     // Vega (volatility sensitivity)
     contract.vega = contract.premium * 0.2; // Simplified
@@ -394,18 +402,18 @@ class DerivativesService extends EventEmitter {
 
   erf(x) {
     // Approximation of error function
-    const a1 =  0.254829592;
+    const a1 = 0.254829592;
     const a2 = -0.284496736;
-    const a3 =  1.421413741;
+    const a3 = 1.421413741;
     const a4 = -1.453152027;
-    const a5 =  1.061405429;
-    const p  =  0.3275911;
+    const a5 = 1.061405429;
+    const p = 0.3275911;
 
     const sign = x < 0 ? -1 : 1;
     x = Math.abs(x);
 
     const t = 1.0 / (1.0 + p * x);
-    const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+    const y = 1.0 - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
 
     return sign * y;
   }
@@ -429,7 +437,7 @@ class DerivativesService extends EventEmitter {
     this.marketData.set(commodity, {
       ...existing,
       ...data,
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
     });
 
     // Recalculate option Greeks and premiums
@@ -438,8 +446,9 @@ class DerivativesService extends EventEmitter {
 
   updateOptionContracts(commodity) {
     const marketData = this.marketData.get(commodity);
-    const contracts = Array.from(this.contracts.values())
-      .filter(c => c.type === 'option' && c.underlyingCommodity === commodity);
+    const contracts = Array.from(this.contracts.values()).filter(
+      c => c.type === 'option' && c.underlyingCommodity === commodity
+    );
 
     contracts.forEach(contract => {
       this.calculateGreeks(contract, marketData);
@@ -459,7 +468,7 @@ class DerivativesService extends EventEmitter {
     this.emit('contractTerminated', {
       contractId,
       type: contract.type,
-      reason
+      reason,
     });
 
     return contract;

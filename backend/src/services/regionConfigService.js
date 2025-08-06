@@ -20,36 +20,36 @@ class RegionConfigService extends EventEmitter {
         name: 'United States',
         currency: 'USD',
         timezone: 'America/New_York',
-        isActive: true
+        isActive: true,
       },
       {
         region: 'EU',
         name: 'European Union',
         currency: 'EUR',
         timezone: 'Europe/London',
-        isActive: true
+        isActive: true,
       },
       {
         region: 'APAC',
         name: 'Asia Pacific',
         currency: 'USD',
         timezone: 'Asia/Singapore',
-        isActive: true
+        isActive: true,
       },
       {
         region: 'UK',
         name: 'United Kingdom',
         currency: 'GBP',
         timezone: 'Europe/London',
-        isActive: true
+        isActive: true,
       },
       {
         region: 'CA',
         name: 'Canada',
         currency: 'CAD',
         timezone: 'America/Toronto',
-        isActive: true
-      }
+        isActive: true,
+      },
     ];
 
     defaultRegions.forEach(regionInfo => {
@@ -71,13 +71,13 @@ class RegionConfigService extends EventEmitter {
       clearingHouse: this.getDefaultClearingHouse(regionInfo.region),
       regulatoryFramework: this.getDefaultRegulatoryFramework(regionInfo.region),
       lastUpdated: new Date(),
-      createdAt: new Date()
+      createdAt: new Date(),
     };
   }
 
   getDefaultMarginRules(region) {
     const baseRules = {
-      defaultInitialMarginRate: 0.10, // 10%
+      defaultInitialMarginRate: 0.1, // 10%
       defaultMaintenanceMarginRate: 0.075, // 7.5%
       marginCallGracePeriod: 24, // hours
       marginCallThreshold: 0.05, // 5%
@@ -86,8 +86,8 @@ class RegionConfigService extends EventEmitter {
       riskModelParameters: {
         confidenceLevel: 0.99,
         lookbackPeriod: 252,
-        volScalingFactor: 1.0
-      }
+        volScalingFactor: 1.0,
+      },
     };
 
     // Region-specific adjustments
@@ -97,34 +97,34 @@ class RegionConfigService extends EventEmitter {
         ...baseRules,
         defaultInitialMarginRate: 0.12, // Higher initial margin
         portfolioMarginingEnabled: true,
-        regulatoryModel: 'CFTC_SPAN'
+        regulatoryModel: 'CFTC_SPAN',
       };
     case 'EU':
       return {
         ...baseRules,
-        defaultInitialMarginRate: 0.10,
+        defaultInitialMarginRate: 0.1,
         marginCallGracePeriod: 48, // Longer grace period
-        regulatoryModel: 'EMIR_SIMM'
+        regulatoryModel: 'EMIR_SIMM',
       };
     case 'UK':
       return {
         ...baseRules,
         defaultInitialMarginRate: 0.11,
         portfolioMarginingEnabled: true,
-        regulatoryModel: 'FCA_SPAN'
+        regulatoryModel: 'FCA_SPAN',
       };
     case 'APAC':
       return {
         ...baseRules,
         defaultInitialMarginRate: 0.15, // Higher due to volatility
         marginCallGracePeriod: 12, // Shorter grace period
-        regulatoryModel: 'REGIONAL_STANDARD'
+        regulatoryModel: 'REGIONAL_STANDARD',
       };
     case 'CA':
       return {
         ...baseRules,
-        defaultInitialMarginRate: 0.10,
-        regulatoryModel: 'CSA_STANDARD'
+        defaultInitialMarginRate: 0.1,
+        regulatoryModel: 'CSA_STANDARD',
       };
     default:
       return baseRules;
@@ -136,13 +136,13 @@ class RegionConfigService extends EventEmitter {
       standardSettlementPeriod: 2, // T+2
       cutoffTimes: {
         trade_cutoff: '15:00',
-        settlement_cutoff: '17:00'
+        settlement_cutoff: '17:00',
       },
       supportedSettlementMethods: ['cash', 'physical', 'net_cash'],
       physicalDeliveryEnabled: true,
       cashSettlementEnabled: true,
       nettingEnabled: true,
-      autoSettlementThreshold: 1000000 // $1M
+      autoSettlementThreshold: 1000000, // $1M
     };
 
     // Region-specific adjustments
@@ -153,10 +153,10 @@ class RegionConfigService extends EventEmitter {
         cutoffTimes: {
           trade_cutoff: '15:00',
           settlement_cutoff: '17:00',
-          fedwire_cutoff: '18:00'
+          fedwire_cutoff: '18:00',
         },
         supportedPaymentSystems: ['Fedwire', 'ACH', 'CHIPS'],
-        regulatoryReporting: true
+        regulatoryReporting: true,
       };
     case 'EU':
       return {
@@ -165,10 +165,10 @@ class RegionConfigService extends EventEmitter {
         cutoffTimes: {
           trade_cutoff: '16:00',
           settlement_cutoff: '18:00',
-          target2_cutoff: '17:00'
+          target2_cutoff: '17:00',
         },
         supportedPaymentSystems: ['TARGET2', 'SEPA'],
-        regulatoryReporting: true
+        regulatoryReporting: true,
       };
     case 'UK':
       return {
@@ -176,10 +176,10 @@ class RegionConfigService extends EventEmitter {
         cutoffTimes: {
           trade_cutoff: '16:00',
           settlement_cutoff: '17:30',
-          chaps_cutoff: '17:00'
+          chaps_cutoff: '17:00',
         },
         supportedPaymentSystems: ['CHAPS', 'Faster Payments'],
-        regulatoryReporting: true
+        regulatoryReporting: true,
       };
     case 'APAC':
       return {
@@ -187,19 +187,19 @@ class RegionConfigService extends EventEmitter {
         standardSettlementPeriod: 3, // T+3 due to time zones
         cutoffTimes: {
           trade_cutoff: '14:00',
-          settlement_cutoff: '16:00'
+          settlement_cutoff: '16:00',
         },
-        crossBorderSettlement: true
+        crossBorderSettlement: true,
       };
     case 'CA':
       return {
         ...baseRules,
         cutoffTimes: {
           trade_cutoff: '15:30',
-          settlement_cutoff: '17:30'
+          settlement_cutoff: '17:30',
         },
         supportedPaymentSystems: ['LVTS', 'Interac'],
-        regulatoryReporting: true
+        regulatoryReporting: true,
       };
     default:
       return baseRules;
@@ -209,7 +209,7 @@ class RegionConfigService extends EventEmitter {
   getDefaultTradingHours(region) {
     const baseTradingHours = {
       tradingDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-      holidays: []
+      holidays: [],
     };
 
     switch (region) {
@@ -221,8 +221,8 @@ class RegionConfigService extends EventEmitter {
         timezone: 'America/New_York',
         extendedHours: {
           preMarket: '08:00',
-          postMarket: '20:00'
-        }
+          postMarket: '20:00',
+        },
       };
     case 'EU':
       return {
@@ -232,15 +232,15 @@ class RegionConfigService extends EventEmitter {
         timezone: 'Europe/London',
         extendedHours: {
           preMarket: '07:00',
-          postMarket: '19:00'
-        }
+          postMarket: '19:00',
+        },
       };
     case 'UK':
       return {
         ...baseTradingHours,
         openTime: '08:00',
         closeTime: '16:30',
-        timezone: 'Europe/London'
+        timezone: 'Europe/London',
       };
     case 'APAC':
       return {
@@ -250,22 +250,22 @@ class RegionConfigService extends EventEmitter {
         timezone: 'Asia/Singapore',
         nightSession: {
           openTime: '19:00',
-          closeTime: '03:00'
-        }
+          closeTime: '03:00',
+        },
       };
     case 'CA':
       return {
         ...baseTradingHours,
         openTime: '09:00',
         closeTime: '17:00',
-        timezone: 'America/Toronto'
+        timezone: 'America/Toronto',
       };
     default:
       return {
         ...baseTradingHours,
         openTime: '09:00',
         closeTime: '17:00',
-        timezone: 'UTC'
+        timezone: 'UTC',
       };
     }
   }
@@ -276,21 +276,18 @@ class RegionConfigService extends EventEmitter {
         crude_oil: 50000000, // $50M
         natural_gas: 30000000, // $30M
         renewable_certificates: 20000000, // $20M
-        carbon_credits: 25000000 // $25M
+        carbon_credits: 25000000, // $25M
       },
       reportingThresholds: {
         large_trader: 10000000, // $10M
         position_reporting: 5000000, // $5M
-        transaction_reporting: 1000000 // $1M
+        transaction_reporting: 1000000, // $1M
       },
-      requiredDisclosures: [
-        'beneficial_ownership',
-        'related_party_transactions'
-      ],
+      requiredDisclosures: ['beneficial_ownership', 'related_party_transactions'],
       riskLimits: {
         daily_var: 1000000, // $1M
-        stress_test: 5000000 // $5M
-      }
+        stress_test: 5000000, // $5M
+      },
     };
 
     // Region-specific compliance adjustments
@@ -302,10 +299,10 @@ class RegionConfigService extends EventEmitter {
         reportingRequirements: {
           dodd_frank: true,
           position_limits: true,
-          swap_data_reporting: true
+          swap_data_reporting: true,
         },
         kycRequirements: 'enhanced',
-        sanctionsScreening: true
+        sanctionsScreening: true,
       };
     case 'EU':
       return {
@@ -314,10 +311,10 @@ class RegionConfigService extends EventEmitter {
         reportingRequirements: {
           mifid_ii: true,
           emir: true,
-          remit: true
+          remit: true,
         },
         gdprCompliant: true,
-        sanctionsScreening: true
+        sanctionsScreening: true,
       };
     case 'UK':
       return {
@@ -325,26 +322,26 @@ class RegionConfigService extends EventEmitter {
         regulatoryBodies: ['FCA', 'PRA'],
         reportingRequirements: {
           uk_mifir: true,
-          uk_emir: true
+          uk_emir: true,
         },
-        sanctionsScreening: true
+        sanctionsScreening: true,
       };
     case 'APAC':
       return {
         ...baseRules,
         reportingThresholds: {
           ...baseRules.reportingThresholds,
-          large_trader: 5000000 // Lower threshold
+          large_trader: 5000000, // Lower threshold
         },
-        crossBorderReporting: true
+        crossBorderReporting: true,
       };
     case 'CA':
       return {
         ...baseRules,
         regulatoryBodies: ['IIROC', 'Provincial Regulators'],
         reportingRequirements: {
-          canadian_derivatives: true
-        }
+          canadian_derivatives: true,
+        },
       };
     default:
       return baseRules;
@@ -357,7 +354,7 @@ class RegionConfigService extends EventEmitter {
       EU: 'LCH_EU',
       UK: 'LCH_UK',
       APAC: 'SGX_CLEARING',
-      CA: 'CDCC'
+      CA: 'CDCC',
     };
     return clearingHouses[region] || 'DEFAULT_CLEARING';
   }
@@ -367,28 +364,28 @@ class RegionConfigService extends EventEmitter {
       US: {
         primary: 'CFTC',
         secondary: ['NFA', 'FERC'],
-        framework: 'US_DERIVATIVES'
+        framework: 'US_DERIVATIVES',
       },
       EU: {
         primary: 'ESMA',
         secondary: ['National Competent Authorities'],
-        framework: 'EU_DERIVATIVES'
+        framework: 'EU_DERIVATIVES',
       },
       UK: {
         primary: 'FCA',
         secondary: ['PRA'],
-        framework: 'UK_DERIVATIVES'
+        framework: 'UK_DERIVATIVES',
       },
       APAC: {
         primary: 'REGIONAL',
         secondary: ['Local Regulators'],
-        framework: 'REGIONAL_DERIVATIVES'
+        framework: 'REGIONAL_DERIVATIVES',
       },
       CA: {
         primary: 'IIROC',
         secondary: ['Provincial Regulators'],
-        framework: 'CANADIAN_DERIVATIVES'
-      }
+        framework: 'CANADIAN_DERIVATIVES',
+      },
     };
     return frameworks[region] || frameworks.US;
   }
@@ -410,13 +407,13 @@ class RegionConfigService extends EventEmitter {
       this.configHistory.set(backupId, {
         ...existingConfig,
         backupId,
-        backupTimestamp: new Date()
+        backupTimestamp: new Date(),
       });
 
       const updatedConfig = {
         ...existingConfig,
         ...updates,
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       };
 
       // Validate configuration
@@ -427,7 +424,7 @@ class RegionConfigService extends EventEmitter {
       this.emit('regionConfigUpdated', {
         region,
         updates,
-        backupId
+        backupId,
       });
 
       return updatedConfig;
@@ -448,7 +445,7 @@ class RegionConfigService extends EventEmitter {
         ...this.createDefaultRegionConfig(regionData),
         ...regionData,
         createdAt: new Date(),
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       };
 
       this.validateRegionConfig(config);
@@ -464,8 +461,15 @@ class RegionConfigService extends EventEmitter {
   }
 
   validateRegionConfig(config) {
-    const required = ['region', 'currency', 'timezone', 'marginRules', 'settlementRules', 'tradingHours'];
-    
+    const required = [
+      'region',
+      'currency',
+      'timezone',
+      'marginRules',
+      'settlementRules',
+      'tradingHours',
+    ];
+
     for (const field of required) {
       if (!config[field]) {
         throw new Error(`Missing required field: ${field}`);
@@ -478,7 +482,10 @@ class RegionConfigService extends EventEmitter {
       throw new Error('Initial margin rate must be between 0 and 1');
     }
 
-    if (marginRules.defaultMaintenanceMarginRate < 0 || marginRules.defaultMaintenanceMarginRate > 1) {
+    if (
+      marginRules.defaultMaintenanceMarginRate < 0 ||
+      marginRules.defaultMaintenanceMarginRate > 1
+    ) {
       throw new Error('Maintenance margin rate must be between 0 and 1');
     }
 
@@ -488,7 +495,10 @@ class RegionConfigService extends EventEmitter {
 
     // Validate settlement rules
     const { settlementRules } = config;
-    if (settlementRules.standardSettlementPeriod < 0 || settlementRules.standardSettlementPeriod > 10) {
+    if (
+      settlementRules.standardSettlementPeriod < 0 ||
+      settlementRules.standardSettlementPeriod > 10
+    ) {
       throw new Error('Settlement period must be between 0 and 10 days');
     }
 
@@ -502,8 +512,7 @@ class RegionConfigService extends EventEmitter {
   }
 
   async getActiveRegions() {
-    return Array.from(this.regionConfigs.values())
-      .filter(config => config.isActive);
+    return Array.from(this.regionConfigs.values()).filter(config => config.isActive);
   }
 
   async getAllRegions() {
@@ -519,7 +528,7 @@ class RegionConfigService extends EventEmitter {
     await this.updateRegionConfig(region, {
       isActive: false,
       deactivationReason: reason,
-      deactivatedAt: new Date()
+      deactivatedAt: new Date(),
     });
 
     this.emit('regionDeactivated', { region, reason });
@@ -537,7 +546,7 @@ class RegionConfigService extends EventEmitter {
       isActive: true,
       deactivationReason: null,
       deactivatedAt: null,
-      reactivatedAt: new Date()
+      reactivatedAt: new Date(),
     });
 
     this.emit('regionActivated', { region });
@@ -578,10 +587,12 @@ class RegionConfigService extends EventEmitter {
     }
 
     const tradingHours = config.tradingHours;
-    const dayOfWeek = currentTime.toLocaleDateString('en-US', { 
-      weekday: 'long',
-      timeZone: config.timezone 
-    }).toLowerCase();
+    const dayOfWeek = currentTime
+      .toLocaleDateString('en-US', {
+        weekday: 'long',
+        timeZone: config.timezone,
+      })
+      .toLowerCase();
 
     if (!tradingHours.tradingDays.includes(dayOfWeek)) {
       return false;
@@ -598,10 +609,12 @@ class RegionConfigService extends EventEmitter {
       hour12: false,
       timeZone: config.timezone,
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
 
-    return currentTimeString >= tradingHours.openTime && currentTimeString <= tradingHours.closeTime;
+    return (
+      currentTimeString >= tradingHours.openTime && currentTimeString <= tradingHours.closeTime
+    );
   }
 
   // Configuration history and rollback
@@ -628,7 +641,7 @@ class RegionConfigService extends EventEmitter {
     this.emit('regionConfigRolledBack', {
       region,
       backupId,
-      rolledBackAt: new Date()
+      rolledBackAt: new Date(),
     });
 
     return rollbackConfig;

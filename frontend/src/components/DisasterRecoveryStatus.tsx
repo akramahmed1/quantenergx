@@ -19,7 +19,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper
+  Paper,
 } from '@mui/material';
 import {
   CheckCircle,
@@ -28,7 +28,7 @@ import {
   CloudQueue,
   Storage,
   Speed,
-  Security
+  Security,
 } from '@mui/icons-material';
 
 interface RegionStatus {
@@ -55,7 +55,7 @@ interface DisasterRecoveryStatusProps {
 export const DisasterRecoveryStatus: React.FC<DisasterRecoveryStatusProps> = ({
   onInitiateFailover,
   onRunHealthCheck,
-  onViewLogs
+  onViewLogs,
 }) => {
   const [regions, setRegions] = useState<RegionStatus[]>([
     {
@@ -65,7 +65,7 @@ export const DisasterRecoveryStatus: React.FC<DisasterRecoveryStatusProps> = ({
       latency: 45,
       uptime: 99.95,
       lastCheck: new Date(),
-      services: { frontend: true, backend: true, database: true, cache: true }
+      services: { frontend: true, backend: true, database: true, cache: true },
     },
     {
       region: 'eu-west-1',
@@ -74,7 +74,7 @@ export const DisasterRecoveryStatus: React.FC<DisasterRecoveryStatusProps> = ({
       latency: 120,
       uptime: 99.91,
       lastCheck: new Date(),
-      services: { frontend: true, backend: true, database: true, cache: true }
+      services: { frontend: true, backend: true, database: true, cache: true },
     },
     {
       region: 'ap-southeast-1',
@@ -83,8 +83,8 @@ export const DisasterRecoveryStatus: React.FC<DisasterRecoveryStatusProps> = ({
       latency: 180,
       uptime: 99.89,
       lastCheck: new Date(),
-      services: { frontend: true, backend: true, database: true, cache: true }
-    }
+      services: { frontend: true, backend: true, database: true, cache: true },
+    },
   ]);
 
   const [isFailoverDialogOpen, setIsFailoverDialogOpen] = useState(false);
@@ -95,13 +95,15 @@ export const DisasterRecoveryStatus: React.FC<DisasterRecoveryStatusProps> = ({
   useEffect(() => {
     // Simulate real-time status updates
     const interval = setInterval(() => {
-      setRegions(prev => prev.map(region => ({
-        ...region,
-        latency: region.latency + (Math.random() - 0.5) * 20,
-        lastCheck: new Date(),
-        // Occasionally simulate issues
-        status: Math.random() > 0.95 ? 'warning' : region.status
-      })));
+      setRegions(prev =>
+        prev.map(region => ({
+          ...region,
+          latency: region.latency + (Math.random() - 0.5) * 20,
+          lastCheck: new Date(),
+          // Occasionally simulate issues
+          status: Math.random() > 0.95 ? 'warning' : region.status,
+        }))
+      );
     }, 30000); // Update every 30 seconds
 
     return () => clearInterval(interval);
@@ -143,36 +145,47 @@ export const DisasterRecoveryStatus: React.FC<DisasterRecoveryStatusProps> = ({
       onInitiateFailover(selectedRegion);
     }
     setIsFailoverDialogOpen(false);
-    
+
     // Simulate failover process
-    setRegions(prev => prev.map(region => 
-      region.region === selectedRegion 
-        ? { ...region, status: 'healthy' as const, name: region.name.replace('Secondary', 'Primary').replace('Tertiary', 'Primary') }
-        : { ...region, status: 'offline' as const }
-    ));
+    setRegions(prev =>
+      prev.map(region =>
+        region.region === selectedRegion
+          ? {
+              ...region,
+              status: 'healthy' as const,
+              name: region.name.replace('Secondary', 'Primary').replace('Tertiary', 'Primary'),
+            }
+          : { ...region, status: 'offline' as const }
+      )
+    );
   };
 
   const handleHealthCheck = async () => {
     if (onRunHealthCheck) {
       onRunHealthCheck();
     }
-    
+
     setIsRunningHealthCheck(true);
-    
+
     // Simulate health check
     await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    setRegions(prev => prev.map(region => ({
-      ...region,
-      lastCheck: new Date(),
-      status: Math.random() > 0.8 ? 'warning' : 'healthy' as const
-    })));
-    
+
+    setRegions(prev =>
+      prev.map(region => ({
+        ...region,
+        lastCheck: new Date(),
+        status: Math.random() > 0.8 ? 'warning' : ('healthy' as const),
+      }))
+    );
+
     setIsRunningHealthCheck(false);
   };
 
-  const overallHealth = regions.every(r => r.status === 'healthy') ? 'healthy' : 
-                      regions.some(r => r.status === 'critical') ? 'critical' : 'warning';
+  const overallHealth = regions.every(r => r.status === 'healthy')
+    ? 'healthy'
+    : regions.some(r => r.status === 'critical')
+      ? 'critical'
+      : 'warning';
 
   const activeRegions = regions.filter(r => r.status !== 'offline').length;
   const avgLatency = regions.reduce((sum, r) => sum + r.latency, 0) / regions.length;
@@ -186,14 +199,19 @@ export const DisasterRecoveryStatus: React.FC<DisasterRecoveryStatusProps> = ({
       </Typography>
 
       {/* Overall Status Alert */}
-      <Alert 
-        severity={overallHealth === 'healthy' ? 'success' : overallHealth === 'warning' ? 'warning' : 'error'}
+      <Alert
+        severity={
+          overallHealth === 'healthy'
+            ? 'success'
+            : overallHealth === 'warning'
+              ? 'warning'
+              : 'error'
+        }
         sx={{ mb: 3 }}
       >
-        System Status: {overallHealth.toUpperCase()} | 
-        Active Regions: {activeRegions}/{regions.length} | 
-        Avg Latency: {avgLatency.toFixed(0)}ms | 
-        Avg Uptime: {avgUptime.toFixed(2)}%
+        System Status: {overallHealth.toUpperCase()} | Active Regions: {activeRegions}/
+        {regions.length} | Avg Latency: {avgLatency.toFixed(0)}ms | Avg Uptime:{' '}
+        {avgUptime.toFixed(2)}%
       </Alert>
 
       {/* Key Metrics */}
@@ -213,15 +231,13 @@ export const DisasterRecoveryStatus: React.FC<DisasterRecoveryStatusProps> = ({
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" gap={1}>
                 <Speed color="info" />
-                <Typography variant="h6">
-                  {avgLatency.toFixed(0)}ms
-                </Typography>
+                <Typography variant="h6">{avgLatency.toFixed(0)}ms</Typography>
               </Box>
               <Typography variant="body2" color="textSecondary">
                 Average Latency
@@ -229,15 +245,13 @@ export const DisasterRecoveryStatus: React.FC<DisasterRecoveryStatusProps> = ({
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" gap={1}>
                 <CloudQueue color="primary" />
-                <Typography variant="h6">
-                  {avgUptime.toFixed(2)}%
-                </Typography>
+                <Typography variant="h6">{avgUptime.toFixed(2)}%</Typography>
               </Box>
               <Typography variant="body2" color="textSecondary">
                 Average Uptime
@@ -245,7 +259,7 @@ export const DisasterRecoveryStatus: React.FC<DisasterRecoveryStatusProps> = ({
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
@@ -269,7 +283,7 @@ export const DisasterRecoveryStatus: React.FC<DisasterRecoveryStatusProps> = ({
           <Typography variant="h6" gutterBottom>
             Region Status
           </Typography>
-          
+
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
@@ -284,7 +298,7 @@ export const DisasterRecoveryStatus: React.FC<DisasterRecoveryStatusProps> = ({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {regions.map((region) => (
+                {regions.map(region => (
                   <TableRow key={region.region}>
                     <TableCell>
                       <Typography variant="subtitle2">{region.name}</Typography>
@@ -304,10 +318,26 @@ export const DisasterRecoveryStatus: React.FC<DisasterRecoveryStatusProps> = ({
                     <TableCell>{region.uptime.toFixed(2)}%</TableCell>
                     <TableCell>
                       <Box display="flex" gap={0.5}>
-                        <Chip label="FE" color={region.services.frontend ? 'success' : 'error'} size="small" />
-                        <Chip label="BE" color={region.services.backend ? 'success' : 'error'} size="small" />
-                        <Chip label="DB" color={region.services.database ? 'success' : 'error'} size="small" />
-                        <Chip label="Cache" color={region.services.cache ? 'success' : 'error'} size="small" />
+                        <Chip
+                          label="FE"
+                          color={region.services.frontend ? 'success' : 'error'}
+                          size="small"
+                        />
+                        <Chip
+                          label="BE"
+                          color={region.services.backend ? 'success' : 'error'}
+                          size="small"
+                        />
+                        <Chip
+                          label="DB"
+                          color={region.services.database ? 'success' : 'error'}
+                          size="small"
+                        />
+                        <Chip
+                          label="Cache"
+                          color={region.services.cache ? 'success' : 'error'}
+                          size="small"
+                        />
                       </Box>
                     </TableCell>
                     <TableCell>
@@ -341,7 +371,7 @@ export const DisasterRecoveryStatus: React.FC<DisasterRecoveryStatusProps> = ({
           <Typography variant="h6" gutterBottom>
             Disaster Recovery Controls
           </Typography>
-          
+
           <Box display="flex" gap={2} flexWrap="wrap">
             <Button
               variant="contained"
@@ -352,16 +382,11 @@ export const DisasterRecoveryStatus: React.FC<DisasterRecoveryStatusProps> = ({
             >
               {isRunningHealthCheck ? 'Running Health Check...' : 'Run Health Check'}
             </Button>
-            
-            <Button
-              variant="outlined"
-              color="info"
-              onClick={onViewLogs}
-              startIcon={<Storage />}
-            >
+
+            <Button variant="outlined" color="info" onClick={onViewLogs} startIcon={<Storage />}>
               View Logs
             </Button>
-            
+
             <Button
               variant="outlined"
               color="secondary"
@@ -381,21 +406,18 @@ export const DisasterRecoveryStatus: React.FC<DisasterRecoveryStatusProps> = ({
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>
-          Confirm Disaster Recovery Failover
-        </DialogTitle>
+        <DialogTitle>Confirm Disaster Recovery Failover</DialogTitle>
         <DialogContent>
           <Alert severity="warning" sx={{ mb: 2 }}>
-            This action will initiate a failover to the selected region. This process is irreversible and will cause temporary service disruption.
+            This action will initiate a failover to the selected region. This process is
+            irreversible and will cause temporary service disruption.
           </Alert>
           <Typography>
             Are you sure you want to failover to region: <strong>{selectedRegion}</strong>?
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsFailoverDialogOpen(false)}>
-            Cancel
-          </Button>
+          <Button onClick={() => setIsFailoverDialogOpen(false)}>Cancel</Button>
           <Button onClick={handleConfirmFailover} color="warning" variant="contained">
             Confirm Failover
           </Button>

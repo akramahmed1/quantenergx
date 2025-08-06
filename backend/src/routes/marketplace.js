@@ -29,12 +29,12 @@ router.get('/plugins', async (req, res) => {
     const { category, featured, search, limit = 20, offset = 0 } = req.query;
 
     let listings;
-    
+
     if (search) {
       listings = marketplace.searchMarketplace(search);
     } else {
       listings = marketplace.getMarketplaceListings(
-        category, 
+        category,
         featured === 'true' ? true : featured === 'false' ? false : undefined
       );
     }
@@ -51,17 +51,16 @@ router.get('/plugins', async (req, res) => {
         total: listings.length,
         limit: parseInt(limit),
         offset: parseInt(offset),
-        has_more: endIndex < listings.length
+        has_more: endIndex < listings.length,
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Get marketplace plugins error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve marketplace plugins',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -81,7 +80,7 @@ router.get('/plugins/:plugin_id', async (req, res) => {
     if (!marketplaceEntry || !plugin) {
       return res.status(404).json({
         success: false,
-        error: 'Plugin not found in marketplace'
+        error: 'Plugin not found in marketplace',
       });
     }
 
@@ -99,7 +98,7 @@ router.get('/plugins/:plugin_id', async (req, res) => {
         dependencies: plugin.dependencies,
         rating: plugin.rating,
         downloads: plugin.downloads,
-        verified: plugin.verified
+        verified: plugin.verified,
       },
       marketplace: {
         publisher: marketplaceEntry.publisher,
@@ -112,24 +111,25 @@ router.get('/plugins/:plugin_id', async (req, res) => {
         pricing_model: marketplaceEntry.pricing_model,
         pricing_details: marketplaceEntry.pricing_details,
         review_count: marketplaceEntry.reviews.length,
-        average_rating: marketplaceEntry.reviews.length > 0 
-          ? marketplaceEntry.reviews.reduce((sum, r) => sum + r.rating, 0) / marketplaceEntry.reviews.length 
-          : 0
-      }
+        average_rating:
+          marketplaceEntry.reviews.length > 0
+            ? marketplaceEntry.reviews.reduce((sum, r) => sum + r.rating, 0) /
+              marketplaceEntry.reviews.length
+            : 0,
+      },
     };
 
     res.json({
       success: true,
       data: detailedInfo,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Get plugin details error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve plugin details',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -147,9 +147,11 @@ router.post('/plugins/:plugin_id/install', async (req, res) => {
     // Simulate user permission check (would come from auth middleware)
     const defaultPermissions = [
       'plugins:install',
-      'risk:read', 'risk:write',
-      'analytics:read', 'analytics:write',
-      'compliance:read'
+      'risk:read',
+      'risk:write',
+      'analytics:read',
+      'analytics:write',
+      'compliance:read',
     ];
 
     const userPerms = user_permissions.length > 0 ? user_permissions : defaultPermissions;
@@ -162,24 +164,23 @@ router.post('/plugins/:plugin_id/install', async (req, res) => {
         data: {
           plugin_id: plugin_id,
           status: 'installed',
-          install_date: new Date().toISOString()
+          install_date: new Date().toISOString(),
         },
         message: 'Plugin installed successfully',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     } else {
       res.status(400).json({
         success: false,
-        error: 'Failed to install plugin'
+        error: 'Failed to install plugin',
       });
     }
-
   } catch (error) {
     console.error('Install plugin error:', error);
     res.status(400).json({
       success: false,
       error: 'Failed to install plugin',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -194,8 +195,7 @@ router.get('/plugins/:plugin_id/reviews', async (req, res) => {
     const { plugin_id } = req.params;
     const { limit = 10, offset = 0 } = req.query;
 
-    const reviews = marketplace.getPluginReviews ? 
-      marketplace.getPluginReviews(plugin_id) : [];
+    const reviews = marketplace.getPluginReviews ? marketplace.getPluginReviews(plugin_id) : [];
 
     // Apply pagination
     const startIndex = parseInt(offset);
@@ -209,17 +209,16 @@ router.get('/plugins/:plugin_id/reviews', async (req, res) => {
         total: reviews.length,
         limit: parseInt(limit),
         offset: parseInt(offset),
-        has_more: endIndex < reviews.length
+        has_more: endIndex < reviews.length,
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Get plugin reviews error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve plugin reviews',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -237,14 +236,14 @@ router.post('/plugins/:plugin_id/reviews', async (req, res) => {
     if (!rating || rating < 1 || rating > 5) {
       return res.status(400).json({
         success: false,
-        error: 'Rating must be between 1 and 5'
+        error: 'Rating must be between 1 and 5',
       });
     }
 
     if (!comment || comment.trim().length < 10) {
       return res.status(400).json({
         success: false,
-        error: 'Comment must be at least 10 characters long'
+        error: 'Comment must be at least 10 characters long',
       });
     }
 
@@ -252,35 +251,35 @@ router.post('/plugins/:plugin_id/reviews', async (req, res) => {
       user_id: req.user?.id || 'anonymous', // Would come from auth middleware
       rating: parseInt(rating),
       comment: comment.trim(),
-      verified_purchase: true // Would check actual purchase history
+      verified_purchase: true, // Would check actual purchase history
     };
 
-    const success = marketplace.addPluginReview ? 
-      marketplace.addPluginReview(plugin_id, review) : false;
+    const success = marketplace.addPluginReview
+      ? marketplace.addPluginReview(plugin_id, review)
+      : false;
 
     if (success) {
       res.json({
         success: true,
         data: {
           ...review,
-          date: new Date().toISOString()
+          date: new Date().toISOString(),
         },
         message: 'Review added successfully',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     } else {
       res.status(400).json({
         success: false,
-        error: 'Failed to add review'
+        error: 'Failed to add review',
       });
     }
-
   } catch (error) {
     console.error('Add plugin review error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to add review',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -298,57 +297,56 @@ router.get('/categories', async (req, res) => {
         name: 'Risk Management',
         description: 'Advanced risk modeling and analysis tools',
         plugin_count: 5,
-        featured_plugins: ['weather-risk-analytics']
+        featured_plugins: ['weather-risk-analytics'],
       },
       {
         id: 'esg_sustainability',
         name: 'ESG & Sustainability',
         description: 'Environmental, Social, and Governance analytics',
         plugin_count: 3,
-        featured_plugins: ['esg-scoring-engine']
+        featured_plugins: ['esg-scoring-engine'],
       },
       {
         id: 'trading_algorithms',
         name: 'Trading Algorithms',
         description: 'Automated trading strategies and execution algorithms',
         plugin_count: 8,
-        featured_plugins: []
+        featured_plugins: [],
       },
       {
         id: 'compliance_reporting',
         name: 'Compliance & Reporting',
         description: 'Regulatory compliance and automated reporting tools',
         plugin_count: 4,
-        featured_plugins: []
+        featured_plugins: [],
       },
       {
         id: 'market_data',
         name: 'Market Data & Analytics',
         description: 'Enhanced market data feeds and analytical tools',
         plugin_count: 6,
-        featured_plugins: []
+        featured_plugins: [],
       },
       {
         id: 'integration_apis',
         name: 'Integration & APIs',
         description: 'Third-party system integrations and API connectors',
         plugin_count: 7,
-        featured_plugins: []
-      }
+        featured_plugins: [],
+      },
     ];
 
     res.json({
       success: true,
       data: categories,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Get categories error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve categories',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -360,8 +358,9 @@ router.get('/categories', async (req, res) => {
  */
 router.get('/stats', async (req, res) => {
   try {
-    const stats = marketplace.getPluginStatistics ? 
-      marketplace.getPluginStatistics() : {
+    const stats = marketplace.getPluginStatistics
+      ? marketplace.getPluginStatistics()
+      : {
         total_plugins: 0,
         by_status: {},
         by_type: {},
@@ -369,8 +368,8 @@ router.get('/stats', async (req, res) => {
         marketplace_stats: {
           total_listings: 0,
           featured_count: 0,
-          average_rating: 0
-        }
+          average_rating: 0,
+        },
       };
 
     // Add additional marketplace metrics
@@ -380,32 +379,27 @@ router.get('/stats', async (req, res) => {
         new_plugins_this_month: 3,
         total_downloads: 15000,
         active_publishers: 25,
-        user_satisfaction: 4.2
+        user_satisfaction: 4.2,
       },
-      trending_categories: [
-        'ESG & Sustainability',
-        'Risk Management',
-        'Trading Algorithms'
-      ],
+      trending_categories: ['ESG & Sustainability', 'Risk Management', 'Trading Algorithms'],
       recent_activity: {
         latest_plugin: 'weather-risk-analytics',
         latest_review_date: new Date().toISOString(),
-        featured_this_week: 2
-      }
+        featured_this_week: 2,
+      },
     };
 
     res.json({
       success: true,
       data: marketplaceStats,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Get marketplace stats error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve marketplace statistics',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -419,8 +413,9 @@ router.get('/featured', async (req, res) => {
   try {
     const { limit = 6 } = req.query;
 
-    const featuredListings = marketplace.getMarketplaceListings ? 
-      marketplace.getMarketplaceListings(undefined, true) : [];
+    const featuredListings = marketplace.getMarketplaceListings
+      ? marketplace.getMarketplaceListings(undefined, true)
+      : [];
 
     const limitedListings = featuredListings.slice(0, parseInt(limit));
 
@@ -428,15 +423,14 @@ router.get('/featured', async (req, res) => {
       success: true,
       data: limitedListings,
       count: limitedListings.length,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Get featured plugins error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve featured plugins',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -448,30 +442,29 @@ router.get('/featured', async (req, res) => {
  */
 router.post('/search', async (req, res) => {
   try {
-    const { 
-      query, 
-      category, 
-      price_range, 
-      rating_min, 
+    const {
+      query,
+      category,
+      price_range,
+      rating_min,
       sort_by = 'relevance',
-      limit = 20, 
-      offset = 0 
+      limit = 20,
+      offset = 0,
     } = req.body;
 
     if (!query || query.trim().length < 2) {
       return res.status(400).json({
         success: false,
-        error: 'Search query must be at least 2 characters long'
+        error: 'Search query must be at least 2 characters long',
       });
     }
 
-    let results = marketplace.searchMarketplace ? 
-      marketplace.searchMarketplace(query.trim()) : [];
+    let results = marketplace.searchMarketplace ? marketplace.searchMarketplace(query.trim()) : [];
 
     // Apply filters
     if (category) {
-      results = results.filter(listing => 
-        listing.marketplace_category.toLowerCase() === category.toLowerCase()
+      results = results.filter(
+        listing => listing.marketplace_category.toLowerCase() === category.toLowerCase()
       );
     }
 
@@ -488,7 +481,7 @@ router.post('/search', async (req, res) => {
       results = results.filter(listing => {
         const plugin = marketplace.plugins?.get(listing.plugin_id);
         if (!plugin) return false;
-        
+
         const price = plugin.price || 0;
         return price >= (min || 0) && price <= (max || Infinity);
       });
@@ -539,25 +532,24 @@ router.post('/search', async (req, res) => {
         filters_applied: {
           category: category || null,
           price_range: price_range || null,
-          rating_min: rating_min || null
+          rating_min: rating_min || null,
         },
-        sort_by: sort_by
+        sort_by: sort_by,
       },
       pagination: {
         total: results.length,
         limit: parseInt(limit),
         offset: parseInt(offset),
-        has_more: endIndex < results.length
+        has_more: endIndex < results.length,
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
     console.error('Marketplace search error:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to search marketplace',
-      details: error.message
+      details: error.message,
     });
   }
 });

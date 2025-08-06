@@ -9,7 +9,7 @@ class LLMTradeRecommendationService {
     this.models = {
       gpt4: { name: 'GPT-4', provider: 'openai', contextLimit: 8192 },
       claude: { name: 'Claude-3', provider: 'anthropic', contextLimit: 100000 },
-      llama: { name: 'Llama-2', provider: 'meta', contextLimit: 4096 }
+      llama: { name: 'Llama-2', provider: 'meta', contextLimit: 4096 },
     };
     this.activeModel = 'gpt4';
     this.confidenceThreshold = 0.7;
@@ -22,7 +22,7 @@ class LLMTradeRecommendationService {
   async generateTradeRecommendations(portfolioData, marketContext) {
     try {
       const recommendation = await this.analyzeWithLLM(portfolioData, marketContext);
-      
+
       const result = {
         id: this.generateRecommendationId(),
         timestamp: new Date().toISOString(),
@@ -34,7 +34,7 @@ class LLMTradeRecommendationService {
         risk_assessment: recommendation.risk,
         market_conditions: marketContext,
         execution_timeline: recommendation.timeline,
-        expected_outcomes: recommendation.outcomes
+        expected_outcomes: recommendation.outcomes,
       };
 
       this.recommendations.set(result.id, result);
@@ -49,7 +49,7 @@ class LLMTradeRecommendationService {
    */
   async analyzeWithLLM(portfolioData, marketContext) {
     const prompt = this.buildAnalysisPrompt(portfolioData, marketContext);
-    
+
     // Simulate LLM analysis with structured reasoning
     const analysis = {
       trades: await this.generateTradeRecommendations_internal(portfolioData, marketContext),
@@ -57,7 +57,7 @@ class LLMTradeRecommendationService {
       confidence: this.calculateConfidence(portfolioData, marketContext),
       risk: await this.assessRisk(portfolioData, marketContext),
       timeline: this.generateExecutionTimeline(),
-      outcomes: await this.predictOutcomes(portfolioData, marketContext)
+      outcomes: await this.predictOutcomes(portfolioData, marketContext),
     };
 
     return analysis;
@@ -127,7 +127,7 @@ REQUIRED OUTPUT FORMAT:
         reasoning: 'Strong fundamentals with supply constraints and robust demand',
         confidence: 0.82,
         time_horizon: '3_months',
-        risk_reward_ratio: 1.6
+        risk_reward_ratio: 1.6,
       });
     }
 
@@ -144,7 +144,7 @@ REQUIRED OUTPUT FORMAT:
         reasoning: 'Oversupply conditions with mild weather forecasts reducing demand',
         confidence: 0.75,
         time_horizon: '2_months',
-        risk_reward_ratio: 2.4
+        risk_reward_ratio: 2.4,
       });
     }
 
@@ -161,7 +161,7 @@ REQUIRED OUTPUT FORMAT:
         reasoning: 'Policy support and corporate ESG commitments driving demand',
         confidence: 0.88,
         time_horizon: '6_months',
-        risk_reward_ratio: 2.1
+        risk_reward_ratio: 2.1,
       });
     }
 
@@ -171,14 +171,14 @@ REQUIRED OUTPUT FORMAT:
         action: 'BUY',
         commodity: 'volatility_hedge',
         instrument: 'VIX_CALL_OPTIONS',
-        quantity: Math.floor(portfolioData.total_value * 0.02 / 100), // 2% portfolio hedge
+        quantity: Math.floor((portfolioData.total_value * 0.02) / 100), // 2% portfolio hedge
         entry_price: 15,
         target_price: 25,
         stop_loss: 12,
         reasoning: 'Portfolio protection against market volatility spikes',
         confidence: 0.71,
         time_horizon: '1_month',
-        risk_reward_ratio: 1.25
+        risk_reward_ratio: 1.25,
       });
     }
 
@@ -191,24 +191,24 @@ REQUIRED OUTPUT FORMAT:
   async generateReasoning(portfolioData, marketContext) {
     return {
       market_analysis: `Current energy markets show ${marketContext.volatility} volatility with oil trading at $${marketContext.oil_price}/barrel. Supply-demand fundamentals indicate ${this.assessSupplyDemand(marketContext)} conditions.`,
-      
+
       portfolio_analysis: `Portfolio demonstrates ${this.assessPortfolioHealth(portfolioData)} performance with ${portfolioData.positions?.length || 0} positions and ${portfolioData.risk_profile} risk profile.`,
-      
+
       risk_factors: [
         'Geopolitical tensions affecting energy supply chains',
         'Central bank policy changes impacting commodity demand',
         'Weather patterns influencing seasonal energy consumption',
-        'Regulatory changes in environmental policies'
+        'Regulatory changes in environmental policies',
       ],
-      
+
       opportunities: [
         'Supply constraints in oil markets creating upside potential',
         'Renewable energy policy support driving long-term growth',
         'Portfolio diversification opportunities in emerging markets',
-        'Hedging strategies to protect against volatility'
+        'Hedging strategies to protect against volatility',
       ],
-      
-      strategic_outlook: `Recommend maintaining ${this.recommendedAllocation(portfolioData)}% allocation to energy with emphasis on ${this.getRecommendedSectors(marketContext).join(', ')}.`
+
+      strategic_outlook: `Recommend maintaining ${this.recommendedAllocation(portfolioData)}% allocation to energy with emphasis on ${this.getRecommendedSectors(marketContext).join(', ')}.`,
     };
   }
 
@@ -244,28 +244,28 @@ REQUIRED OUTPUT FORMAT:
       market_risk: this.assessMarketRisk(marketContext),
       liquidity_risk: this.assessLiquidityRisk(portfolioData),
       operational_risk: this.assessOperationalRisk(),
-      
+
       risk_mitigation: [
         'Diversify across multiple energy subsectors',
         'Implement stop-loss orders for position protection',
         'Monitor correlation changes during market stress',
-        'Maintain adequate cash reserves for opportunities'
+        'Maintain adequate cash reserves for opportunities',
       ],
-      
+
       stress_scenarios: [
         {
           scenario: 'Oil price crash (-30%)',
           portfolio_impact: '-15% to -25%',
           probability: '10%',
-          mitigation: 'Short oil futures hedge'
+          mitigation: 'Short oil futures hedge',
         },
         {
           scenario: 'Renewable policy reversal',
           portfolio_impact: '-8% to -12%',
           probability: '5%',
-          mitigation: 'Diversify beyond pure-play renewables'
-        }
-      ]
+          mitigation: 'Diversify beyond pure-play renewables',
+        },
+      ],
     };
   }
 
@@ -278,13 +278,13 @@ REQUIRED OUTPUT FORMAT:
       short_term: 'Execute high-confidence oil and gas trades within 1-2 weeks',
       medium_term: 'Build renewable energy positions over 1-3 months',
       long_term: 'Rebalance portfolio allocation based on market evolution',
-      
+
       execution_order: [
         { step: 1, action: 'Secure hedging positions', timeline: '1-2 days' },
         { step: 2, action: 'Execute oil sector trades', timeline: '3-5 days' },
         { step: 3, action: 'Build renewable positions', timeline: '2-4 weeks' },
-        { step: 4, action: 'Monitor and adjust', timeline: 'Ongoing' }
-      ]
+        { step: 4, action: 'Monitor and adjust', timeline: 'Ongoing' },
+      ],
     };
   }
 
@@ -296,28 +296,28 @@ REQUIRED OUTPUT FORMAT:
       expected_return: {
         conservative: '5-8% over 6 months',
         moderate: '8-12% over 6 months',
-        aggressive: '12-18% over 6 months'
+        aggressive: '12-18% over 6 months',
       },
-      
+
       risk_metrics: {
         expected_volatility: '15-20% annualized',
         max_drawdown: '8-12%',
-        sharpe_ratio: '1.2-1.6'
+        sharpe_ratio: '1.2-1.6',
       },
-      
+
       key_catalysts: [
         'OPEC+ production decisions',
         'US energy policy changes',
         'Global economic growth trajectory',
-        'Climate policy implementation'
+        'Climate policy implementation',
       ],
-      
+
       success_indicators: [
         'Oil positions profitable within 30 days',
         'Portfolio volatility remains below 20%',
         'Renewable positions gain 10%+ over 6 months',
-        'Overall portfolio outperforms benchmark by 3%+'
-      ]
+        'Overall portfolio outperforms benchmark by 3%+',
+      ],
     };
   }
 
@@ -333,11 +333,11 @@ REQUIRED OUTPUT FORMAT:
   }
 
   shouldRecommendOil(marketContext) {
-    return (marketContext.oil_price || 75) < 80 && (marketContext.volatility !== 'High');
+    return (marketContext.oil_price || 75) < 80 && marketContext.volatility !== 'High';
   }
 
   shouldRecommendGas(marketContext) {
-    return (marketContext.gas_price || 3.5) > 3.2 && (marketContext.volatility !== 'High');
+    return (marketContext.gas_price || 3.5) > 3.2 && marketContext.volatility !== 'High';
   }
 
   shouldRecommendRenewables(marketContext) {
@@ -354,10 +354,10 @@ REQUIRED OUTPUT FORMAT:
       crude_oil: 1.0,
       natural_gas: 0.8,
       renewables: 1.2,
-      volatility_hedge: 0.5
+      volatility_hedge: 0.5,
     };
-    
-    return Math.floor(baseAllocation * (commodityMultipliers[commodity] || 1.0) / 1000);
+
+    return Math.floor((baseAllocation * (commodityMultipliers[commodity] || 1.0)) / 1000);
   }
 
   assessSupplyDemand(marketContext) {
@@ -375,9 +375,9 @@ REQUIRED OUTPUT FORMAT:
 
   recommendedAllocation(portfolioData) {
     const riskProfiles = {
-      'Conservative': 15,
-      'Moderate': 25,
-      'Aggressive': 35
+      Conservative: 15,
+      Moderate: 25,
+      Aggressive: 35,
     };
     return riskProfiles[portfolioData.risk_profile] || 25;
   }
@@ -395,13 +395,13 @@ REQUIRED OUTPUT FORMAT:
 
   calculateOverallRisk(portfolioData, marketContext) {
     let risk = 'MEDIUM'; // Default
-    
+
     if (marketContext.volatility === 'High' || (portfolioData.max_drawdown || 0) < -15) {
       risk = 'HIGH';
     } else if (marketContext.volatility === 'Low' && (portfolioData.sharpe_ratio || 0) > 1.5) {
       risk = 'LOW';
     }
-    
+
     return risk;
   }
 
@@ -452,7 +452,10 @@ REQUIRED OUTPUT FORMAT:
     const recommendation = this.recommendations.get(recommendationId);
     if (recommendation) {
       recommendation.actual_outcome = actualOutcome;
-      recommendation.performance_score = this.calculatePerformanceScore(recommendation, actualOutcome);
+      recommendation.performance_score = this.calculatePerformanceScore(
+        recommendation,
+        actualOutcome
+      );
       recommendation.updated_at = new Date().toISOString();
     }
     return recommendation;
@@ -462,10 +465,10 @@ REQUIRED OUTPUT FORMAT:
     // Simple performance scoring based on prediction accuracy
     const expectedReturn = recommendation.expected_outcomes?.expected_return?.moderate || '8%';
     const actualReturn = actualOutcome.return_percentage || 0;
-    
+
     const expectedNumeric = parseFloat(expectedReturn) || 8;
     const accuracy = Math.max(0, 1 - Math.abs(expectedNumeric - actualReturn) / expectedNumeric);
-    
+
     return Math.round(accuracy * 100); // Score out of 100
   }
 }

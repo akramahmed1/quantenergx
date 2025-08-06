@@ -12,7 +12,7 @@ class ShariaComplianceService {
       'conventional_banking',
       'interest_based_finance',
       'pork_products',
-      'adult_entertainment'
+      'adult_entertainment',
     ];
 
     this.shariaCompliantEnergySectors = [
@@ -22,7 +22,7 @@ class ShariaComplianceService {
       'geothermal',
       'biomass',
       'natural_gas',
-      'crude_oil_halal'
+      'crude_oil_halal',
     ];
   }
 
@@ -38,7 +38,7 @@ class ShariaComplianceService {
         interest_check: this.checkInterestCompliance(instrument),
         speculation_check: this.checkSpeculationCompliance(instrument),
         asset_backing: this.checkAssetBacking(instrument),
-        contract_structure: this.checkContractStructure(instrument)
+        contract_structure: this.checkContractStructure(instrument),
       };
 
       const isCompliant = Object.values(complianceChecks).every(check => check.compliant);
@@ -50,13 +50,13 @@ class ShariaComplianceService {
         compliance_score: this.calculateComplianceScore(complianceChecks),
         checks: complianceChecks,
         certification: isCompliant ? this.generateShariaCertificate(instrument) : null,
-        recommendations: this.generateRecommendations(complianceChecks)
+        recommendations: this.generateRecommendations(complianceChecks),
       };
     } catch (error) {
       return {
         success: false,
         error: error.message,
-        is_sharia_compliant: false
+        is_sharia_compliant: false,
       };
     }
   }
@@ -66,9 +66,7 @@ class ShariaComplianceService {
    */
   checkSectorCompliance(instrument) {
     const sector = instrument.sector?.toLowerCase() || '';
-    const isProhibited = this.prohibitedSectors.some(prohibited => 
-      sector.includes(prohibited)
-    );
+    const isProhibited = this.prohibitedSectors.some(prohibited => sector.includes(prohibited));
 
     return {
       compliant: !isProhibited,
@@ -78,10 +76,10 @@ class ShariaComplianceService {
         prohibited_sectors_matched: this.prohibitedSectors.filter(prohibited =>
           sector.includes(prohibited)
         ),
-        message: isProhibited ? 
-          'Instrument involves prohibited business activities' : 
-          'Sector is permissible under Sharia law'
-      }
+        message: isProhibited
+          ? 'Instrument involves prohibited business activities'
+          : 'Sector is permissible under Sharia law',
+      },
     };
   }
 
@@ -89,8 +87,8 @@ class ShariaComplianceService {
    * Check for interest-based transactions (Riba)
    */
   checkInterestCompliance(instrument) {
-    const hasInterest = instrument.interest_rate > 0 || 
-                       instrument.financing_type === 'interest_based';
+    const hasInterest =
+      instrument.interest_rate > 0 || instrument.financing_type === 'interest_based';
 
     return {
       compliant: !hasInterest,
@@ -98,10 +96,10 @@ class ShariaComplianceService {
       details: {
         interest_rate: instrument.interest_rate || 0,
         financing_type: instrument.financing_type,
-        message: hasInterest ? 
-          'Transaction involves Riba (interest) which is prohibited' : 
-          'No interest-based elements detected'
-      }
+        message: hasInterest
+          ? 'Transaction involves Riba (interest) which is prohibited'
+          : 'No interest-based elements detected',
+      },
     };
   }
 
@@ -118,10 +116,10 @@ class ShariaComplianceService {
       details: {
         speculation_risk: speculationScore,
         risk_factors: this.identifySpeculationRisks(instrument),
-        message: isCompliant ? 
-          'Acceptable level of uncertainty' : 
-          'Excessive speculation (Gharar) detected'
-      }
+        message: isCompliant
+          ? 'Acceptable level of uncertainty'
+          : 'Excessive speculation (Gharar) detected',
+      },
     };
   }
 
@@ -139,10 +137,11 @@ class ShariaComplianceService {
         asset_backed: hasPhysicalAsset,
         backing_ratio: assetRatio,
         physical_assets: instrument.underlying_assets,
-        message: hasPhysicalAsset && assetRatio >= 0.51 ? 
-          'Sufficient asset backing' : 
-          'Insufficient tangible asset backing'
-      }
+        message:
+          hasPhysicalAsset && assetRatio >= 0.51
+            ? 'Sufficient asset backing'
+            : 'Insufficient tangible asset backing',
+      },
     };
   }
 
@@ -160,10 +159,10 @@ class ShariaComplianceService {
       details: {
         contract_structure: structure,
         allowed_structures: allowedStructures,
-        message: isAllowed ? 
-          'Contract structure is Sharia compliant' : 
-          'Contract structure not recognized as Sharia compliant'
-      }
+        message: isAllowed
+          ? 'Contract structure is Sharia compliant'
+          : 'Contract structure not recognized as Sharia compliant',
+      },
     };
   }
 
@@ -183,13 +182,13 @@ class ShariaComplianceService {
 
     // Derivative instruments add risk
     if (instrument.type === 'derivative') riskScore += 20;
-    
+
     // High volatility adds risk
     if (instrument.volatility > 50) riskScore += 15;
-    
+
     // Short selling adds risk
     if (instrument.allows_short_selling) riskScore += 25;
-    
+
     // Leverage adds risk
     if (instrument.max_leverage > 2) riskScore += 20;
 
@@ -201,7 +200,7 @@ class ShariaComplianceService {
    */
   identifySpeculationRisks(instrument) {
     const risks = [];
-    
+
     if (instrument.type === 'derivative') {
       risks.push('Complex derivative structure');
     }
@@ -229,7 +228,7 @@ class ShariaComplianceService {
       certifying_authority: 'QuantEnergx Sharia Board',
       certificate_type: 'Energy Trading Instrument Compliance',
       shariah_standards: ['AAOIFI', 'Islamic Fiqh Academy'],
-      notes: 'Certificate valid for spot and forward energy trading'
+      notes: 'Certificate valid for spot and forward energy trading',
     };
   }
 
@@ -249,7 +248,9 @@ class ShariaComplianceService {
           recommendations.push('Structure transaction without interest-based elements');
           break;
         case 'speculation_check':
-          recommendations.push('Reduce speculation risk through physical delivery or asset backing');
+          recommendations.push(
+            'Reduce speculation risk through physical delivery or asset backing'
+          );
           break;
         case 'asset_backing':
           recommendations.push('Increase tangible asset backing ratio to minimum 51%');
@@ -279,7 +280,7 @@ class ShariaComplianceService {
           contract_structure: 'salam',
           asset_backed: true,
           minimum_quantity: 1000,
-          unit: 'barrels'
+          unit: 'barrels',
         },
         {
           id: 'solar_energy_certificates',
@@ -289,7 +290,7 @@ class ShariaComplianceService {
           contract_structure: 'ijara',
           asset_backed: true,
           minimum_quantity: 1,
-          unit: 'MWh'
+          unit: 'MWh',
         },
         {
           id: 'wind_energy_forward',
@@ -300,9 +301,9 @@ class ShariaComplianceService {
           asset_backed: true,
           delivery_period: '30_days',
           minimum_quantity: 100,
-          unit: 'MWh'
-        }
-      ]
+          unit: 'MWh',
+        },
+      ],
     };
   }
 
@@ -318,13 +319,13 @@ class ShariaComplianceService {
     if (dayOfWeek === 5 && hour >= 12 && hour < 14) {
       return {
         valid: false,
-        reason: 'Friday prayer time (Jummah) - trading suspended'
+        reason: 'Friday prayer time (Jummah) - trading suspended',
       };
     }
 
     return {
       valid: true,
-      reason: 'Normal trading hours'
+      reason: 'Normal trading hours',
     };
   }
 }

@@ -13,7 +13,7 @@ import {
   Switch,
   FormControlLabel,
   Alert,
-  Button
+  Button,
 } from '@mui/material';
 import { useTranslation } from '../../i18n/I18nProvider';
 import { getRegionalConfig, isMarketOpen, RegionalConfig } from '../../i18n/regionalConfig';
@@ -28,7 +28,7 @@ interface MobileSettingsProps {
 
 export const MobileSettings: React.FC<MobileSettingsProps> = ({
   onRegionChange,
-  onLanguageChange
+  onLanguageChange,
 }) => {
   const { t, language, setLanguage } = useTranslation();
   const [selectedRegion, setSelectedRegion] = useState('US');
@@ -41,7 +41,7 @@ export const MobileSettings: React.FC<MobileSettingsProps> = ({
     // Load saved settings
     const savedRegion = localStorage.getItem('quantenergx_region') || 'US';
     const savedRtl = localStorage.getItem('quantenergx_rtl') === 'true';
-    
+
     setSelectedRegion(savedRegion);
     setRtlMode(savedRtl);
     updateRegionalConfig(savedRegion);
@@ -49,10 +49,10 @@ export const MobileSettings: React.FC<MobileSettingsProps> = ({
     // Monitor online status
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
-    
+
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-    
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
@@ -66,7 +66,7 @@ export const MobileSettings: React.FC<MobileSettingsProps> = ({
     }, 60000);
 
     setMarketStatus(isMarketOpen(selectedRegion));
-    
+
     return () => clearInterval(interval);
   }, [selectedRegion]);
 
@@ -91,7 +91,7 @@ export const MobileSettings: React.FC<MobileSettingsProps> = ({
     setSelectedRegion(region);
     localStorage.setItem('quantenergx_region', region);
     updateRegionalConfig(region);
-    
+
     if (onRegionChange) {
       onRegionChange(region);
     }
@@ -99,7 +99,7 @@ export const MobileSettings: React.FC<MobileSettingsProps> = ({
 
   const handleLanguageChange = (lang: string) => {
     setLanguage(lang as any);
-    
+
     if (onLanguageChange) {
       onLanguageChange(lang);
     }
@@ -147,14 +147,14 @@ export const MobileSettings: React.FC<MobileSettingsProps> = ({
               <Typography variant="h6" gutterBottom>
                 {t('regional.tradingHours')} & {t('common.language')}
               </Typography>
-              
+
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
                     <InputLabel>Language</InputLabel>
                     <Select
                       value={language}
-                      onChange={(e) => handleLanguageChange(e.target.value)}
+                      onChange={e => handleLanguageChange(e.target.value)}
                       label="Language"
                     >
                       <MenuItem value="en">English</MenuItem>
@@ -165,13 +165,13 @@ export const MobileSettings: React.FC<MobileSettingsProps> = ({
                     </Select>
                   </FormControl>
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth>
                     <InputLabel>Region</InputLabel>
                     <Select
                       value={selectedRegion}
-                      onChange={(e) => handleRegionChange(e.target.value)}
+                      onChange={e => handleRegionChange(e.target.value)}
                       label="Region"
                     >
                       <MenuItem value="US">United States</MenuItem>
@@ -186,10 +186,7 @@ export const MobileSettings: React.FC<MobileSettingsProps> = ({
 
               <FormControlLabel
                 control={
-                  <Switch
-                    checked={rtlMode}
-                    onChange={(e) => handleRtlToggle(e.target.checked)}
-                  />
+                  <Switch checked={rtlMode} onChange={e => handleRtlToggle(e.target.checked)} />
                 }
                 label="Right-to-Left Mode (RTL)"
                 sx={{ mt: 2 }}
@@ -200,24 +197,21 @@ export const MobileSettings: React.FC<MobileSettingsProps> = ({
               <Typography variant="subtitle2" gutterBottom>
                 {t('regional.tradingHours')}
               </Typography>
-              
+
               <Box display="flex" alignItems="center" gap={2} mb={1}>
                 <Typography variant="body2">
-                  {regionalConfig.tradingHours.start} - {regionalConfig.tradingHours.end} ({regionalConfig.tradingHours.timezone})
+                  {regionalConfig.tradingHours.start} - {regionalConfig.tradingHours.end} (
+                  {regionalConfig.tradingHours.timezone})
                 </Typography>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  color={getMarketStatusColor()}
-                >
+                <Button variant="outlined" size="small" color={getMarketStatusColor()}>
                   {getMarketStatusText()}
                 </Button>
               </Box>
 
               <Typography variant="body2" color="textSecondary">
-                Currency: {regionalConfig.currency} | 
-                Tax Rate: {(regionalConfig.taxRate * 100).toFixed(1)}% | 
-                Customs: {(regionalConfig.customsDuty * 100).toFixed(1)}%
+                Currency: {regionalConfig.currency} | Tax Rate:{' '}
+                {(regionalConfig.taxRate * 100).toFixed(1)}% | Customs:{' '}
+                {(regionalConfig.customsDuty * 100).toFixed(1)}%
               </Typography>
             </CardContent>
           </Card>
@@ -246,10 +240,7 @@ export const MobileSettings: React.FC<MobileSettingsProps> = ({
 
         {/* Offline Trading */}
         <Grid item xs={12}>
-          <OfflineTrading
-            isOnline={isOnline}
-            onSyncOrders={handleSyncOrders}
-          />
+          <OfflineTrading isOnline={isOnline} onSyncOrders={handleSyncOrders} />
         </Grid>
 
         {/* Regional Information */}
@@ -259,7 +250,7 @@ export const MobileSettings: React.FC<MobileSettingsProps> = ({
               <Typography variant="h6" gutterBottom>
                 {t('regional.localRegulations')}
               </Typography>
-              
+
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <Typography variant="subtitle2">Market Information</Typography>
@@ -267,13 +258,14 @@ export const MobileSettings: React.FC<MobileSettingsProps> = ({
                     Max Order Size: ${regionalConfig.regulations.maxOrderSize.toLocaleString()}
                   </Typography>
                   <Typography variant="body2">
-                    Margin Requirement: {(regionalConfig.regulations.marginRequirement * 100).toFixed(1)}%
+                    Margin Requirement:{' '}
+                    {(regionalConfig.regulations.marginRequirement * 100).toFixed(1)}%
                   </Typography>
                   <Typography variant="body2">
                     Settlement Days: {regionalConfig.regulations.settlementDays}
                   </Typography>
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6}>
                   <Typography variant="subtitle2">{t('regional.holidays')}</Typography>
                   <Typography variant="body2">

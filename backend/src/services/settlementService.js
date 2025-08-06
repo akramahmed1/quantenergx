@@ -18,14 +18,14 @@ class SettlementService extends EventEmitter {
       defaultSettlementPeriod: 2, // T+2 days
       maxSettlementAmount: 1000000000, // $1B
       supportedCurrencies: ['USD', 'EUR', 'GBP', 'JPY', 'CAD'],
-      autoSettlementThreshold: 1000000 // $1M
+      autoSettlementThreshold: 1000000, // $1M
     };
 
     // Settlement processors
     this.processors = {
       cash: this.processCashSettlement.bind(this),
       physical: this.processPhysicalSettlement.bind(this),
-      net_cash: this.processNetCashSettlement.bind(this)
+      net_cash: this.processNetCashSettlement.bind(this),
     };
 
     // Start settlement monitoring
@@ -43,7 +43,7 @@ class SettlementService extends EventEmitter {
         settlementDate,
         region = 'US',
         deliveryInstructions = null,
-        autoSettle = false
+        autoSettle = false,
       } = params;
 
       // Validate parameters
@@ -59,9 +59,9 @@ class SettlementService extends EventEmitter {
       }
 
       const settlementId = uuidv4();
-      const finalSettlementDate = settlementDate ? 
-        new Date(settlementDate) : 
-        this.calculateSettlementDate(settlementRules.standardSettlementPeriod);
+      const finalSettlementDate = settlementDate
+        ? new Date(settlementDate)
+        : this.calculateSettlementDate(settlementRules.standardSettlementPeriod);
 
       const instruction = {
         id: settlementId,
@@ -76,7 +76,7 @@ class SettlementService extends EventEmitter {
         deliveryInstructions,
         autoSettle,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       // Add region-specific cash flow details
@@ -84,7 +84,7 @@ class SettlementService extends EventEmitter {
         instruction.cashflowDetails = {
           paymentMethod: 'wire_transfer',
           clearingHouse: regionConfig?.clearingHouse || 'default',
-          cutoffTime: settlementRules.cutoffTimes.settlement_cutoff || '17:00'
+          cutoffTime: settlementRules.cutoffTimes.settlement_cutoff || '17:00',
         };
       }
 
@@ -104,7 +104,7 @@ class SettlementService extends EventEmitter {
         userId,
         region,
         settlementType,
-        amount
+        amount,
       });
 
       return instruction;
@@ -124,7 +124,7 @@ class SettlementService extends EventEmitter {
       currentStep: 0,
       status: 'pending',
       region: instruction.region,
-      createdAt: new Date()
+      createdAt: new Date(),
     };
 
     this.settlementWorkflows.set(workflowId, workflow);
@@ -138,15 +138,15 @@ class SettlementService extends EventEmitter {
         name: 'validation',
         status: 'pending',
         description: 'Validate settlement instruction and check compliance',
-        processor: 'validation_engine'
+        processor: 'validation_engine',
       },
       {
         stepNumber: 2,
         name: 'authorization',
         status: 'pending',
         description: 'Authorize settlement with required approvals',
-        processor: 'authorization_engine'
-      }
+        processor: 'authorization_engine',
+      },
     ];
 
     // Add settlement-type specific steps
@@ -157,33 +157,31 @@ class SettlementService extends EventEmitter {
           name: 'delivery_scheduling',
           status: 'pending',
           description: 'Schedule physical delivery and logistics',
-          processor: 'logistics_engine'
+          processor: 'logistics_engine',
         },
         {
           stepNumber: 4,
           name: 'quality_inspection',
           status: 'pending',
           description: 'Quality inspection and certificate issuance',
-          processor: 'inspection_engine'
+          processor: 'inspection_engine',
         },
         {
           stepNumber: 5,
           name: 'delivery_confirmation',
           status: 'pending',
           description: 'Confirm physical delivery completion',
-          processor: 'delivery_engine'
+          processor: 'delivery_engine',
         }
       );
     } else {
-      baseSteps.push(
-        {
-          stepNumber: 3,
-          name: 'payment_processing',
-          status: 'pending',
-          description: 'Process cash settlement payment',
-          processor: 'payment_engine'
-        }
-      );
+      baseSteps.push({
+        stepNumber: 3,
+        name: 'payment_processing',
+        status: 'pending',
+        description: 'Process cash settlement payment',
+        processor: 'payment_engine',
+      });
     }
 
     // Add netting step if enabled
@@ -193,7 +191,7 @@ class SettlementService extends EventEmitter {
         name: 'netting',
         status: 'pending',
         description: 'Calculate net settlement amounts',
-        processor: 'netting_engine'
+        processor: 'netting_engine',
       });
     }
 
@@ -203,7 +201,7 @@ class SettlementService extends EventEmitter {
       name: 'settlement_completion',
       status: 'pending',
       description: 'Complete settlement and update records',
-      processor: 'settlement_engine'
+      processor: 'settlement_engine',
     });
 
     return baseSteps;
@@ -221,8 +219,9 @@ class SettlementService extends EventEmitter {
       }
 
       // Find associated workflow
-      const workflow = Array.from(this.settlementWorkflows.values())
-        .find(w => w.settlementId === settlementId);
+      const workflow = Array.from(this.settlementWorkflows.values()).find(
+        w => w.settlementId === settlementId
+      );
 
       if (!workflow) {
         throw new Error(`Workflow not found for settlement: ${settlementId}`);
@@ -244,7 +243,7 @@ class SettlementService extends EventEmitter {
 
   async executeWorkflow(workflow) {
     workflow.status = 'in_progress';
-    
+
     for (let i = 0; i < workflow.steps.length; i++) {
       const step = workflow.steps[i];
       workflow.currentStep = i;
@@ -264,9 +263,8 @@ class SettlementService extends EventEmitter {
           workflowId: workflow.id,
           settlementId: workflow.settlementId,
           stepNumber: step.stepNumber,
-          stepName: step.name
+          stepName: step.name,
         });
-
       } catch (error) {
         step.status = 'failed';
         step.errorMessage = error.message;
@@ -288,7 +286,7 @@ class SettlementService extends EventEmitter {
     this.emit('settlementCompleted', {
       settlementId: workflow.settlementId,
       workflowId: workflow.id,
-      region: workflow.region
+      region: workflow.region,
     });
   }
 
@@ -353,7 +351,8 @@ class SettlementService extends EventEmitter {
 
   async authorizeSettlement(instruction) {
     // Simulate authorization checks
-    if (instruction.amount > 10000000) { // $10M requires additional approval
+    if (instruction.amount > 10000000) {
+      // $10M requires additional approval
       // In production, this would trigger approval workflow
       await new Promise(resolve => setTimeout(resolve, 100));
     }
@@ -363,13 +362,13 @@ class SettlementService extends EventEmitter {
 
   async processNetting(instruction) {
     // Find all pending settlements for same user and commodity
-    const userSettlements = Array.from(this.settlementInstructions.values())
-      .filter(s => 
-        s.userId === instruction.userId && 
+    const userSettlements = Array.from(this.settlementInstructions.values()).filter(
+      s =>
+        s.userId === instruction.userId &&
         s.region === instruction.region &&
         s.status === 'processing' &&
         s.settlementType === 'net_cash'
-      );
+    );
 
     // Calculate net amount
     const netAmount = userSettlements.reduce((sum, settlement) => {
@@ -396,34 +395,34 @@ class SettlementService extends EventEmitter {
   async processCashSettlement(instruction) {
     // Simulate cash settlement processing
     await new Promise(resolve => setTimeout(resolve, 200));
-    
+
     instruction.paymentReference = `PAY-${uuidv4().substr(0, 8)}`;
     instruction.clearingHouse = instruction.cashflowDetails?.clearingHouse || 'default';
-    
+
     return {
       status: 'completed',
       paymentReference: instruction.paymentReference,
-      processedAt: new Date()
+      processedAt: new Date(),
     };
   }
 
   async processPhysicalSettlement(instruction) {
     // Simulate physical settlement processing
     await new Promise(resolve => setTimeout(resolve, 500));
-    
+
     instruction.deliveryReference = `DEL-${uuidv4().substr(0, 8)}`;
-    
+
     return {
       status: 'completed',
       deliveryReference: instruction.deliveryReference,
-      processedAt: new Date()
+      processedAt: new Date(),
     };
   }
 
   async processNetCashSettlement(instruction) {
     // Process net cash settlement
     await this.processNetting(instruction);
-    
+
     if (instruction.amount > 0) {
       return await this.processCashSettlement(instruction);
     } else {
@@ -431,7 +430,7 @@ class SettlementService extends EventEmitter {
       return {
         status: 'completed',
         netted: true,
-        processedAt: new Date()
+        processedAt: new Date(),
       };
     }
   }
@@ -439,12 +438,12 @@ class SettlementService extends EventEmitter {
   async scheduleDelivery(instruction) {
     // Simulate delivery scheduling
     await new Promise(resolve => setTimeout(resolve, 100));
-    
+
     instruction.deliverySchedule = {
       scheduledDate: instruction.settlementDate,
       location: instruction.deliveryInstructions?.location || 'default_terminal',
       carrier: 'default_logistics',
-      scheduledAt: new Date()
+      scheduledAt: new Date(),
     };
 
     return instruction.deliverySchedule;
@@ -453,13 +452,13 @@ class SettlementService extends EventEmitter {
   async performQualityInspection(instruction) {
     // Simulate quality inspection
     await new Promise(resolve => setTimeout(resolve, 150));
-    
+
     instruction.qualityReport = {
       inspectionId: `QC-${uuidv4().substr(0, 8)}`,
       passed: true,
       grade: 'A',
       inspectedAt: new Date(),
-      inspector: 'certified_inspector'
+      inspector: 'certified_inspector',
     };
 
     return instruction.qualityReport;
@@ -468,12 +467,12 @@ class SettlementService extends EventEmitter {
   async confirmDelivery(instruction) {
     // Simulate delivery confirmation
     await new Promise(resolve => setTimeout(resolve, 100));
-    
+
     instruction.deliveryConfirmation = {
       confirmationId: `CONF-${uuidv4().substr(0, 8)}`,
       deliveredAt: new Date(),
       receivedBy: instruction.deliveryInstructions?.recipient || 'default_recipient',
-      signature: 'digital_signature_hash'
+      signature: 'digital_signature_hash',
     };
 
     return instruction.deliveryConfirmation;
@@ -483,17 +482,17 @@ class SettlementService extends EventEmitter {
     // Final settlement completion
     instruction.settlementReference = `SETT-${uuidv4().substr(0, 8)}`;
     instruction.finalAmount = instruction.amount;
-    
+
     // Store in settlement history
     this.settlementHistory.set(instruction.id, {
       ...instruction,
-      completedAt: new Date()
+      completedAt: new Date(),
     });
 
     return {
       status: 'completed',
       settlementReference: instruction.settlementReference,
-      completedAt: new Date()
+      completedAt: new Date(),
     };
   }
 
@@ -507,21 +506,24 @@ class SettlementService extends EventEmitter {
       this.emit('settlementFailed', {
         settlementId,
         error: error.message,
-        region: instruction.region
+        region: instruction.region,
       });
     }
   }
 
   startSettlementMonitoring() {
     // Monitor settlements every 5 minutes
-    this.settlementMonitoringInterval = setInterval(async () => {
-      try {
-        await this.processScheduledSettlements();
-        await this.checkOverdueSettlements();
-      } catch (error) {
-        console.error('Settlement monitoring error:', error);
-      }
-    }, 5 * 60 * 1000); // 5 minutes
+    this.settlementMonitoringInterval = setInterval(
+      async () => {
+        try {
+          await this.processScheduledSettlements();
+          await this.checkOverdueSettlements();
+        } catch (error) {
+          console.error('Settlement monitoring error:', error);
+        }
+      },
+      5 * 60 * 1000
+    ); // 5 minutes
   }
 
   stopSettlementMonitoring() {
@@ -533,12 +535,9 @@ class SettlementService extends EventEmitter {
 
   async processScheduledSettlements() {
     const now = new Date();
-    const pendingSettlements = Array.from(this.settlementInstructions.values())
-      .filter(s => 
-        s.status === 'pending' && 
-        s.settlementDate <= now &&
-        s.autoSettle
-      );
+    const pendingSettlements = Array.from(this.settlementInstructions.values()).filter(
+      s => s.status === 'pending' && s.settlementDate <= now && s.autoSettle
+    );
 
     for (const settlement of pendingSettlements) {
       try {
@@ -552,18 +551,16 @@ class SettlementService extends EventEmitter {
   async checkOverdueSettlements() {
     const now = new Date();
     const overdueThreshold = 24 * 60 * 60 * 1000; // 24 hours
-    
-    const overdueSettlements = Array.from(this.settlementInstructions.values())
-      .filter(s => 
-        s.status === 'processing' && 
-        (now - s.updatedAt) > overdueThreshold
-      );
+
+    const overdueSettlements = Array.from(this.settlementInstructions.values()).filter(
+      s => s.status === 'processing' && now - s.updatedAt > overdueThreshold
+    );
 
     overdueSettlements.forEach(settlement => {
       this.emit('settlementOverdue', {
         settlementId: settlement.id,
         region: settlement.region,
-        overdueHours: Math.floor((now - settlement.updatedAt) / (60 * 60 * 1000))
+        overdueHours: Math.floor((now - settlement.updatedAt) / (60 * 60 * 1000)),
       });
     });
   }
@@ -577,7 +574,8 @@ class SettlementService extends EventEmitter {
 
   getNextBusinessDay(date) {
     const businessDay = new Date(date);
-    while (businessDay.getDay() === 0 || businessDay.getDay() === 6) { // Skip weekends
+    while (businessDay.getDay() === 0 || businessDay.getDay() === 6) {
+      // Skip weekends
       businessDay.setDate(businessDay.getDate() + 1);
     }
     return businessDay;
@@ -587,7 +585,7 @@ class SettlementService extends EventEmitter {
     const [hours, minutes] = cutoffTime.split(':').map(Number);
     const cutoff = new Date(currentTime);
     cutoff.setHours(hours, minutes, 0, 0);
-    
+
     return currentTime > cutoff;
   }
 
@@ -616,13 +614,13 @@ class SettlementService extends EventEmitter {
       standardSettlementPeriod: this.config.defaultSettlementPeriod,
       cutoffTimes: {
         trade_cutoff: '15:00',
-        settlement_cutoff: '17:00'
+        settlement_cutoff: '17:00',
       },
       supportedSettlementMethods: this.config.supportedSettlementTypes,
       physicalDeliveryEnabled: true,
       cashSettlementEnabled: true,
       nettingEnabled: true,
-      autoSettlementThreshold: this.config.autoSettlementThreshold
+      autoSettlementThreshold: this.config.autoSettlementThreshold,
     };
   }
 
@@ -636,21 +634,19 @@ class SettlementService extends EventEmitter {
   }
 
   async getUserSettlements(userId, region = null) {
-    return Array.from(this.settlementInstructions.values())
-      .filter(s => {
-        if (s.userId !== userId) return false;
-        if (region && s.region !== region) return false;
-        return true;
-      });
+    return Array.from(this.settlementInstructions.values()).filter(s => {
+      if (s.userId !== userId) return false;
+      if (region && s.region !== region) return false;
+      return true;
+    });
   }
 
   async getSettlementsByStatus(status, region = null) {
-    return Array.from(this.settlementInstructions.values())
-      .filter(s => {
-        if (s.status !== status) return false;
-        if (region && s.region !== region) return false;
-        return true;
-      });
+    return Array.from(this.settlementInstructions.values()).filter(s => {
+      if (s.status !== status) return false;
+      if (region && s.region !== region) return false;
+      return true;
+    });
   }
 
   async cancelSettlement(settlementId, reason = 'user_request') {
@@ -670,7 +666,7 @@ class SettlementService extends EventEmitter {
     this.emit('settlementCancelled', {
       settlementId,
       reason,
-      region: instruction.region
+      region: instruction.region,
     });
 
     return instruction;

@@ -178,8 +178,8 @@ app.get('/health', (req, res) => {
     version: '1.0.0',
     services: {
       http: 'running',
-      grpc: 'running'
-    }
+      grpc: 'running',
+    },
   });
 });
 

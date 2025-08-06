@@ -26,28 +26,28 @@ class NYMEXConnector extends BaseExchangeConnector {
     this.tradingHours = {
       open: '18:00', // 6 PM EST Sunday
       close: '17:00', // 5 PM EST Friday
-      timezone: 'America/New_York'
+      timezone: 'America/New_York',
     };
-    
+
     this.contractSpecifications = {
       crude_oil: {
         tickSize: 0.01,
         contractSize: 1000,
         currency: 'USD',
-        settleType: 'physical'
+        settleType: 'physical',
       },
       natural_gas: {
         tickSize: 0.001,
         contractSize: 10000,
         currency: 'USD',
-        settleType: 'physical'
-      }
+        settleType: 'physical',
+      },
     };
   }
 
   async connect(credentials) {
     this.validateCredentials(credentials);
-    
+
     try {
       // Simulate NYMEX connection using CME Direct protocol
       this.connection = {
@@ -56,9 +56,9 @@ class NYMEXConnector extends BaseExchangeConnector {
         connected: true,
         lastHeartbeat: new Date(),
       };
-      
+
       this.status = 'connected';
-      
+
       return {
         exchangeId: this.id,
         status: 'connected',
@@ -78,7 +78,7 @@ class NYMEXConnector extends BaseExchangeConnector {
 
     this.connection = null;
     this.status = 'disconnected';
-    
+
     return {
       exchangeId: this.id,
       status: 'disconnected',
@@ -93,9 +93,9 @@ class NYMEXConnector extends BaseExchangeConnector {
 
     // NYMEX-specific order validation
     this.validateNYMEXOrder(orderData);
-    
+
     const orderId = `NYMEX_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     // Simulate order submission
     const response = {
       orderId,
@@ -120,7 +120,7 @@ class NYMEXConnector extends BaseExchangeConnector {
 
     // Simulate NYMEX market data
     const basePrice = this.getBasePrice(symbol);
-    
+
     return {
       exchangeId: this.id,
       symbol,
@@ -157,7 +157,7 @@ class NYMEXConnector extends BaseExchangeConnector {
   validateNYMEXOrder(orderData) {
     const required = ['symbol', 'quantity', 'price', 'side'];
     const missing = required.filter(field => !orderData[field]);
-    
+
     if (missing.length > 0) {
       throw new Error(`Missing required order fields: ${missing.join(', ')}`);
     }
@@ -178,7 +178,7 @@ class NYMEXConnector extends BaseExchangeConnector {
   calculateNYMEXFees(orderData) {
     const baseRate = 0.85; // $0.85 per contract
     const quantity = orderData.quantity;
-    
+
     return {
       exchangeFee: baseRate * quantity,
       clearingFee: 0.04 * quantity,
@@ -189,7 +189,7 @@ class NYMEXConnector extends BaseExchangeConnector {
 
   getBasePrice(symbol) {
     const basePrices = {
-      crude_oil: 75.50,
+      crude_oil: 75.5,
       natural_gas: 3.25,
       heating_oil: 2.15,
       gasoline: 2.45,
@@ -231,7 +231,7 @@ class DMEConnector extends BaseExchangeConnector {
     this.tradingHours = {
       open: '01:00', // 1 AM GST
       close: '21:00', // 9 PM GST
-      timezone: 'Asia/Dubai'
+      timezone: 'Asia/Dubai',
     };
 
     this.contractSpecifications = {
@@ -240,14 +240,14 @@ class DMEConnector extends BaseExchangeConnector {
         contractSize: 1000,
         currency: 'USD',
         benchmark: 'Oman Crude',
-        settleType: 'physical'
-      }
+        settleType: 'physical',
+      },
     };
   }
 
   async connect(credentials) {
     this.validateCredentials(credentials);
-    
+
     try {
       this.connection = {
         sessionId: `DME_${Date.now()}`,
@@ -255,9 +255,9 @@ class DMEConnector extends BaseExchangeConnector {
         connected: true,
         lastHeartbeat: new Date(),
       };
-      
+
       this.status = 'connected';
-      
+
       return {
         exchangeId: this.id,
         status: 'connected',
@@ -277,7 +277,7 @@ class DMEConnector extends BaseExchangeConnector {
 
     this.connection = null;
     this.status = 'disconnected';
-    
+
     return {
       exchangeId: this.id,
       status: 'disconnected',
@@ -291,9 +291,9 @@ class DMEConnector extends BaseExchangeConnector {
     }
 
     this.validateDMEOrder(orderData);
-    
+
     const orderId = `DME_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     return {
       orderId,
       exchangeId: this.id,
@@ -315,7 +315,7 @@ class DMEConnector extends BaseExchangeConnector {
     }
 
     const basePrice = this.getBasePrice(symbol);
-    
+
     return {
       exchangeId: this.id,
       symbol,
@@ -351,7 +351,7 @@ class DMEConnector extends BaseExchangeConnector {
   validateDMEOrder(orderData) {
     const required = ['symbol', 'quantity', 'price', 'side'];
     const missing = required.filter(field => !orderData[field]);
-    
+
     if (missing.length > 0) {
       throw new Error(`Missing required order fields: ${missing.join(', ')}`);
     }
@@ -367,9 +367,9 @@ class DMEConnector extends BaseExchangeConnector {
   }
 
   calculateDMEFees(orderData) {
-    const baseRate = 0.50; // $0.50 per contract
+    const baseRate = 0.5; // $0.50 per contract
     const quantity = orderData.quantity;
-    
+
     return {
       exchangeFee: baseRate * quantity,
       clearingFee: 0.03 * quantity,
@@ -382,7 +382,7 @@ class DMEConnector extends BaseExchangeConnector {
     const basePrices = {
       crude_oil: 73.25, // Oman Crude pricing
       natural_gas: 3.15,
-      fuel_oil: 425.50,
+      fuel_oil: 425.5,
       gas_oil: 625.75,
     };
     return basePrices[symbol] || 50.0;
@@ -431,7 +431,7 @@ class OPECConnector extends BaseExchangeConnector {
 
   async connect(credentials) {
     this.validateCredentials(credentials);
-    
+
     try {
       this.connection = {
         sessionId: `OPEC_${Date.now()}`,
@@ -439,9 +439,9 @@ class OPECConnector extends BaseExchangeConnector {
         connected: true,
         lastHeartbeat: new Date(),
       };
-      
+
       this.status = 'connected';
-      
+
       return {
         exchangeId: this.id,
         status: 'connected',
@@ -461,7 +461,7 @@ class OPECConnector extends BaseExchangeConnector {
 
     this.connection = null;
     this.status = 'disconnected';
-    
+
     return {
       exchangeId: this.id,
       status: 'disconnected',
@@ -484,7 +484,7 @@ class OPECConnector extends BaseExchangeConnector {
     }
 
     const basePrice = this.getBasePrice(symbol);
-    
+
     return {
       exchangeId: this.id,
       symbol,
@@ -501,12 +501,15 @@ class OPECConnector extends BaseExchangeConnector {
     }
 
     // OPEC updates daily
-    const interval = setInterval(() => {
-      symbols.forEach(async symbol => {
-        const marketData = await this.getMarketData(symbol);
-        callback(marketData);
-      });
-    }, 24 * 60 * 60 * 1000); // Daily updates
+    const interval = setInterval(
+      () => {
+        symbols.forEach(async symbol => {
+          const marketData = await this.getMarketData(symbol);
+          callback(marketData);
+        });
+      },
+      24 * 60 * 60 * 1000
+    ); // Daily updates
 
     return {
       subscriptionId: `OPEC_SUB_${Date.now()}`,
@@ -520,7 +523,7 @@ class OPECConnector extends BaseExchangeConnector {
     // Calculate weighted average of basket components
     const basePrice = 74.25; // OPEC basket reference
     const dailyVariation = (Math.random() - 0.5) * 2; // ±$1 variation
-    
+
     return {
       exchangeId: this.id,
       symbol: 'opec_basket',
@@ -534,7 +537,7 @@ class OPECConnector extends BaseExchangeConnector {
   getBasePrice(symbol) {
     const basePrices = {
       crude_oil: 74.25,
-      petroleum_products: 78.50,
+      petroleum_products: 78.5,
     };
     return basePrices[symbol] || 74.25;
   }
@@ -572,7 +575,7 @@ class GuyanaConnector extends BaseExchangeConnector {
 
   async connect(credentials) {
     this.validateCredentials(credentials);
-    
+
     try {
       this.connection = {
         sessionId: `GUY_${Date.now()}`,
@@ -580,9 +583,9 @@ class GuyanaConnector extends BaseExchangeConnector {
         connected: true,
         lastHeartbeat: new Date(),
       };
-      
+
       this.status = 'connected';
-      
+
       return {
         exchangeId: this.id,
         status: 'connected',
@@ -602,7 +605,7 @@ class GuyanaConnector extends BaseExchangeConnector {
 
     this.connection = null;
     this.status = 'disconnected';
-    
+
     return {
       exchangeId: this.id,
       status: 'disconnected',
@@ -616,9 +619,9 @@ class GuyanaConnector extends BaseExchangeConnector {
     }
 
     this.validateGuyanaOrder(orderData);
-    
+
     const orderId = `GUY_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     return {
       orderId,
       exchangeId: this.id,
@@ -640,7 +643,7 @@ class GuyanaConnector extends BaseExchangeConnector {
     }
 
     const basePrice = this.getBasePrice(symbol);
-    
+
     return {
       exchangeId: this.id,
       symbol,
@@ -674,19 +677,27 @@ class GuyanaConnector extends BaseExchangeConnector {
   validateGuyanaOrder(orderData) {
     const required = ['symbol', 'quantity', 'price', 'side'];
     const missing = required.filter(field => !orderData[field]);
-    
+
     if (missing.length > 0) {
       throw new Error(`Missing required order fields: ${missing.join(', ')}`);
     }
 
     // Local content requirement check
-    if (!orderData.localContentPercentage || orderData.localContentPercentage < this.localContentRequirement) {
+    if (
+      !orderData.localContentPercentage ||
+      orderData.localContentPercentage < this.localContentRequirement
+    ) {
       throw new Error(`Local content must be at least ${this.localContentRequirement}%`);
     }
 
     // Environmental standards check
-    if (!orderData.environmentalScore || orderData.environmentalScore < this.environmentalStandards.minScore) {
-      throw new Error(`Environmental score must be at least ${this.environmentalStandards.minScore}`);
+    if (
+      !orderData.environmentalScore ||
+      orderData.environmentalScore < this.environmentalStandards.minScore
+    ) {
+      throw new Error(
+        `Environmental score must be at least ${this.environmentalStandards.minScore}`
+      );
     }
   }
 
@@ -694,25 +705,25 @@ class GuyanaConnector extends BaseExchangeConnector {
     const baseRate = 0.25; // $0.25 per unit
     const quantity = orderData.quantity;
     const localContentDiscount = orderData.localContentPercentage > 50 ? 0.1 : 0;
-    
+
     const baseFee = baseRate * quantity;
     const discount = baseFee * localContentDiscount;
-    
+
     return {
       exchangeFee: baseFee - discount,
       regulatoryFee: 0.02 * quantity,
       environmentalFee: 0.01 * quantity,
       localContentDiscount: discount,
-      total: (baseFee - discount) + (0.02 * quantity) + (0.01 * quantity),
+      total: baseFee - discount + 0.02 * quantity + 0.01 * quantity,
     };
   }
 
   getBasePrice(symbol) {
     const basePrices = {
-      crude_oil: 76.50, // Liza crude pricing
+      crude_oil: 76.5, // Liza crude pricing
       electricity: 0.12, // per kWh
       renewable: 0.08, // per kWh
-      natural_gas: 3.50,
+      natural_gas: 3.5,
     };
     return basePrices[symbol] || 50.0;
   }
