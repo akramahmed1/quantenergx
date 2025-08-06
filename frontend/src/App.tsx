@@ -12,6 +12,8 @@ import { RiskDashboard } from './pages/Risk/Dashboard';
 import { ComplianceDashboard } from './pages/Compliance/Dashboard';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
+import ArbitrageAlerts from './components/ArbitrageAlerts';
+import QuantumNotebook from './components/QuantumNotebook';
 
 const App: React.FC = () => {
   return (
@@ -45,6 +47,9 @@ const App: React.FC = () => {
                   <Route path="/trading" element={<TradingDashboard />} />
                   <Route path="/risk" element={<RiskDashboard />} />
                   <Route path="/compliance" element={<ComplianceDashboard />} />
+                  <Route path="/arbitrage" element={<ArbitrageAlerts />} />
+                  <Route path="/notebook" element={<QuantumNotebook />} />
+                  <Route path="/notebook/:notebookId" element={<QuantumNotebook />} />
                 </Routes>
               </Box>
             </Box>

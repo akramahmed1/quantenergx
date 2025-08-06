@@ -64,6 +64,11 @@ export class WebSocketService {
         this.handleComplianceSubscription(socket, userId);
       });
 
+      // Handle arbitrage alerts subscription
+      socket.on('subscribe-arbitrage', (data: { userId: string; region?: string }) => {
+        this.handleArbitrageSubscription(socket, data);
+      });
+
       // Handle disconnection
       socket.on('disconnect', (reason: string) => {
         this.handleDisconnection(socket, reason);
@@ -187,6 +192,39 @@ export class WebSocketService {
   }
 
   /**
+   * Handle arbitrage alerts subscription
+   */
+  private handleArbitrageSubscription(socket: Socket, data: { userId: string; region?: string }): void {
+    const { userId, region } = data;
+    const roomName = `arbitrage-${userId}`;
+    const regionRoom = region ? `arbitrage-region-${region}` : null;
+    
+    socket.join(roomName);
+    if (regionRoom) {
+      socket.join(regionRoom);
+    }
+
+    socket.emit('arbitrage-subscribed', {
+      userId,
+      region,
+      rooms: [roomName, regionRoom].filter(Boolean),
+      message: `Subscribed to arbitrage alerts for user ${userId}${region ? ` in region ${region}` : ''}`,
+    });
+
+    this.logger.info(`Client subscribed to arbitrage alerts`, {
+      socketId: socket.id,
+      userId,
+      region,
+      rooms: [roomName, regionRoom].filter(Boolean),
+    });
+
+    // Send initial sample arbitrage alert for demo
+    setTimeout(() => {
+      this.sendSampleArbitrageAlert(userId, region);
+    }, 2000);
+  }
+
+  /**
    * Handle client disconnection
    */
   private handleDisconnection(socket: Socket, reason: string): void {
@@ -242,6 +280,13 @@ export class WebSocketService {
         'compliance-events',
         'websocket-compliance-group',
         this.handleComplianceMessage.bind(this)
+      );
+
+      // Subscribe to arbitrage opportunities
+      await this.kafkaService.subscribeToTopic(
+        'arbitrage-opportunities',
+        'websocket-arbitrage-group',
+        this.handleArbitrageMessage.bind(this)
       );
 
       this.logger.info('WebSocket service subscribed to all Kafka topics');
@@ -376,6 +421,103 @@ export class WebSocketService {
    */
   public sendToRoom(room: string, event: string, data: any): void {
     this.io.to(room).emit(event, data);
+  }
+
+  /**
+   * Handle arbitrage messages from Kafka
+   */
+  private async handleArbitrageMessage(message: KafkaMessage): Promise<void> {
+    const arbitrageData = message.value;
+    const userRoomName = `arbitrage-${arbitrageData.userId}`;
+    const regionRoomName = `arbitrage-region-${arbitrageData.region}`;
+
+    const wsMessage: WebSocketMessage = {
+      type: 'ARBITRAGE_ALERT',
+      payload: arbitrageData,
+      timestamp: message.timestamp,
+      userId: arbitrageData.userId,
+    };
+
+    // Send to specific user
+    this.io.to(userRoomName).emit('arbitrage-alert', wsMessage);
+    
+    // Send to region-specific room for broader alerts
+    if (arbitrageData.severity === 'high' || arbitrageData.severity === 'critical') {
+      this.io.to(regionRoomName).emit('arbitrage-alert', wsMessage);
+    }
+
+    this.logger.info(`Arbitrage alert sent`, {
+      userId: arbitrageData.userId,
+      commodity: arbitrageData.commodity,
+      spread: arbitrageData.spreadPercentage,
+      severity: arbitrageData.severity,
+    });
+  }
+
+  /**
+   * Send sample arbitrage alert for demo purposes
+   */
+  private sendSampleArbitrageAlert(userId: string, region?: string): void {
+    const commodities = ['Crude Oil', 'Natural Gas', 'Gasoline', 'Heating Oil', 'Coal'];
+    const markets = {
+      'guyana': ['Georgetown Exchange', 'Suriname Market'],
+      'middle-east': ['Dubai Mercantile', 'Qatar Exchange'],
+      'us': ['NYMEX', 'ICE Futures'],
+      'europe': ['ICE Europe', 'EEX'],
+      'uk': ['ICE Futures Europe', 'London Exchange'],
+    };
+    
+    const regionMarkets = markets[region as keyof typeof markets] || markets.us;
+    const commodity = commodities[Math.floor(Math.random() * commodities.length)];
+    const basePrice = 50 + Math.random() * 100;
+    const spread = 1 + Math.random() * 10;
+    const spreadPercentage = (spread / basePrice) * 100;
+    
+    const arbitrageAlert = {
+      id: `arb-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      commodity,
+      market1: {
+        name: regionMarkets[0],
+        price: basePrice,
+        currency: 'USD',
+        region: region || 'us',
+      },
+      market2: {
+        name: regionMarkets[1],
+        price: basePrice + spread,
+        currency: 'USD',
+        region: region || 'us',
+      },
+      spread,
+      spreadPercentage,
+      profitPotential: spread * 1000, // Assuming 1000 units
+      severity: spreadPercentage > 8 ? 'critical' : spreadPercentage > 5 ? 'high' : spreadPercentage > 2 ? 'medium' : 'low',
+      compliance: {
+        region: region || 'us',
+        status: Math.random() > 0.8 ? 'warning' : 'compliant',
+        notes: Math.random() > 0.8 ? 'Cross-border regulations may apply' : undefined,
+      },
+      expiresAt: new Date(Date.now() + 300000).toISOString(), // 5 minutes
+      userId,
+      region: region || 'us',
+    };
+
+    const wsMessage: WebSocketMessage = {
+      type: 'ARBITRAGE_ALERT',
+      payload: arbitrageAlert,
+      timestamp: Date.now(),
+      userId,
+    };
+
+    this.io.to(`arbitrage-${userId}`).emit('arbitrage-alert', wsMessage);
+    
+    this.logger.info(`Sample arbitrage alert sent`, {
+      userId,
+      commodity,
+      spread: spreadPercentage,
+      severity: arbitrageAlert.severity,
+    });
   }
 
   /**
