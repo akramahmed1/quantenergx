@@ -40,6 +40,8 @@ import {
   Insights,
 } from '@mui/icons-material';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+
 interface AIDashboardData {
   sentiment: {
     alerts: any[];
@@ -99,7 +101,7 @@ const AIDashboard: React.FC = () => {
   const fetchDashboardData = async () => {
     try {
       setRefreshing(true);
-      const response = await fetch('/api/v1/ai/dashboard?timeframe=24h');
+      const response = await fetch(`${API_URL}/api/v1/ai/dashboard?timeframe=24h`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

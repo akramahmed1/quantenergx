@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+
 export interface MarketDataPoint {
   timestamp: string;
   open: number;
@@ -124,7 +126,7 @@ export const fetchMarketData = createAsyncThunk(
     timeframe?: string;
   }) => {
     const response = await fetch(
-      `/api/v1/market/prices/${commodity}?symbol=${symbol}&timeframe=${timeframe}`
+      `${API_URL}/api/v1/market/prices/${commodity}?symbol=${symbol}&timeframe=${timeframe}`
     );
     if (!response.ok) {
       throw new Error('Failed to fetch market data');
@@ -137,7 +139,7 @@ export const fetchMarketData = createAsyncThunk(
 export const fetchAnalytics = createAsyncThunk(
   'market/fetchAnalytics',
   async ({ commodity, period }: { commodity: string; period?: string }) => {
-    const response = await fetch(`/api/v1/market/analytics/${commodity}?period=${period}`);
+    const response = await fetch(`${API_URL}/api/v1/market/analytics/${commodity}?period=${period}`);
     if (!response.ok) {
       throw new Error('Failed to fetch analytics');
     }
@@ -147,7 +149,7 @@ export const fetchAnalytics = createAsyncThunk(
 );
 
 export const fetchQuotes = createAsyncThunk('market/fetchQuotes', async (symbols: string[]) => {
-  const response = await fetch(`/api/v1/market/quotes?symbols=${symbols.join(',')}`);
+  const response = await fetch(`${API_URL}/api/v1/market/quotes?symbols=${symbols.join(',')}`);
   if (!response.ok) {
     throw new Error('Failed to fetch quotes');
   }
@@ -158,7 +160,7 @@ export const fetchQuotes = createAsyncThunk('market/fetchQuotes', async (symbols
 export const fetchSupportedCommodities = createAsyncThunk(
   'market/fetchSupportedCommodities',
   async () => {
-    const response = await fetch('/api/v1/market/commodities');
+    const response = await fetch(`${API_URL}/api/v1/market/commodities`);
     if (!response.ok) {
       throw new Error('Failed to fetch supported commodities');
     }

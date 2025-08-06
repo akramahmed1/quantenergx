@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+
 export interface Notification {
   id: string;
   type: 'info' | 'success' | 'warning' | 'error' | 'trade' | 'risk' | 'compliance';
@@ -107,7 +109,7 @@ export const fetchNotifications = createAsyncThunk(
       ...(unreadOnly && { unread: 'true' }),
     });
 
-    const response = await fetch(`/api/v1/notifications?${params}`, {
+    const response = await fetch(`${API_URL}/api/v1/notifications?${params}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
@@ -126,7 +128,7 @@ export const markAsRead = createAsyncThunk(
   async (notificationIds: string | string[]) => {
     const ids = Array.isArray(notificationIds) ? notificationIds : [notificationIds];
 
-    const response = await fetch('/api/v1/notifications/mark-read', {
+    const response = await fetch(`${API_URL}/api/v1/notifications/mark-read`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -146,7 +148,7 @@ export const markAsRead = createAsyncThunk(
 export const deleteNotifications = createAsyncThunk(
   'notifications/deleteNotifications',
   async (notificationIds: string[]) => {
-    const response = await fetch('/api/v1/notifications', {
+    const response = await fetch(`${API_URL}/api/v1/notifications`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -176,7 +178,7 @@ export const sendNotification = createAsyncThunk(
     message: string;
     options?: any;
   }) => {
-    const response = await fetch('/api/v1/notifications/send', {
+    const response = await fetch(`${API_URL}/api/v1/notifications/send`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -201,7 +203,7 @@ export const sendNotification = createAsyncThunk(
 export const fetchNotificationChannels = createAsyncThunk(
   'notifications/fetchChannels',
   async () => {
-    const response = await fetch('/api/v1/notifications/channels', {
+    const response = await fetch(`${API_URL}/api/v1/notifications/channels`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
@@ -218,7 +220,7 @@ export const fetchNotificationChannels = createAsyncThunk(
 export const updateNotificationPreferences = createAsyncThunk(
   'notifications/updatePreferences',
   async (preferences: Partial<NotificationPreferences>) => {
-    const response = await fetch('/api/v1/notifications/preferences', {
+    const response = await fetch(`${API_URL}/api/v1/notifications/preferences`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -238,7 +240,7 @@ export const updateNotificationPreferences = createAsyncThunk(
 export const testNotification = createAsyncThunk(
   'notifications/testNotification',
   async ({ channel, recipient }: { channel: string; recipient: string }) => {
-    const response = await fetch('/api/v1/notifications/test', {
+    const response = await fetch(`${API_URL}/api/v1/notifications/test`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
