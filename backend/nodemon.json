@@ -1,0 +1,7 @@
+{
+  "ignore": [
+    "logs/*",
+    "*.log",
+    "src/plugins/modules/sample-data-source.ts"
+  ]
+}

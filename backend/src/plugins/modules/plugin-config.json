@@ -1,0 +1,29 @@
+{
+  "sample-data-source": {
+    "enabled": true,
+    "type": "data_source",
+    "version": "1.0.0",
+    "settings": {
+      "updateInterval": 30000,
+      "retryAttempts": 3
+    }
+  },
+  "basic-analytics": {
+    "enabled": true,
+    "type": "analytics",
+    "version": "1.0.0",
+    "settings": {
+      "windowSize": 100,
+      "smoothingFactor": 0.3
+    }
+  },
+  "email-notifications": {
+    "enabled": false,
+    "type": "notification",
+    "version": "1.0.0",
+    "settings": {
+      "smtpHost": "localhost",
+      "smtpPort": 587
+    }
+  }
+}
