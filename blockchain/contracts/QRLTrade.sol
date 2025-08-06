@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 /**
  * @title QRLTrade
@@ -14,13 +14,11 @@ pragma solidity ^0.8.19;
  * - Future-proof against quantum computing attacks
  */
 
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 
 contract QRLTrade is ReentrancyGuard, AccessControl, Pausable {
-    using ECDSA for bytes32;
 
     // Roles for access control
     bytes32 public constant TRADER_ROLE = keccak256("TRADER_ROLE");
