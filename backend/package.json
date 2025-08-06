@@ -4,7 +4,9 @@
   "description": "Backend services for QuantEnergx energy trading platform",
   "main": "src/server.js",
   "scripts": {
+    "prebuild": "node ../scripts/validate-env.js backend",
     "build": "tsc",
+    "prestart": "node ../scripts/validate-env.js backend",
     "start": "node dist/server.js",
     "start:js": "node src/server.js",
     "dev": "nodemon --exec ts-node src/server.ts",
@@ -102,6 +104,7 @@
     "parquetjs": "^0.11.2",
     "pdf-parse": "^1.1.1",
     "pg": "^8.11.0",
+    "react-scripts": "0.0.0",
     "redis": "^4.6.5",
     "sharp": "^0.32.1",
     "socket.io": "^4.8.1",

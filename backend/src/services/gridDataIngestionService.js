@@ -431,21 +431,21 @@ class GridDataIngestionService {
    */
   async executeAction(action, trigger, context) {
     switch (action) {
-      case 'email':
-        await this.sendEmailAlert(trigger, context);
-        break;
-      case 'sms':
-        await this.sendSMSAlert(trigger, context);
-        break;
-      case 'dashboard_alert':
-        await this.createDashboardAlert(trigger, context);
-        break;
-      case 'auto_hedge':
-        await this.executeAutoHedge(trigger, context);
-        break;
-      case 'price_alert':
-        await this.createPriceAlert(trigger, context);
-        break;
+    case 'email':
+      await this.sendEmailAlert(trigger, context);
+      break;
+    case 'sms':
+      await this.sendSMSAlert(trigger, context);
+      break;
+    case 'dashboard_alert':
+      await this.createDashboardAlert(trigger, context);
+      break;
+    case 'auto_hedge':
+      await this.executeAutoHedge(trigger, context);
+      break;
+    case 'price_alert':
+      await this.createPriceAlert(trigger, context);
+      break;
     }
   }
 
