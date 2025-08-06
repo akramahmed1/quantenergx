@@ -1,6 +1,51 @@
 # QuantEnergx .gitignore
-# Comprehensive .gitignore for Node.js/React full-stack energy trading platform
+# Comprehensive .gitignore for Node.js/React/Python full-stack energy trading platform
 # Excludes dependencies, build artifacts, coverage reports, caches, IDE files, logs, and generated files
+
+# Python-specific ignores
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.python-version
+
+# Python testing
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
 
 # Dependencies
 node_modules/
