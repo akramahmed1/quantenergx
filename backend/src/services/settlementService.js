@@ -294,32 +294,32 @@ class SettlementService extends EventEmitter {
     const instruction = this.settlementInstructions.get(workflow.settlementId);
 
     switch (step.name) {
-      case 'validation':
-        await this.validateSettlement(instruction);
-        break;
-      case 'authorization':
-        await this.authorizeSettlement(instruction);
-        break;
-      case 'netting':
-        await this.processNetting(instruction);
-        break;
-      case 'payment_processing':
-        await this.processPayment(instruction);
-        break;
-      case 'delivery_scheduling':
-        await this.scheduleDelivery(instruction);
-        break;
-      case 'quality_inspection':
-        await this.performQualityInspection(instruction);
-        break;
-      case 'delivery_confirmation':
-        await this.confirmDelivery(instruction);
-        break;
-      case 'settlement_completion':
-        await this.completeSettlement(instruction);
-        break;
-      default:
-        throw new Error(`Unknown workflow step: ${step.name}`);
+    case 'validation':
+      await this.validateSettlement(instruction);
+      break;
+    case 'authorization':
+      await this.authorizeSettlement(instruction);
+      break;
+    case 'netting':
+      await this.processNetting(instruction);
+      break;
+    case 'payment_processing':
+      await this.processPayment(instruction);
+      break;
+    case 'delivery_scheduling':
+      await this.scheduleDelivery(instruction);
+      break;
+    case 'quality_inspection':
+      await this.performQualityInspection(instruction);
+      break;
+    case 'delivery_confirmation':
+      await this.confirmDelivery(instruction);
+      break;
+    case 'settlement_completion':
+      await this.completeSettlement(instruction);
+      break;
+    default:
+      throw new Error(`Unknown workflow step: ${step.name}`);
     }
   }
 

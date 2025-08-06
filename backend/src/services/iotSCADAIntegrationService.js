@@ -381,23 +381,23 @@ class IoTSCADAIntegrationService {
     const protocol = device.config.protocol;
 
     switch (protocol) {
-      case 'IEC_61850':
-        await this.initializeIEC61850Stream(device, dataStream);
-        break;
-      case 'DNP3':
-        await this.initializeDNP3Stream(device, dataStream);
-        break;
-      case 'MODBUS':
-        await this.initializeModbusStream(device, dataStream);
-        break;
-      case 'OPENADR':
-        await this.initializeOpenADRStream(device, dataStream);
-        break;
-      case 'MQTT':
-        await this.initializeMQTTStream(device, dataStream);
-        break;
-      default:
-        throw new Error(`Unsupported protocol: ${protocol}`);
+    case 'IEC_61850':
+      await this.initializeIEC61850Stream(device, dataStream);
+      break;
+    case 'DNP3':
+      await this.initializeDNP3Stream(device, dataStream);
+      break;
+    case 'MODBUS':
+      await this.initializeModbusStream(device, dataStream);
+      break;
+    case 'OPENADR':
+      await this.initializeOpenADRStream(device, dataStream);
+      break;
+    case 'MQTT':
+      await this.initializeMQTTStream(device, dataStream);
+      break;
+    default:
+      throw new Error(`Unsupported protocol: ${protocol}`);
     }
   }
 
@@ -654,20 +654,20 @@ class IoTSCADAIntegrationService {
 
   generateSimulatedValue(type, range) {
     switch (type) {
-      case 'voltage':
-        return (range?.min || 0) + Math.random() * ((range?.max || 480) - (range?.min || 0));
-      case 'current':
-        return (range?.min || 0) + Math.random() * ((range?.max || 100) - (range?.min || 0));
-      case 'power':
-        return (range?.min || 0) + Math.random() * ((range?.max || 1000) - (range?.min || 0));
-      case 'frequency':
-        return 59.5 + Math.random() * 1.0; // 59.5-60.5 Hz
-      case 'temperature':
-        return 20 + Math.random() * 40; // 20-60°C
-      case 'boolean':
-        return Math.random() > 0.5;
-      default:
-        return Math.random() * 100;
+    case 'voltage':
+      return (range?.min || 0) + Math.random() * ((range?.max || 480) - (range?.min || 0));
+    case 'current':
+      return (range?.min || 0) + Math.random() * ((range?.max || 100) - (range?.min || 0));
+    case 'power':
+      return (range?.min || 0) + Math.random() * ((range?.max || 1000) - (range?.min || 0));
+    case 'frequency':
+      return 59.5 + Math.random() * 1.0; // 59.5-60.5 Hz
+    case 'temperature':
+      return 20 + Math.random() * 40; // 20-60°C
+    case 'boolean':
+      return Math.random() > 0.5;
+    default:
+      return Math.random() * 100;
     }
   }
 
@@ -737,26 +737,26 @@ class IoTSCADAIntegrationService {
     const device = this.deviceRegistry.get(deviceId);
 
     switch (rule.id) {
-      case 'device_offline': {
-        const lastComm = new Date(device.status.last_communication);
-        const timeDiff = (Date.now() - lastComm.getTime()) / 1000;
-        return timeDiff > 300; // 5 minutes
-      }
+    case 'device_offline': {
+      const lastComm = new Date(device.status.last_communication);
+      const timeDiff = (Date.now() - lastComm.getTime()) / 1000;
+      return timeDiff > 300; // 5 minutes
+    }
 
-      case 'communication_failure':
-        return device.status.error_count >= 3;
+    case 'communication_failure':
+      return device.status.error_count >= 3;
 
-      case 'data_anomaly':
-        return this.detectDataAnomaly(data);
+    case 'data_anomaly':
+      return this.detectDataAnomaly(data);
 
-      case 'security_breach':
-        return this.detectSecurityBreach(deviceId, data);
+    case 'security_breach':
+      return this.detectSecurityBreach(deviceId, data);
 
-      case 'performance_degradation':
-        return this.detectPerformanceDegradation(deviceId);
+    case 'performance_degradation':
+      return this.detectPerformanceDegradation(deviceId);
 
-      default:
-        return false;
+    default:
+      return false;
     }
   }
 
@@ -788,27 +788,27 @@ class IoTSCADAIntegrationService {
   async executeAlertActions(rule, deviceId, data) {
     for (const action of rule.actions) {
       switch (action) {
-        case 'email':
-          await this.sendEmailAlert(rule, deviceId, data);
-          break;
-        case 'sms':
-          await this.sendSMSAlert(rule, deviceId, data);
-          break;
-        case 'dashboard_alert':
-          await this.createDashboardAlert(rule, deviceId, data);
-          break;
-        case 'auto_diagnostic':
-          await this.runAutoDiagnostic(deviceId);
-          break;
-        case 'failover':
-          await this.executeFailover(deviceId);
-          break;
-        case 'device_isolation':
-          await this.isolateDevice(deviceId);
-          break;
-        case 'security_response':
-          await this.executeSecurityResponse(deviceId, data);
-          break;
+      case 'email':
+        await this.sendEmailAlert(rule, deviceId, data);
+        break;
+      case 'sms':
+        await this.sendSMSAlert(rule, deviceId, data);
+        break;
+      case 'dashboard_alert':
+        await this.createDashboardAlert(rule, deviceId, data);
+        break;
+      case 'auto_diagnostic':
+        await this.runAutoDiagnostic(deviceId);
+        break;
+      case 'failover':
+        await this.executeFailover(deviceId);
+        break;
+      case 'device_isolation':
+        await this.isolateDevice(deviceId);
+        break;
+      case 'security_response':
+        await this.executeSecurityResponse(deviceId, data);
+        break;
       }
     }
   }

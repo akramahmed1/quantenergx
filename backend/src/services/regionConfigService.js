@@ -92,42 +92,42 @@ class RegionConfigService extends EventEmitter {
 
     // Region-specific adjustments
     switch (region) {
-      case 'US':
-        return {
-          ...baseRules,
-          defaultInitialMarginRate: 0.12, // Higher initial margin
-          portfolioMarginingEnabled: true,
-          regulatoryModel: 'CFTC_SPAN',
-        };
-      case 'EU':
-        return {
-          ...baseRules,
-          defaultInitialMarginRate: 0.1,
-          marginCallGracePeriod: 48, // Longer grace period
-          regulatoryModel: 'EMIR_SIMM',
-        };
-      case 'UK':
-        return {
-          ...baseRules,
-          defaultInitialMarginRate: 0.11,
-          portfolioMarginingEnabled: true,
-          regulatoryModel: 'FCA_SPAN',
-        };
-      case 'APAC':
-        return {
-          ...baseRules,
-          defaultInitialMarginRate: 0.15, // Higher due to volatility
-          marginCallGracePeriod: 12, // Shorter grace period
-          regulatoryModel: 'REGIONAL_STANDARD',
-        };
-      case 'CA':
-        return {
-          ...baseRules,
-          defaultInitialMarginRate: 0.1,
-          regulatoryModel: 'CSA_STANDARD',
-        };
-      default:
-        return baseRules;
+    case 'US':
+      return {
+        ...baseRules,
+        defaultInitialMarginRate: 0.12, // Higher initial margin
+        portfolioMarginingEnabled: true,
+        regulatoryModel: 'CFTC_SPAN',
+      };
+    case 'EU':
+      return {
+        ...baseRules,
+        defaultInitialMarginRate: 0.1,
+        marginCallGracePeriod: 48, // Longer grace period
+        regulatoryModel: 'EMIR_SIMM',
+      };
+    case 'UK':
+      return {
+        ...baseRules,
+        defaultInitialMarginRate: 0.11,
+        portfolioMarginingEnabled: true,
+        regulatoryModel: 'FCA_SPAN',
+      };
+    case 'APAC':
+      return {
+        ...baseRules,
+        defaultInitialMarginRate: 0.15, // Higher due to volatility
+        marginCallGracePeriod: 12, // Shorter grace period
+        regulatoryModel: 'REGIONAL_STANDARD',
+      };
+    case 'CA':
+      return {
+        ...baseRules,
+        defaultInitialMarginRate: 0.1,
+        regulatoryModel: 'CSA_STANDARD',
+      };
+    default:
+      return baseRules;
     }
   }
 
@@ -147,62 +147,62 @@ class RegionConfigService extends EventEmitter {
 
     // Region-specific adjustments
     switch (region) {
-      case 'US':
-        return {
-          ...baseRules,
-          cutoffTimes: {
-            trade_cutoff: '15:00',
-            settlement_cutoff: '17:00',
-            fedwire_cutoff: '18:00',
-          },
-          supportedPaymentSystems: ['Fedwire', 'ACH', 'CHIPS'],
-          regulatoryReporting: true,
-        };
-      case 'EU':
-        return {
-          ...baseRules,
-          standardSettlementPeriod: 1, // T+1 for some instruments
-          cutoffTimes: {
-            trade_cutoff: '16:00',
-            settlement_cutoff: '18:00',
-            target2_cutoff: '17:00',
-          },
-          supportedPaymentSystems: ['TARGET2', 'SEPA'],
-          regulatoryReporting: true,
-        };
-      case 'UK':
-        return {
-          ...baseRules,
-          cutoffTimes: {
-            trade_cutoff: '16:00',
-            settlement_cutoff: '17:30',
-            chaps_cutoff: '17:00',
-          },
-          supportedPaymentSystems: ['CHAPS', 'Faster Payments'],
-          regulatoryReporting: true,
-        };
-      case 'APAC':
-        return {
-          ...baseRules,
-          standardSettlementPeriod: 3, // T+3 due to time zones
-          cutoffTimes: {
-            trade_cutoff: '14:00',
-            settlement_cutoff: '16:00',
-          },
-          crossBorderSettlement: true,
-        };
-      case 'CA':
-        return {
-          ...baseRules,
-          cutoffTimes: {
-            trade_cutoff: '15:30',
-            settlement_cutoff: '17:30',
-          },
-          supportedPaymentSystems: ['LVTS', 'Interac'],
-          regulatoryReporting: true,
-        };
-      default:
-        return baseRules;
+    case 'US':
+      return {
+        ...baseRules,
+        cutoffTimes: {
+          trade_cutoff: '15:00',
+          settlement_cutoff: '17:00',
+          fedwire_cutoff: '18:00',
+        },
+        supportedPaymentSystems: ['Fedwire', 'ACH', 'CHIPS'],
+        regulatoryReporting: true,
+      };
+    case 'EU':
+      return {
+        ...baseRules,
+        standardSettlementPeriod: 1, // T+1 for some instruments
+        cutoffTimes: {
+          trade_cutoff: '16:00',
+          settlement_cutoff: '18:00',
+          target2_cutoff: '17:00',
+        },
+        supportedPaymentSystems: ['TARGET2', 'SEPA'],
+        regulatoryReporting: true,
+      };
+    case 'UK':
+      return {
+        ...baseRules,
+        cutoffTimes: {
+          trade_cutoff: '16:00',
+          settlement_cutoff: '17:30',
+          chaps_cutoff: '17:00',
+        },
+        supportedPaymentSystems: ['CHAPS', 'Faster Payments'],
+        regulatoryReporting: true,
+      };
+    case 'APAC':
+      return {
+        ...baseRules,
+        standardSettlementPeriod: 3, // T+3 due to time zones
+        cutoffTimes: {
+          trade_cutoff: '14:00',
+          settlement_cutoff: '16:00',
+        },
+        crossBorderSettlement: true,
+      };
+    case 'CA':
+      return {
+        ...baseRules,
+        cutoffTimes: {
+          trade_cutoff: '15:30',
+          settlement_cutoff: '17:30',
+        },
+        supportedPaymentSystems: ['LVTS', 'Interac'],
+        regulatoryReporting: true,
+      };
+    default:
+      return baseRules;
     }
   }
 
@@ -213,60 +213,60 @@ class RegionConfigService extends EventEmitter {
     };
 
     switch (region) {
-      case 'US':
-        return {
-          ...baseTradingHours,
-          openTime: '09:00',
-          closeTime: '17:00',
-          timezone: 'America/New_York',
-          extendedHours: {
-            preMarket: '08:00',
-            postMarket: '20:00',
-          },
-        };
-      case 'EU':
-        return {
-          ...baseTradingHours,
-          openTime: '08:00',
-          closeTime: '18:00',
-          timezone: 'Europe/London',
-          extendedHours: {
-            preMarket: '07:00',
-            postMarket: '19:00',
-          },
-        };
-      case 'UK':
-        return {
-          ...baseTradingHours,
-          openTime: '08:00',
-          closeTime: '16:30',
-          timezone: 'Europe/London',
-        };
-      case 'APAC':
-        return {
-          ...baseTradingHours,
-          openTime: '09:00',
-          closeTime: '17:00',
-          timezone: 'Asia/Singapore',
-          nightSession: {
-            openTime: '19:00',
-            closeTime: '03:00',
-          },
-        };
-      case 'CA':
-        return {
-          ...baseTradingHours,
-          openTime: '09:00',
-          closeTime: '17:00',
-          timezone: 'America/Toronto',
-        };
-      default:
-        return {
-          ...baseTradingHours,
-          openTime: '09:00',
-          closeTime: '17:00',
-          timezone: 'UTC',
-        };
+    case 'US':
+      return {
+        ...baseTradingHours,
+        openTime: '09:00',
+        closeTime: '17:00',
+        timezone: 'America/New_York',
+        extendedHours: {
+          preMarket: '08:00',
+          postMarket: '20:00',
+        },
+      };
+    case 'EU':
+      return {
+        ...baseTradingHours,
+        openTime: '08:00',
+        closeTime: '18:00',
+        timezone: 'Europe/London',
+        extendedHours: {
+          preMarket: '07:00',
+          postMarket: '19:00',
+        },
+      };
+    case 'UK':
+      return {
+        ...baseTradingHours,
+        openTime: '08:00',
+        closeTime: '16:30',
+        timezone: 'Europe/London',
+      };
+    case 'APAC':
+      return {
+        ...baseTradingHours,
+        openTime: '09:00',
+        closeTime: '17:00',
+        timezone: 'Asia/Singapore',
+        nightSession: {
+          openTime: '19:00',
+          closeTime: '03:00',
+        },
+      };
+    case 'CA':
+      return {
+        ...baseTradingHours,
+        openTime: '09:00',
+        closeTime: '17:00',
+        timezone: 'America/Toronto',
+      };
+    default:
+      return {
+        ...baseTradingHours,
+        openTime: '09:00',
+        closeTime: '17:00',
+        timezone: 'UTC',
+      };
     }
   }
 
@@ -292,59 +292,59 @@ class RegionConfigService extends EventEmitter {
 
     // Region-specific compliance adjustments
     switch (region) {
-      case 'US':
-        return {
-          ...baseRules,
-          regulatoryBodies: ['CFTC', 'NFA', 'FERC'],
-          reportingRequirements: {
-            dodd_frank: true,
-            position_limits: true,
-            swap_data_reporting: true,
-          },
-          kycRequirements: 'enhanced',
-          sanctionsScreening: true,
-        };
-      case 'EU':
-        return {
-          ...baseRules,
-          regulatoryBodies: ['ESMA', 'National Regulators'],
-          reportingRequirements: {
-            mifid_ii: true,
-            emir: true,
-            remit: true,
-          },
-          gdprCompliant: true,
-          sanctionsScreening: true,
-        };
-      case 'UK':
-        return {
-          ...baseRules,
-          regulatoryBodies: ['FCA', 'PRA'],
-          reportingRequirements: {
-            uk_mifir: true,
-            uk_emir: true,
-          },
-          sanctionsScreening: true,
-        };
-      case 'APAC':
-        return {
-          ...baseRules,
-          reportingThresholds: {
-            ...baseRules.reportingThresholds,
-            large_trader: 5000000, // Lower threshold
-          },
-          crossBorderReporting: true,
-        };
-      case 'CA':
-        return {
-          ...baseRules,
-          regulatoryBodies: ['IIROC', 'Provincial Regulators'],
-          reportingRequirements: {
-            canadian_derivatives: true,
-          },
-        };
-      default:
-        return baseRules;
+    case 'US':
+      return {
+        ...baseRules,
+        regulatoryBodies: ['CFTC', 'NFA', 'FERC'],
+        reportingRequirements: {
+          dodd_frank: true,
+          position_limits: true,
+          swap_data_reporting: true,
+        },
+        kycRequirements: 'enhanced',
+        sanctionsScreening: true,
+      };
+    case 'EU':
+      return {
+        ...baseRules,
+        regulatoryBodies: ['ESMA', 'National Regulators'],
+        reportingRequirements: {
+          mifid_ii: true,
+          emir: true,
+          remit: true,
+        },
+        gdprCompliant: true,
+        sanctionsScreening: true,
+      };
+    case 'UK':
+      return {
+        ...baseRules,
+        regulatoryBodies: ['FCA', 'PRA'],
+        reportingRequirements: {
+          uk_mifir: true,
+          uk_emir: true,
+        },
+        sanctionsScreening: true,
+      };
+    case 'APAC':
+      return {
+        ...baseRules,
+        reportingThresholds: {
+          ...baseRules.reportingThresholds,
+          large_trader: 5000000, // Lower threshold
+        },
+        crossBorderReporting: true,
+      };
+    case 'CA':
+      return {
+        ...baseRules,
+        regulatoryBodies: ['IIROC', 'Provincial Regulators'],
+        reportingRequirements: {
+          canadian_derivatives: true,
+        },
+      };
+    default:
+      return baseRules;
     }
   }
 

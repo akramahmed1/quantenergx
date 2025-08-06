@@ -5,7 +5,7 @@ const EnhancedRegulatoryService = require('../services/enhancedRegulatoryService
 
 // Initialize services
 const connectorRegistry = new ExchangeConnectorRegistry();
-const regulatoryService = new EnhancedRegulatoryService();
+const _regulatoryService = new EnhancedRegulatoryService();
 
 /**
  * GET /api/exchanges

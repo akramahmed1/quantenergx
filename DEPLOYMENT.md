@@ -159,6 +159,30 @@ cp frontend/.env.example frontend/.env
 4. **Use different secrets** for development, staging, production
 5. **Audit secret access** through GitHub audit logs
 
+### Environment Variable Validation
+
+QuantEnergx includes automatic environment variable validation that runs before every build and startup:
+
+```bash
+# Manual validation
+node scripts/validate-env.js backend
+node scripts/validate-env.js frontend
+
+# Validation runs automatically on:
+npm run build    # Build validation
+npm run start    # Runtime validation
+```
+
+**Required Backend Environment Variables:**
+- `NODE_ENV` - Application environment (development/production)
+- `PORT` - Server port (default: 3001)
+- `DATABASE_URL` - PostgreSQL connection string (production only)
+- `JWT_SECRET` - JWT signing secret (min 32 chars in production)
+- `JWT_REFRESH_SECRET` - Refresh token secret (min 32 chars in production)
+
+**Required Frontend Environment Variables:**
+- `REACT_APP_API_URL` - Backend API endpoint URL
+
 ### Environment File Security
 ```bash
 # ✅ Good - These files are included
@@ -173,12 +197,30 @@ credentials.json
 ```
 
 ### Security Headers
-The platform implements comprehensive security headers:
-- Content Security Policy (CSP)
-- X-Frame-Options (clickjacking protection)
-- X-Content-Type-Options (MIME sniffing protection)
-- X-XSS-Protection (XSS filtering)
-- Strict-Transport-Security (HTTPS enforcement)
+The platform implements comprehensive security headers across all deployment targets:
+
+- **Content Security Policy (CSP)** - Prevents XSS and data injection attacks
+- **X-Frame-Options** - Clickjacking protection (SAMEORIGIN)
+- **X-Content-Type-Options** - MIME sniffing protection (nosniff)
+- **X-XSS-Protection** - XSS filtering enabled
+- **Referrer-Policy** - Controls referrer information (strict-origin-when-cross-origin)
+- **Permissions-Policy** - Restricts access to browser features
+- **Strict-Transport-Security** - HTTPS enforcement (on secure platforms)
+
+### Dependency Security Management
+
+The project includes automated dependency monitoring and updates:
+
+1. **Dependabot Configuration** - Weekly automated dependency updates
+2. **Security Audit Integration** - `npm audit` runs in CI pipeline
+3. **Vulnerability Tracking** - See `DEPENDENCY_UPGRADE_NOTES.md` for blocked upgrades
+4. **Safe Update Strategy** - Groups related updates, ignores breaking changes
+
+**Current Security Status:**
+- ✅ Bundlesize replaced with webpack-bundle-analyzer (eliminated axios vulnerabilities)
+- ✅ node-telegram-bot-api updated to v0.66.0+ (fixed critical form-data issue)
+- ⚠️ Artillery requires Node.js 22+ (documented in upgrade notes)
+- ⚠️ ESLint 8.x EOL (upgrade to v9 planned)
 
 ## 🧪 Testing Deployments
 

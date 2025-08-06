@@ -752,18 +752,18 @@ class IoTSmartMeterService {
 
     anomalies.forEach(anomaly => {
       switch (anomaly.type) {
-        case 'threshold':
-          recommendations.push('Review device calibration and operating parameters');
-          break;
-        case 'statistical':
-          recommendations.push('Investigate recent changes in operating conditions');
-          break;
-        case 'pattern':
-          recommendations.push('Check for external factors affecting normal operation');
-          break;
-        case 'ml_prediction':
-          recommendations.push('Monitor device closely for potential issues');
-          break;
+      case 'threshold':
+        recommendations.push('Review device calibration and operating parameters');
+        break;
+      case 'statistical':
+        recommendations.push('Investigate recent changes in operating conditions');
+        break;
+      case 'pattern':
+        recommendations.push('Check for external factors affecting normal operation');
+        break;
+      case 'ml_prediction':
+        recommendations.push('Monitor device closely for potential issues');
+        break;
       }
     });
 

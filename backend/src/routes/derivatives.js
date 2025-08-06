@@ -682,7 +682,7 @@ router.put(
 );
 
 // Error handling middleware
-router.use((error, req, res, next) => {
+router.use((error, req, res, _next) => {
   console.error('Derivatives API error:', error);
   res.status(500).json({
     success: false,

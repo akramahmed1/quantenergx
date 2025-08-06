@@ -357,29 +357,29 @@ class EnhancedRegulatoryService {
     let content, filename, schema;
 
     switch (exportFormat) {
-      case 'XML':
-        content = this.generateXMLReport(reportData, regulation, template);
-        filename = `${regulation}_${timestamp}.xml`;
-        schema =
+    case 'XML':
+      content = this.generateXMLReport(reportData, regulation, template);
+      filename = `${regulation}_${timestamp}.xml`;
+      schema =
           template.transactionReport?.schema ||
           template.fundamentalData?.schema ||
           template.swapDataReport?.schema;
-        break;
+      break;
 
-      case 'XBRL':
-        content = this.generateXBRLReport(reportData, regulation, template);
-        filename = `${regulation}_${timestamp}.xbrl`;
-        schema = `${regulation}_taxonomy.xsd`;
-        break;
+    case 'XBRL':
+      content = this.generateXBRLReport(reportData, regulation, template);
+      filename = `${regulation}_${timestamp}.xbrl`;
+      schema = `${regulation}_taxonomy.xsd`;
+      break;
 
-      case 'CSV':
-        content = this.generateCSVReport(reportData, regulation, template);
-        filename = `${regulation}_${timestamp}.csv`;
-        schema = null;
-        break;
+    case 'CSV':
+      content = this.generateCSVReport(reportData, regulation, template);
+      filename = `${regulation}_${timestamp}.csv`;
+      schema = null;
+      break;
 
-      default:
-        throw new Error(`Unsupported export format: ${exportFormat}`);
+    default:
+      throw new Error(`Unsupported export format: ${exportFormat}`);
     }
 
     return { content, filename, schema };
@@ -751,14 +751,14 @@ class EnhancedRegulatoryService {
     const now = new Date();
 
     switch (deadline) {
-      case 'immediate':
-        return now.toISOString();
-      case 'T+1':
-        return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
-      case 'T+2':
-        return new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString();
-      default:
-        return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
+    case 'immediate':
+      return now.toISOString();
+    case 'T+1':
+      return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
+    case 'T+2':
+      return new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000).toISOString();
+    default:
+      return new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
     }
   }
 
