@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+
 export interface DocumentField {
   name: string;
   value: string | number;
@@ -64,7 +66,7 @@ export const uploadDocument = createAsyncThunk(
       formData.append(key, value as string);
     });
 
-    const response = await fetch('/api/v1/ocr/process', {
+    const response = await fetch(`${API_URL}/api/v1/ocr/process`, {
       method: 'POST',
       body: formData,
       headers: {
@@ -91,7 +93,7 @@ export const uploadBatch = createAsyncThunk(
       formData.append(key, value as string);
     });
 
-    const response = await fetch('/api/v1/ocr/batch', {
+    const response = await fetch(`${API_URL}/api/v1/ocr/batch`, {
       method: 'POST',
       body: formData,
       headers: {
@@ -108,7 +110,7 @@ export const uploadBatch = createAsyncThunk(
 );
 
 export const getBatchStatus = createAsyncThunk('ocr/getBatchStatus', async (batchId: string) => {
-  const response = await fetch(`/api/v1/ocr/batch/${batchId}`, {
+  const response = await fetch(`${API_URL}/api/v1/ocr/batch/${batchId}`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token')}`,
     },
@@ -129,7 +131,7 @@ export const submitReview = createAsyncThunk(
     reviewStatus: 'approved' | 'rejected' | 'needs_revision';
     comments?: string;
   }) => {
-    const response = await fetch(`/api/v1/ocr/review/${data.documentId}`, {
+    const response = await fetch(`${API_URL}/api/v1/ocr/review/${data.documentId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
