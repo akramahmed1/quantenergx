@@ -434,8 +434,8 @@ def generate_forecast():
         })
         
     except Exception as e:
-        logger.error(f"Forecast generation failed: {e}")
-        return jsonify({'error': str(e)}), 500
+        logger.exception("Forecast generation failed")
+        return jsonify({'error': 'An internal error has occurred.'}), 500
 
 @app.route('/benchmark', methods=['POST'])
 def run_benchmark():
@@ -455,8 +455,8 @@ def run_benchmark():
         })
         
     except Exception as e:
-        logger.error(f"Benchmark failed: {e}")
-        return jsonify({'error': str(e)}), 500
+        logger.exception("Benchmark failed")
+        return jsonify({'error': 'An internal error has occurred.'}), 500
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
