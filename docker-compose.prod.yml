@@ -1,0 +1,618 @@
+# Docker Compose for QuantEnergx - Production Multi-Service Deployment
+# Multi-cloud ready: AWS, GCP, Azure compatible
+# Services: Node.js API, Python Analytics, Blockchain, React Frontend, Databases
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database - Primary
+  postgres:
+    image: postgres:15-alpine
+    container_name: quantenergx-postgres-prod
+    environment:
+      POSTGRES_DB: ${DB_NAME:-quantenergx_prod}
+      POSTGRES_USER: ${DB_USER:-quantenergx_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+      - ./deployment/postgres/init:/docker-entrypoint-initdb.d
+      - ./deployment/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+    networks:
+      - quantenergx-network-prod
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-quantenergx_user} -d ${DB_NAME:-quantenergx_prod}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  # Redis Cache - Production
+  redis:
+    image: redis:7-alpine
+    container_name: quantenergx-redis-prod
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data_prod:/data
+      - ./deployment/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - quantenergx-network-prod
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # MongoDB - Analytics and Blockchain Data
+  mongodb:
+    image: mongo:7.0
+    container_name: quantenergx-mongodb-prod
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: quantenergx_analytics
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    volumes:
+      - mongodb_data_prod:/data/db
+      - ./deployment/mongodb/init:/docker-entrypoint-initdb.d
+      - ./deployment/mongodb/mongod.conf:/etc/mongod.conf
+    networks:
+      - quantenergx-network-prod
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  # Elasticsearch - Search and Analytics
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: quantenergx-elasticsearch-prod
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+    ports:
+      - "${ELASTIC_PORT:-9200}:9200"
+    volumes:
+      - elasticsearch_data_prod:/usr/share/elasticsearch/data
+      - ./deployment/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    networks:
+      - quantenergx-network-prod
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u elastic:${ELASTIC_PASSWORD} -f http://localhost:9200/_cluster/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  # Apache Kafka - Event Streaming
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: quantenergx-kafka-prod
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+      KAFKA_LOG_RETENTION_HOURS: 168
+      KAFKA_LOG_RETENTION_BYTES: 1073741824
+    ports:
+      - "${KAFKA_PORT:-9092}:9092"
+    volumes:
+      - kafka_data_prod:/var/lib/kafka/data
+    networks:
+      - quantenergx-network-prod
+    depends_on:
+      - zookeeper
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  # Zookeeper - Kafka Coordination
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: quantenergx-zookeeper-prod
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    volumes:
+      - zookeeper_data_prod:/var/lib/zookeeper/data
+      - zookeeper_logs_prod:/var/lib/zookeeper/log
+    networks:
+      - quantenergx-network-prod
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.25'
+    restart: unless-stopped
+
+  # Node.js Backend API Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: quantenergx-backend-prod
+    environment:
+      - NODE_ENV=production
+      - PORT=${BACKEND_PORT:-3001}
+      - GRPC_PORT=${GRPC_PORT:-50051}
+      - DATABASE_URL=postgresql://${DB_USER:-quantenergx_user}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-quantenergx_prod}
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-quantenergx_prod}
+      - DB_USER=${DB_USER:-quantenergx_user}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - MONGODB_URI=mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD}@mongodb:27017/quantenergx_analytics?authSource=admin
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_USER=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
+      - KAFKA_BROKERS=kafka:9092
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-24h}
+      - ENFORCE_HTTPS=${ENFORCE_HTTPS:-true}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - S3_DATA_LAKE_BUCKET=${S3_DATA_LAKE_BUCKET:-quantenergx-datalake}
+      - EIA_API_KEY=${EIA_API_KEY}
+      - IEA_API_KEY=${IEA_API_KEY}
+      - ICE_API_KEY=${ICE_API_KEY}
+      - BLOCKCHAIN_RPC_URL=${BLOCKCHAIN_RPC_URL}
+      - BLOCKCHAIN_PRIVATE_KEY=${BLOCKCHAIN_PRIVATE_KEY}
+      - COMPLIANCE_REGIONS=${COMPLIANCE_REGIONS:-US,Europe,UK,Guyana,MiddleEast}
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
+      - "${GRPC_PORT:-50051}:50051"
+    volumes:
+      - backend_uploads_prod:/app/uploads
+      - backend_logs_prod:/app/logs
+      - ./backend/etl:/app/etl
+    networks:
+      - quantenergx-network-prod
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  # Python Analytics Service
+  python-analytics:
+    build:
+      context: ./services/python-analytics
+      dockerfile: Dockerfile
+    container_name: quantenergx-python-analytics-prod
+    environment:
+      - PYTHON_ENV=production
+      - DATABASE_URL=postgresql://${DB_USER:-quantenergx_user}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-quantenergx_prod}
+      - MONGODB_URI=mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD}@mongodb:27017/quantenergx_analytics?authSource=admin
+      - REDIS_URL=redis://default:${REDIS_PASSWORD}@redis:6379
+      - ELASTICSEARCH_URL=http://elastic:${ELASTIC_PASSWORD}@elasticsearch:9200
+      - KAFKA_BROKERS=kafka:9092
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - S3_DATA_LAKE_BUCKET=${S3_DATA_LAKE_BUCKET:-quantenergx-datalake}
+      - ML_MODEL_BUCKET=${ML_MODEL_BUCKET:-quantenergx-ml-models}
+      - COMPLIANCE_REGIONS=${COMPLIANCE_REGIONS:-US,Europe,UK,Guyana,MiddleEast}
+    ports:
+      - "${PYTHON_PORT:-8000}:8000"
+    volumes:
+      - python_models_prod:/app/models
+      - python_data_prod:/app/data
+      - python_logs_prod:/app/logs
+    networks:
+      - quantenergx-network-prod
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2.0'
+        reservations:
+          memory: 2G
+          cpus: '1.0'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  # Blockchain Service
+  blockchain-service:
+    build:
+      context: ./services/blockchain
+      dockerfile: Dockerfile
+    container_name: quantenergx-blockchain-prod
+    environment:
+      - NODE_ENV=production
+      - BLOCKCHAIN_NETWORK=${BLOCKCHAIN_NETWORK:-ethereum}
+      - RPC_URL=${BLOCKCHAIN_RPC_URL}
+      - PRIVATE_KEY=${BLOCKCHAIN_PRIVATE_KEY}
+      - CONTRACT_ADDRESS=${SMART_CONTRACT_ADDRESS}
+      - MONGODB_URI=mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD}@mongodb:27017/quantenergx_blockchain?authSource=admin
+      - REDIS_URL=redis://default:${REDIS_PASSWORD}@redis:6379
+      - KAFKA_BROKERS=kafka:9092
+      - GAS_PRICE=${GAS_PRICE:-20}
+      - GAS_LIMIT=${GAS_LIMIT:-300000}
+      - COMPLIANCE_ENABLED=true
+      - AUDIT_ENABLED=true
+    ports:
+      - "${BLOCKCHAIN_PORT:-3002}:3002"
+    volumes:
+      - blockchain_data_prod:/app/data
+      - blockchain_logs_prod:/app/logs
+      - blockchain_keys_prod:/app/keys
+    networks:
+      - quantenergx-network-prod
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3002/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  # React Frontend Application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: quantenergx-frontend-prod
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_API_URL=${FRONTEND_API_URL:-https://api.quantenergx.com}
+      - REACT_APP_WS_URL=${FRONTEND_WS_URL:-wss://api.quantenergx.com}
+      - REACT_APP_BLOCKCHAIN_URL=${FRONTEND_BLOCKCHAIN_URL:-https://blockchain.quantenergx.com}
+      - REACT_APP_ANALYTICS_URL=${FRONTEND_ANALYTICS_URL:-https://analytics.quantenergx.com}
+      - REACT_APP_COMPLIANCE_REGIONS=${COMPLIANCE_REGIONS:-US,Europe,UK,Guyana,MiddleEast}
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+      - "${FRONTEND_SSL_PORT:-443}:443"
+    volumes:
+      - ./deployment/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./deployment/ssl:/etc/ssl/certs
+    networks:
+      - quantenergx-network-prod
+    depends_on:
+      backend:
+        condition: service_healthy
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # ETL Service - Dedicated ORC Data Lake Pipeline
+  etl-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.etl
+    container_name: quantenergx-etl-prod
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${DB_USER:-quantenergx_user}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-quantenergx_prod}
+      - MONGODB_URI=mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD}@mongodb:27017/quantenergx_analytics?authSource=admin
+      - REDIS_URL=redis://default:${REDIS_PASSWORD}@redis:6379
+      - KAFKA_BROKERS=kafka:9092
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - S3_DATA_LAKE_BUCKET=${S3_DATA_LAKE_BUCKET:-quantenergx-datalake}
+      - ATHENA_DATABASE=${ATHENA_DATABASE:-quantenergx_analytics}
+      - ATHENA_RESULTS_BUCKET=${ATHENA_RESULTS_BUCKET:-quantenergx-athena-results}
+      - EIA_API_KEY=${EIA_API_KEY}
+      - IEA_API_KEY=${IEA_API_KEY}
+      - ICE_API_KEY=${ICE_API_KEY}
+      - ETL_SCHEDULE_ENABLED=true
+      - ETL_BATCH_SIZE=1000
+      - DATA_RETENTION_DAYS=2555
+    volumes:
+      - etl_temp_prod:/tmp
+      - etl_logs_prod:/app/logs
+    networks:
+      - quantenergx-network-prod
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  # Monitoring - Prometheus
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: quantenergx-prometheus-prod
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./deployment/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data_prod:/prometheus
+    networks:
+      - quantenergx-network-prod
+    restart: unless-stopped
+
+  # Monitoring - Grafana
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: quantenergx-grafana-prod
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_DOMAIN=${GRAFANA_DOMAIN:-grafana.quantenergx.com}
+      - GF_SMTP_ENABLED=true
+      - GF_SMTP_HOST=${SMTP_HOST}
+      - GF_SMTP_USER=${SMTP_USER}
+      - GF_SMTP_PASSWORD=${SMTP_PASSWORD}
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - grafana_data_prod:/var/lib/grafana
+      - ./deployment/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./deployment/grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - quantenergx-network-prod
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # Security - Vault for Secrets Management
+  vault:
+    image: vault:1.15.0
+    container_name: quantenergx-vault-prod
+    cap_add:
+      - IPC_LOCK
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=${VAULT_ROOT_TOKEN}
+      - VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200
+      - VAULT_ADDR=http://127.0.0.1:8200
+    ports:
+      - "${VAULT_PORT:-8200}:8200"
+    volumes:
+      - vault_data_prod:/vault/data
+      - ./deployment/vault/config:/vault/config
+    networks:
+      - quantenergx-network-prod
+    command: vault server -config=/vault/config/vault.hcl
+    restart: unless-stopped
+
+  # Load Balancer - HAProxy
+  load-balancer:
+    image: haproxy:2.8-alpine
+    container_name: quantenergx-haproxy-prod
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8404:8404"  # HAProxy stats
+    volumes:
+      - ./deployment/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+      - ./deployment/ssl:/etc/ssl/certs
+    networks:
+      - quantenergx-network-prod
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data_prod:
+    driver: local
+  redis_data_prod:
+    driver: local
+  mongodb_data_prod:
+    driver: local
+  elasticsearch_data_prod:
+    driver: local
+  kafka_data_prod:
+    driver: local
+  zookeeper_data_prod:
+    driver: local
+  zookeeper_logs_prod:
+    driver: local
+  backend_uploads_prod:
+    driver: local
+  backend_logs_prod:
+    driver: local
+  python_models_prod:
+    driver: local
+  python_data_prod:
+    driver: local
+  python_logs_prod:
+    driver: local
+  blockchain_data_prod:
+    driver: local
+  blockchain_logs_prod:
+    driver: local
+  blockchain_keys_prod:
+    driver: local
+  etl_temp_prod:
+    driver: local
+  etl_logs_prod:
+    driver: local
+  prometheus_data_prod:
+    driver: local
+  grafana_data_prod:
+    driver: local
+  vault_data_prod:
+    driver: local
+
+networks:
+  quantenergx-network-prod:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

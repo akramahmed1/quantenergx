@@ -1,0 +1,66 @@
+# Multi-stage Docker build for QuantEnergx Backend - Production
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY tsconfig.json ./
+
+# Install dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy source code
+COPY src/ ./src/
+COPY etl/ ./etl/
+
+# Build TypeScript
+RUN npm run build
+
+# Production stage
+FROM node:20-alpine AS production
+
+# Install security updates and necessary packages
+RUN apk update && apk upgrade && \
+    apk add --no-cache \
+    curl \
+    tzdata \
+    dumb-init \
+    && rm -rf /var/cache/apk/*
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S quantenergx -u 1001
+
+WORKDIR /app
+
+# Copy production dependencies
+COPY --from=builder --chown=quantenergx:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=quantenergx:nodejs /app/dist ./dist
+COPY --from=builder --chown=quantenergx:nodejs /app/etl ./etl
+COPY --chown=quantenergx:nodejs package.json ./
+
+# Create directories
+RUN mkdir -p logs uploads temp && \
+    chown -R quantenergx:nodejs /app
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=3001
+ENV GRPC_PORT=50051
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:3001/health || exit 1
+
+# Switch to non-root user
+USER quantenergx
+
+# Expose ports
+EXPOSE 3001 50051
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start the application
+CMD ["node", "dist/server.js"]
