@@ -10,6 +10,7 @@ api_router = APIRouter()
 api_router.include_router(market_router, prefix="/market", tags=["Market"])
 api_router.include_router(energy_router, prefix="/energy", tags=["Energy"])
 
+
 # Health check specific to API
 @api_router.get("/health", tags=["API"])
 async def api_health():

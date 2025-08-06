@@ -8,12 +8,12 @@ from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 # Set up test environment variables before importing the app
-os.environ.setdefault('DATABASE_URL', 'postgresql://test:test@localhost:5432/test')
-os.environ.setdefault('DB_USER', 'test')
-os.environ.setdefault('DB_PASSWORD', 'test')
-os.environ.setdefault('JWT_SECRET', 'test-secret-key-32-characters-long')
-os.environ.setdefault('JWT_REFRESH_SECRET', 'test-refresh-secret-32-characters')
-os.environ.setdefault('API_ENCRYPTION_KEY', 'test-encryption-key-32-chars-long')
+os.environ.setdefault("DATABASE_URL", "postgresql://test:test@localhost:5432/test")
+os.environ.setdefault("DB_USER", "test")
+os.environ.setdefault("DB_PASSWORD", "test")
+os.environ.setdefault("JWT_SECRET", "test-secret-key-32-characters-long")
+os.environ.setdefault("JWT_REFRESH_SECRET", "test-refresh-secret-32-characters")
+os.environ.setdefault("API_ENCRYPTION_KEY", "test-encryption-key-32-chars-long")
 
 from main import app
 from database import db_client
@@ -22,7 +22,7 @@ from config import settings
 
 
 # Test configuration
-pytest_plugins = ['pytest_asyncio']
+pytest_plugins = ["pytest_asyncio"]
 
 
 @pytest.fixture(scope="session")
@@ -58,12 +58,12 @@ async def redis_client_fixture():
     # Use a different Redis DB for testing
     test_redis = redis_client
     test_redis.client = test_redis.client if test_redis.client else await test_redis.connect()
-    
+
     # Use test database
     await test_redis.client.select(15)  # Use DB 15 for tests
-    
+
     yield test_redis
-    
+
     # Clean up test database
     await test_redis.client.flushdb()
     await test_redis.client.select(0)  # Back to default DB
@@ -80,12 +80,12 @@ async def db_client_fixture():
 # Test data factories
 class TestDataFactory:
     """Factory for creating test data."""
-    
+
     @staticmethod
     def create_market_data(**kwargs):
         """Create test market data."""
         from datetime import datetime, timezone
-        
+
         defaults = {
             "symbol": "TEST_SYMBOL",
             "price": 50.0,
@@ -97,12 +97,12 @@ class TestDataFactory:
         }
         defaults.update(kwargs)
         return defaults
-    
+
     @staticmethod
     def create_energy_price(**kwargs):
         """Create test energy price data."""
         from datetime import date, datetime, timezone
-        
+
         defaults = {
             "market": "ELECTRICITY",
             "date": date.today(),
@@ -114,7 +114,7 @@ class TestDataFactory:
         }
         defaults.update(kwargs)
         return defaults
-    
+
     @staticmethod
     def create_user(**kwargs):
         """Create test user data."""
@@ -139,34 +139,36 @@ def test_data_factory():
 @pytest.fixture(autouse=True)
 def mock_redis_and_external_apis(monkeypatch):
     """Mock Redis client and external API calls for testing."""
-    
+
     # Mock Redis client
     class MockRedisClient:
         def __init__(self):
             self.data = {}
-            
+
         async def get(self, key: str, json_decode: bool = True):
             """Mock get method."""
             value = self.data.get(key)
             if value is None:
                 return None
-            
+
             if json_decode and isinstance(value, str):
                 try:
                     import json
+
                     return json.loads(value)
                 except (json.JSONDecodeError, TypeError):
                     return value
             return value
-        
+
         async def set(self, key: str, value, ttl: int = None):
             """Mock set method."""
             if isinstance(value, (dict, list)):
                 import json
+
                 value = json.dumps(value, default=str)
             self.data[key] = value
             return True
-        
+
         async def delete(self, *keys):
             """Mock delete method."""
             count = 0
@@ -175,20 +177,21 @@ def mock_redis_and_external_apis(monkeypatch):
                     del self.data[key]
                     count += 1
             return count
-        
+
         async def exists(self, key: str):
             """Mock exists method."""
             return key in self.data
-        
+
         async def get_ttl(self, key: str):
             """Mock TTL method."""
             return 300 if key in self.data else None
-    
+
     # Replace the global redis client with mock
     from utils.redis_client import redis_client
+
     mock_redis = MockRedisClient()
     monkeypatch.setattr(redis_client, "client", mock_redis)
-    
+
     # Mock Redis methods directly on the client
     monkeypatch.setattr(redis_client, "get", mock_redis.get)
     monkeypatch.setattr(redis_client, "set", mock_redis.set)
@@ -249,10 +252,10 @@ def override_settings_for_tests(monkeypatch):
     # Override cache TTL for faster tests
     monkeypatch.setattr(settings, "energy_price_cache_ttl", 1)
     monkeypatch.setattr(settings, "market_data_cache_ttl", 1)
-    
+
     # Override rate limiting for tests
     monkeypatch.setattr(settings, "rate_limit_per_minute", 1000)
     monkeypatch.setattr(settings, "auth_rate_limit_per_minute", 100)
-    
+
     # Set debug mode for detailed error messages
     monkeypatch.setattr(settings, "debug", True)

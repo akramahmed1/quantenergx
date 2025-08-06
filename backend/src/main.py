@@ -35,7 +35,9 @@ structlog.configure(
         structlog.processors.add_log_level,
         structlog.processors.StackInfoRenderer(),
         structlog.dev.set_exc_info,
-        structlog.processors.JSONRenderer() if not settings.debug else structlog.dev.ConsoleRenderer(),
+        structlog.processors.JSONRenderer()
+        if not settings.debug
+        else structlog.dev.ConsoleRenderer(),
     ],
     wrapper_class=structlog.stdlib.BoundLogger,
     logger_factory=structlog.stdlib.LoggerFactory(),
@@ -50,26 +52,26 @@ async def lifespan(app: FastAPI):
     """Application lifespan manager."""
     # Startup
     logger.info("Starting QuantEnergx Backend", version="2.0.0", environment=settings.environment)
-    
+
     try:
         # Initialize database connection
         await db_client.connect()
-        
+
         # Initialize Redis connection
         await redis_client.connect()
-        
+
         logger.info("All services initialized successfully")
-        
+
         yield
-        
+
     except Exception as e:
         logger.error("Failed to initialize services", error=str(e))
         raise
-    
+
     finally:
         # Shutdown
         logger.info("Shutting down QuantEnergx Backend")
-        
+
         try:
             await redis_client.disconnect()
             await db_client.disconnect()
@@ -107,8 +109,7 @@ app.add_middleware(
 # Trusted Host Middleware (security)
 if not settings.debug:
     app.add_middleware(
-        TrustedHostMiddleware,
-        allowed_hosts=["*.quantenergx.com", "quantenergx.com", "localhost"]
+        TrustedHostMiddleware, allowed_hosts=["*.quantenergx.com", "quantenergx.com", "localhost"]
     )
 
 
@@ -120,16 +121,18 @@ if not settings.debug:
 async def security_headers_middleware(request: Request, call_next):
     """Add security headers."""
     response = await call_next(request)
-    
+
     # Security headers
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-    
+
     if not settings.debug:
-        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
-    
+        response.headers[
+            "Strict-Transport-Security"
+        ] = "max-age=31536000; includeSubDomains; preload"
+
     return response
 
 
@@ -138,9 +141,9 @@ async def security_headers_middleware(request: Request, call_next):
 async def logging_middleware(request: Request, call_next):
     """Request/response logging middleware."""
     import time
-    
+
     start_time = time.time()
-    
+
     # Log request
     logger.info(
         "Request received",
@@ -149,11 +152,11 @@ async def logging_middleware(request: Request, call_next):
         client_ip=request.client.host if request.client else None,
         user_agent=request.headers.get("user-agent"),
     )
-    
+
     response = await call_next(request)
-    
+
     process_time = time.time() - start_time
-    
+
     # Log response
     logger.info(
         "Request completed",
@@ -162,7 +165,7 @@ async def logging_middleware(request: Request, call_next):
         status_code=response.status_code,
         process_time_ms=round(process_time * 1000, 2),
     )
-    
+
     response.headers["X-Process-Time"] = str(process_time)
     return response
 
@@ -180,7 +183,7 @@ async def health_check() -> Dict[str, Any]:
     """System health check endpoint."""
     # Check database
     db_healthy = await db_client.health_check()
-    
+
     # Check Redis
     redis_healthy = False
     try:
@@ -188,7 +191,7 @@ async def health_check() -> Dict[str, Any]:
         redis_healthy = True
     except Exception:
         pass
-    
+
     health_status = {
         "status": "healthy" if db_healthy and redis_healthy else "unhealthy",
         "timestamp": "2024-12-19T21:30:00Z",  # This would be dynamic in real implementation
@@ -200,7 +203,7 @@ async def health_check() -> Dict[str, Any]:
             "api": "online",
         },
     }
-    
+
     return health_status
 
 
@@ -215,7 +218,7 @@ async def root():
     return {
         "message": "QuantEnergx Backend API",
         "version": "2.0.0",
-        "docs": "/api/v1/docs" if settings.debug else "Not available in production"
+        "docs": "/api/v1/docs" if settings.debug else "Not available in production",
     }
 
 
