@@ -1,9 +1,10 @@
-import express, { Application, Request, Response, NextFunction } from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import dotenv from 'dotenv';
-import winston from 'winston';
-import rateLimit from 'express-rate-limit';
+import * as express from 'express';
+import { Application, Request, Response, NextFunction } from 'express';
+import * as cors from 'cors';
+import * as helmet from 'helmet';
+import * as dotenv from 'dotenv';
+import * as winston from 'winston';
+import * as rateLimit from 'express-rate-limit';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { SecurityMiddleware } from '../middleware/security';
@@ -65,7 +66,7 @@ app.use(helmet({
 }));
 
 // Rate limiting for CBB API calls
-const cbbLimiter = rateLimit({
+const cbbLimiter = rateLimit.default({
   windowMs: 60 * 1000, // 1 minute
   max: 100, // Limit each IP to 100 CBB validation requests per minute
   message: {
