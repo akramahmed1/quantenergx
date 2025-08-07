@@ -1,6 +1,5 @@
 const { EventEmitter } = require('events');
 const axios = require('axios');
-const { v4: uuidv4 } = require('uuid');
 
 /**
  * Liza Crude Oil Trading Service for Guyana
