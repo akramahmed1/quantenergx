@@ -7,6 +7,7 @@
  */
 
 import { EventEmitter } from 'events';
+import * as crypto from 'crypto';
 
 export interface HijriDate {
   year: number;
@@ -426,7 +427,7 @@ export class ShariaComplianceService extends EventEmitter {
       'Sheikh Nizam Yaquby'
     ];
     
-    return scholars[Math.floor(Math.random() * scholars.length)];
+    return scholars[crypto.randomInt(scholars.length)];
   }
 
   private isHijriLeapYear(year: number): boolean {
