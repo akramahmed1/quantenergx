@@ -183,6 +183,16 @@ npm run security:audit
 ### User Management
 - Multi-role user authentication (traders, risk managers, compliance officers)
 - Permission-based access control
+
+### Multi-Region Infrastructure
+- **Regional deployment support** for US, EU, Middle East, Guyana, and Bahrain
+- **Isolated PostgreSQL and Redis clusters** per region with health checks
+- **Enhanced security middleware** with strict CSP, HSTS, and regional compliance headers
+- **Bahrain CBB validator microservice** for Central Bank of Bahrain compliance
+- **Regional data residency** and compliance requirements (SOX, GDPR, CBB, EPA, ADGM)
+- **Comprehensive documentation** with deployment guides and configuration examples
+
+📖 **See [Multi-Region Infrastructure Guide](./docs/MULTI_REGION_INFRASTRUCTURE.md)** for detailed setup and usage instructions.
 - Activity logging and audit trails
 
 ### Basic Compliance
