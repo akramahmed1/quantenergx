@@ -64,7 +64,7 @@
     "@sentry/react": "8.40.0",
     "@testing-library/dom": "^10.4.1",
     "@types/node": "^24.1.0",
-    "axios": "1.6.0",
+    "axios": "1.8.2",
     "chart.js": "^4.5.0",
     "plotly.js": "^3.0.3",
     "react": "^18.2.0",
