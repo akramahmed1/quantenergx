@@ -81,7 +81,7 @@
     "@types/socket.io": "^3.0.1",
     "apache-arrow": "^21.0.0",
     "argon2": "^0.43.1",
-    "axios": "^1.11.0",
+    "axios": "^1.8.2",
     "bcryptjs": "^2.4.3",
     "bull": "^4.10.4",
     "cors": "^2.8.5",
