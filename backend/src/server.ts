@@ -17,6 +17,7 @@ import { KafkaService, getKafkaService } from './kafka/kafkaService';
 import { WebSocketService } from './websocket/websocketService';
 import { WebhookManager } from './webhooks/webhookManager';
 import { PluginManager } from './plugins/pluginManager';
+import { SecurityMiddleware } from './middleware/security';
 
 // Load environment variables
 dotenv.config();
@@ -67,6 +68,14 @@ let webhookManager: WebhookManager;
 let pluginManager: PluginManager;
 let grpcService: any;
 
+// Initialize security middleware with enhanced configuration
+const securityMiddleware = new SecurityMiddleware({
+  enforceHttps: process.env.NODE_ENV === 'production',
+  hstsMaxAge: 31536000, // 1 year
+  includeSubDomains: true,
+  preload: true,
+});
+
 // Initialize all services
 async function initializeServices(): Promise<void> {
   try {
@@ -115,39 +124,28 @@ async function initializeServices(): Promise<void> {
   }
 }
 
-// HTTPS/TLS enforcement middleware
-app.use((req: Request, res: Response, next: NextFunction): void => {
-  // In production, enforce HTTPS
-  if (process.env.NODE_ENV === 'production') {
-    if (req.header('x-forwarded-proto') !== 'https') {
-      res.redirect(`https://${req.header('host')}${req.url}`);
-      return;
-    }
-  }
-  next();
-});
+// Apply enhanced security middleware
+app.use(...securityMiddleware.getMiddleware());
 
-// Enhanced security headers
+// Enhanced security headers - using our custom security middleware instead of helmet
+// helmet is still used for additional non-conflicting security features
 app.use(
   helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-        fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-        imgSrc: ["'self'", 'data:', 'https:'],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
-        connectSrc: ["'self'"],
-        frameSrc: ["'none'"],
-        objectSrc: ["'none'"],
-        upgradeInsecureRequests: [],
-      },
-    },
-    hsts: {
-      maxAge: 31536000,
-      includeSubDomains: true,
-      preload: true,
-    },
+    // Disable conflicting headers that our security middleware handles better
+    contentSecurityPolicy: false,
+    hsts: false,
+    frameguard: false,
+    // Keep other helmet features
+    crossOriginEmbedderPolicy: false,
+    crossOriginOpenerPolicy: false,
+    crossOriginResourcePolicy: false,
+    dnsPrefetchControl: true,
+    ieNoOpen: true,
+    noSniff: false, // Handled by our middleware
+    originAgentCluster: true,
+    permittedCrossDomainPolicies: false,
+    referrerPolicy: false, // Handled by our middleware
+    xssFilter: false, // Handled by our middleware
   })
 );
 

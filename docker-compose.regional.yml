@@ -1,0 +1,489 @@
+# Docker Compose for QuantEnergx Multi-Region Oil & Gas Trading Infrastructure
+# Supports PostgreSQL and Redis clusters per region: US, EU, ME (Middle East), Guyana, Bahrain
+# 
+# USAGE:
+# 1. Copy .env.example to .env and configure region-specific variables
+# 2. Start specific region: docker compose -f docker-compose.regional.yml up postgres-us redis-us
+# 3. Start all regions: docker compose -f docker-compose.regional.yml up
+# 4. Health checks ensure services are ready before dependent services start
+# 5. Each region uses separate networks for isolation and security
+#
+# REGIONS:
+# - US: PostgreSQL on 5432, Redis on 6379
+# - EU: PostgreSQL on 5433, Redis on 6380  
+# - ME: PostgreSQL on 5434, Redis on 6381
+# - Guyana: PostgreSQL on 5435, Redis on 6382
+# - Bahrain: PostgreSQL on 5436, Redis on 6383
+#
+# ENVIRONMENT VARIABLES:
+# Set per-region database credentials:
+# - DB_PASSWORD_US, DB_PASSWORD_EU, etc.
+# - DB_USER_US, DB_USER_EU, etc.
+# - DB_NAME_US, DB_NAME_EU, etc.
+
+services:
+  # ========================
+  # US REGION - United States
+  # SOX Compliance, CFTC Regulations
+  # ========================
+  
+  postgres-us:
+    image: postgres:15-alpine
+    container_name: quantenergx-postgres-us
+    environment:
+      POSTGRES_DB: ${DB_NAME_US:-quantenergx_us}
+      POSTGRES_USER: ${DB_USER_US:-quantenergx_us}
+      POSTGRES_PASSWORD: ${DB_PASSWORD_US:-quantenergx_us_secure123}
+      # US-specific timezone and locale
+      TZ: America/New_York
+      POSTGRES_INITDB_ARGS: "--locale=en_US.UTF-8"
+    ports:
+      - "${DB_PORT_US:-5432}:5432"
+    volumes:
+      - postgres_data_us:/var/lib/postgresql/data
+      - ./deployment/postgres/init-us.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - quantenergx-us-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER_US:-quantenergx_us} -d ${DB_NAME_US:-quantenergx_us}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  redis-us:
+    image: redis:7-alpine
+    container_name: quantenergx-redis-us
+    command: redis-server --requirepass ${REDIS_PASSWORD_US:-redis_us_secure123} --maxmemory 256mb --maxmemory-policy allkeys-lru
+    environment:
+      TZ: America/New_York
+    ports:
+      - "${REDIS_PORT_US:-6379}:6379"
+    volumes:
+      - redis_data_us:/data
+      - ./deployment/redis/redis-us.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - quantenergx-us-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD_US:-redis_us_secure123}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # ========================
+  # EU REGION - European Union
+  # GDPR Compliance, MiFID II Regulations
+  # ========================
+  
+  postgres-eu:
+    image: postgres:15-alpine
+    container_name: quantenergx-postgres-eu
+    environment:
+      POSTGRES_DB: ${DB_NAME_EU:-quantenergx_eu}
+      POSTGRES_USER: ${DB_USER_EU:-quantenergx_eu}
+      POSTGRES_PASSWORD: ${DB_PASSWORD_EU:-quantenergx_eu_secure123}
+      # EU-specific timezone and locale
+      TZ: Europe/London
+      POSTGRES_INITDB_ARGS: "--locale=en_GB.UTF-8"
+    ports:
+      - "${DB_PORT_EU:-5433}:5432"
+    volumes:
+      - postgres_data_eu:/var/lib/postgresql/data
+      - ./deployment/postgres/init-eu.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - quantenergx-eu-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER_EU:-quantenergx_eu} -d ${DB_NAME_EU:-quantenergx_eu}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  redis-eu:
+    image: redis:7-alpine
+    container_name: quantenergx-redis-eu
+    command: redis-server --requirepass ${REDIS_PASSWORD_EU:-redis_eu_secure123} --maxmemory 256mb --maxmemory-policy allkeys-lru
+    environment:
+      TZ: Europe/London
+    ports:
+      - "${REDIS_PORT_EU:-6380}:6379"
+    volumes:
+      - redis_data_eu:/data
+      - ./deployment/redis/redis-eu.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - quantenergx-eu-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD_EU:-redis_eu_secure123}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # ========================
+  # ME REGION - Middle East
+  # Islamic Finance Compliance, ADGM Regulations
+  # ========================
+  
+  postgres-me:
+    image: postgres:15-alpine
+    container_name: quantenergx-postgres-me
+    environment:
+      POSTGRES_DB: ${DB_NAME_ME:-quantenergx_me}
+      POSTGRES_USER: ${DB_USER_ME:-quantenergx_me}
+      POSTGRES_PASSWORD: ${DB_PASSWORD_ME:-quantenergx_me_secure123}
+      # Middle East timezone and locale
+      TZ: Asia/Dubai
+      POSTGRES_INITDB_ARGS: "--locale=en_US.UTF-8"
+    ports:
+      - "${DB_PORT_ME:-5434}:5432"
+    volumes:
+      - postgres_data_me:/var/lib/postgresql/data
+      - ./deployment/postgres/init-me.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - quantenergx-me-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER_ME:-quantenergx_me} -d ${DB_NAME_ME:-quantenergx_me}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  redis-me:
+    image: redis:7-alpine
+    container_name: quantenergx-redis-me
+    command: redis-server --requirepass ${REDIS_PASSWORD_ME:-redis_me_secure123} --maxmemory 256mb --maxmemory-policy allkeys-lru
+    environment:
+      TZ: Asia/Dubai
+    ports:
+      - "${REDIS_PORT_ME:-6381}:6379"
+    volumes:
+      - redis_data_me:/data
+      - ./deployment/redis/redis-me.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - quantenergx-me-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD_ME:-redis_me_secure123}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # ========================
+  # GUYANA REGION
+  # Environmental Compliance, Energy Regulations
+  # ========================
+  
+  postgres-guyana:
+    image: postgres:15-alpine
+    container_name: quantenergx-postgres-guyana
+    environment:
+      POSTGRES_DB: ${DB_NAME_GUYANA:-quantenergx_guyana}
+      POSTGRES_USER: ${DB_USER_GUYANA:-quantenergx_guyana}
+      POSTGRES_PASSWORD: ${DB_PASSWORD_GUYANA:-quantenergx_guyana_secure123}
+      # Guyana timezone and locale
+      TZ: America/Guyana
+      POSTGRES_INITDB_ARGS: "--locale=en_US.UTF-8"
+    ports:
+      - "${DB_PORT_GUYANA:-5435}:5432"
+    volumes:
+      - postgres_data_guyana:/var/lib/postgresql/data
+      - ./deployment/postgres/init-guyana.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - quantenergx-guyana-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER_GUYANA:-quantenergx_guyana} -d ${DB_NAME_GUYANA:-quantenergx_guyana}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  redis-guyana:
+    image: redis:7-alpine
+    container_name: quantenergx-redis-guyana
+    command: redis-server --requirepass ${REDIS_PASSWORD_GUYANA:-redis_guyana_secure123} --maxmemory 256mb --maxmemory-policy allkeys-lru
+    environment:
+      TZ: America/Guyana
+    ports:
+      - "${REDIS_PORT_GUYANA:-6382}:6379"
+    volumes:
+      - redis_data_guyana:/data
+      - ./deployment/redis/redis-guyana.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - quantenergx-guyana-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD_GUYANA:-redis_guyana_secure123}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # ========================
+  # BAHRAIN REGION
+  # Central Bank of Bahrain (CBB) Compliance
+  # ========================
+  
+  postgres-bahrain:
+    image: postgres:15-alpine
+    container_name: quantenergx-postgres-bahrain
+    environment:
+      POSTGRES_DB: ${DB_NAME_BAHRAIN:-quantenergx_bahrain}
+      POSTGRES_USER: ${DB_USER_BAHRAIN:-quantenergx_bahrain}
+      POSTGRES_PASSWORD: ${DB_PASSWORD_BAHRAIN:-quantenergx_bahrain_secure123}
+      # Bahrain timezone and locale
+      TZ: Asia/Bahrain
+      POSTGRES_INITDB_ARGS: "--locale=en_US.UTF-8"
+    ports:
+      - "${DB_PORT_BAHRAIN:-5436}:5432"
+    volumes:
+      - postgres_data_bahrain:/var/lib/postgresql/data
+      - ./deployment/postgres/init-bahrain.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - quantenergx-bahrain-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER_BAHRAIN:-quantenergx_bahrain} -d ${DB_NAME_BAHRAIN:-quantenergx_bahrain}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  redis-bahrain:
+    image: redis:7-alpine
+    container_name: quantenergx-redis-bahrain
+    command: redis-server --requirepass ${REDIS_PASSWORD_BAHRAIN:-redis_bahrain_secure123} --maxmemory 256mb --maxmemory-policy allkeys-lru
+    environment:
+      TZ: Asia/Bahrain
+    ports:
+      - "${REDIS_PORT_BAHRAIN:-6383}:6379"
+    volumes:
+      - redis_data_bahrain:/data
+      - ./deployment/redis/redis-bahrain.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - quantenergx-bahrain-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD_BAHRAIN:-redis_bahrain_secure123}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # ========================
+  # BAHRAIN CBB VALIDATOR MICROSERVICE
+  # Central Bank of Bahrain Compliance Validator
+  # ========================
+  
+  cbb-validator:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.cbb-validator
+    container_name: quantenergx-cbb-validator
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=3010
+      - CBB_API_ENDPOINT=${CBB_API_ENDPOINT:-https://api.cbb.gov.bh/v1}
+      - CBB_CLIENT_ID=${CBB_CLIENT_ID:-}
+      - CBB_CLIENT_SECRET=${CBB_CLIENT_SECRET:-}
+      - CBB_VALIDATION_TIMEOUT=30000
+      - DATABASE_URL=postgresql://${DB_USER_BAHRAIN:-quantenergx_bahrain}:${DB_PASSWORD_BAHRAIN:-quantenergx_bahrain_secure123}@postgres-bahrain:5432/${DB_NAME_BAHRAIN:-quantenergx_bahrain}
+      - REDIS_URL=redis://default:${REDIS_PASSWORD_BAHRAIN:-redis_bahrain_secure123}@redis-bahrain:6379
+    ports:
+      - "3010:3010"
+    volumes:
+      - ./backend/logs:/app/logs
+    networks:
+      - quantenergx-bahrain-network
+    depends_on:
+      postgres-bahrain:
+        condition: service_healthy
+      redis-bahrain:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3010/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.25'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+# ========================
+# PERSISTENT VOLUMES
+# Each region has isolated data storage
+# ========================
+
+volumes:
+  postgres_data_us:
+    driver: local
+    name: quantenergx_postgres_us
+  redis_data_us:
+    driver: local
+    name: quantenergx_redis_us
+  
+  postgres_data_eu:
+    driver: local
+    name: quantenergx_postgres_eu
+  redis_data_eu:
+    driver: local
+    name: quantenergx_redis_eu
+  
+  postgres_data_me:
+    driver: local
+    name: quantenergx_postgres_me
+  redis_data_me:
+    driver: local
+    name: quantenergx_redis_me
+  
+  postgres_data_guyana:
+    driver: local
+    name: quantenergx_postgres_guyana
+  redis_data_guyana:
+    driver: local
+    name: quantenergx_redis_guyana
+  
+  postgres_data_bahrain:
+    driver: local
+    name: quantenergx_postgres_bahrain
+  redis_data_bahrain:
+    driver: local
+    name: quantenergx_redis_bahrain
+
+# ========================
+# NETWORKS
+# Isolated networks per region for security
+# ========================
+
+networks:
+  quantenergx-us-network:
+    driver: bridge
+    name: quantenergx-us
+  quantenergx-eu-network:
+    driver: bridge
+    name: quantenergx-eu
+  quantenergx-me-network:
+    driver: bridge
+    name: quantenergx-me
+  quantenergx-guyana-network:
+    driver: bridge
+    name: quantenergx-guyana
+  quantenergx-bahrain-network:
+    driver: bridge
+    name: quantenergx-bahrain
