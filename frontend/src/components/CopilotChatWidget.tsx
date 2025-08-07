@@ -154,8 +154,16 @@ export const CopilotChatWidget: React.FC<CopilotWidgetProps> = ({
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
   // Session management
+  // Helper to generate a cryptographically secure random string
+  function generateSecureRandomString(length: number = 9): string {
+    const array = new Uint8Array(length);
+    window.crypto.getRandomValues(array);
+    // Convert to base36 for compactness
+    return Array.from(array, b => b.toString(36).padStart(2, '0')).join('').substr(0, length);
+  }
+
   const _sessionId = useMemo(() => 
-    userContext.sessionId || `copilot_session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    userContext.sessionId || `copilot_session_${Date.now()}_${generateSecureRandomString(9)}`,
     [userContext.sessionId]
   );
 
