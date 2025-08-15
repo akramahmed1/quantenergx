@@ -3,6 +3,11 @@
 # Excludes dependencies, build artifacts, coverage reports, caches, IDE files, logs, and generated files
 
 # Python-specific ignores
+node_modules/
+build/
+dist/
+*.log
+.env
 __pycache__/
 *.py[cod]
 *$py.class
