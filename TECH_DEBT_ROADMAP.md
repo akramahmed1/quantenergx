@@ -1,4 +1,12 @@
+
 # QuantEnergx Technical Debt Roadmap
+
+## Strategic Tech Debt Initiatives 🚀
+
+### Priorities
+- **High**: ESG analytics (see esg.js)
+- **Medium**: ETL pipeline (see oilPricesETL.js)
+- **Low**: Quantum hardware integration
 
 ## Overview
 
@@ -18,7 +26,7 @@ This document outlines the strategic technical debt initiatives for QuantEnergx 
 ## Strategic Tech Debt Initiatives 🚀
 
 ### 1. Quantum Hardware Integration 🔬
-**Priority**: Future-looking | **Timeline**: 12 months | **Investment**: $200K-$300K
+**Priority**: Low | **Timeline**: 12 months | **Investment**: $200K-$300K
 
 #### Quantum Advantage Opportunities
 - **Quantum Portfolio Optimization**: QAOA algorithms for exponential speedup
@@ -37,7 +45,7 @@ This document outlines the strategic technical debt initiatives for QuantEnergx 
 - Measurable advantage in at least 2 use cases
 
 ### 2. ETL Pipeline Optimization ⚡
-**Priority**: High | **Timeline**: 4 months | **Investment**: $100K-$150K
+**Priority**: Medium | **Timeline**: 4 months | **Investment**: $100K-$150K
 
 #### Performance Enhancement Goals
 - **Real-time Processing**: Sub-30 second data availability

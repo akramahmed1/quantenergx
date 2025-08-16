@@ -1,3 +1,11 @@
+  describe("settleTrade", function () {
+    it("should emit TradeSettled event", async function () {
+      const { qrlTrade, owner } = await loadFixture(deployQRLTradeFixture);
+      await expect(qrlTrade.settleTrade(1))
+        .to.emit(qrlTrade, "TradeSettled")
+        .withArgs(1, owner.address);
+    });
+  });
 /**
  * @title QRLTrade Contract Tests
  * @dev Comprehensive test suite for quantum-resistant trading contract

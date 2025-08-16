@@ -1,0 +1,2 @@
+Snyk scan: No critical vulns
+Trivy scan: No critical vulns

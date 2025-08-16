@@ -1,3 +1,10 @@
+#
+# Web Application Firewall (WAF) Rules
+
+- Block SQL injection patterns
+- Rate limit API endpoints
+- Allow only HTTPS traffic
+- Block known malicious IPs
 # Web Application Firewall (WAF) Configuration for QuantEnergx
 
 ## Overview

@@ -1,3 +1,13 @@
+#
+# Snyk/Trivy Scans
+- Snyk: No critical vulnerabilities found (see security_scan_report.txt)
+- Trivy: No critical vulnerabilities found
+
+# HTTPS
+- All endpoints require HTTPS in production
+
+# WAF
+- See WAF_CONFIGURATION.md for rules
 # Security Policy
 
 ## Supported Versions
