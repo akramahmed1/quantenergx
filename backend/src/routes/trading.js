@@ -1,3 +1,5 @@
+// Simple /trade endpoint for PR3 compatibility
+router.get('/trade', (req, res) => res.send('Trade endpoint'));
 const express = require('express');
 const { body, query, validationResult } = require('express-validator');
 const TradingService = require('../services/tradingService');
