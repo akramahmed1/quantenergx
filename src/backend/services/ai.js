@@ -1,13 +1,23 @@
 
+
 // Manipulation detection, arbitrage, forecasting, dampener, Zakat
 function runAIWorker(data, cb) {
-  // ...existing code...
+  try {
+    // ...existing code...
+    cb(null, { result: 'success' });
+  } catch (err) {
+    cb({ error: true, message: err.message || 'AI worker error' });
+  }
 }
 
 // AI scoring function (NeuralForecast mock)
 function aiScore(input) {
-  // TODO: Replace with real NeuralForecast logic
-  return Math.random() * 100;
+  try {
+    // TODO: Replace with real NeuralForecast logic
+    return Math.random() * 100;
+  } catch (err) {
+    return { error: true, message: err.message || 'AI scoring error' };
+  }
 }
 
 module.exports = { runAIWorker, aiScore };

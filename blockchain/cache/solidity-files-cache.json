@@ -39,8 +39,8 @@
       ]
     },
     "/workspaces/quantenergx/blockchain/contracts/QRLTrade.sol": {
-      "lastModificationDate": 1755377680149,
-      "contentHash": "bc0898c0b3071a6c960d5da034de40c0",
+      "lastModificationDate": 1755380346009,
+      "contentHash": "61a06b75fc8e43f7214ad26cf51f78b5",
       "sourceName": "contracts/QRLTrade.sol",
       "solcConfig": {
         "version": "0.8.20",

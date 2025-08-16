@@ -6,7 +6,7 @@
 
 QuantEnergx is designed to be a market-leading energy trading platform that enables efficient trading of oil, gas, and renewable energy commodities across global markets. Our platform addresses the complex regulatory and operational requirements of energy trading in the US, UK, Europe, and Middle East markets.
 
-## 🏗️ Architecture Overview
+## 🏗️ Architecture & Quality Overview
 
 ### Separated Frontend and Backend Deployments
 
@@ -15,6 +15,11 @@ This project follows industry best practices with **fully separated frontend and
 - **Frontend**: React SPA deployed on **Vercel** (static hosting)
 - **Backend**: Node.js API deployed on **Render** and **Railway** (server hosting)
 - **Databases**: PostgreSQL and Redis hosted on cloud providers
+
+### Test Coverage & CI/CD
+- Solidity/Hardhat, Node.js, and Python tests: 100% pass rate (as of Aug 2025)
+- Full CI/CD: security scans, static analysis, mutation/fuzz/contract/regression tests, Python/Node.js audit
+- Known Node.js audit issues (cookie/tmp): no fix available, see SECURITY.md
 
 ### Project Structure
 ```

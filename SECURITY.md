@@ -1,14 +1,11 @@
-#
-# Snyk/Trivy Scans
-- Snyk: No critical vulnerabilities found (see security_scan_report.txt)
-- Trivy: No critical vulnerabilities found
 
-# HTTPS
+# Security Scans & Policy
+
+- Snyk/Trivy: No critical vulnerabilities found (see security_scan_report.txt)
+- Node.js: Only low/moderate audit issues in transitive dependencies (cookie/tmp); no fix available as of Aug 2025
+- Python: All dependencies checked with pip-audit in CI
 - All endpoints require HTTPS in production
-
-# WAF
-- See WAF_CONFIGURATION.md for rules
-# Security Policy
+- WAF: See WAF_CONFIGURATION.md for rules
 
 ## Supported Versions
 

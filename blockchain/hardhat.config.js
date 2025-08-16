@@ -5,6 +5,12 @@ require("hardhat-contract-sizer");
 require("dotenv").config();
 
 /** @type import('hardhat/config').HardhatUserConfig */
+// Import high-balance test accounts for local Hardhat network
+let accountsConfig = undefined;
+try {
+  accountsConfig = require("./hardhat.accounts.js");
+} catch (e) {}
+
 module.exports = {
   solidity: {
     version: "0.8.20",
@@ -16,14 +22,14 @@ module.exports = {
       viaIR: true
     }
   },
-  
+
   networks: {
-    hardhat: {
+    hardhat: Object.assign({
       chainId: 31337,
       gas: 12000000,
       blockGasLimit: 12000000,
       allowUnlimitedContractSize: true
-    },
+    }, accountsConfig && accountsConfig.networks && accountsConfig.networks.hardhat ? { accounts: accountsConfig.networks.hardhat.accounts } : {}),
     localhost: {
       url: "http://127.0.0.1:8545"
     },
@@ -36,7 +42,7 @@ module.exports = {
       accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : []
     }
   },
-  
+
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
     currency: "USD",
