@@ -1,3 +1,6 @@
+# PR1: Ignore temp and files.txt
+files.txt
+temp.txt
 # QuantEnergx .gitignore
 # Comprehensive .gitignore for Node.js/React/Python full-stack energy trading platform
 # Excludes dependencies, build artifacts, coverage reports, caches, IDE files, logs, and generated files
