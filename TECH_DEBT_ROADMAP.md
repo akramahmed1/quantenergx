@@ -4,9 +4,10 @@
 ## Strategic Tech Debt Initiatives 🚀
 
 ### Priorities
-- **High**: ESG analytics (see esg.js)
-- **Medium**: ETL pipeline (see oilPricesETL.js)
-- **Low**: Quantum hardware integration
+- **High**: AI/ESG analytics (see ai.js, esg.js)
+- **Medium**: Quantum hybrids (quantum.js, hybrid_lstm.py)
+- **Low**: ETL pipeline (see oilPricesETL.js)
+- **Very Low**: Quantum hardware integration
 
 ## Overview
 
