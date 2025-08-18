@@ -310,7 +310,10 @@ remote_paths_clean_final.txt
 # Ignore Windows environment script if not needed in repo
 backend/set_node_env.bat
 
-
+# Blockchain build artifacts
+blockchain/artifacts/
+blockchain/cache/
+blockchain/node_modules/
 
 .nx/cache
 .nx/workspace-data

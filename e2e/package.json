@@ -4,6 +4,7 @@
   "description": "E2E tests for QuantEnergx platform",
   "main": "index.js",
   "scripts": {
+    "test": "npm run test:e2e",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
     "cy:run:chrome": "cypress run --browser chrome",
@@ -26,7 +27,7 @@
     "test:performance": "lighthouse-ci autorun",
     "test:visual": "cypress run --spec 'cypress/e2e/visual/**/*.cy.js'",
     "test:security": "cypress run --spec 'cypress/e2e/security/**/*.cy.js'",
-    "test:load": "k6 run tests/load/e2e-load-test.js",
+    "test:load": "node ../scripts/run-k6.js tests/load/e2e-load-test.js",
     "test:all": "npm run test:e2e && npm run test:playwright && npm run test:a11y && npm run test:performance"
   },
   "keywords": ["e2e", "testing", "cypress", "playwright"],

@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "Running repo-wide quality checks..."
+npm run lint:all || exit 1
+npm run typecheck:all || exit 1
+npm run test:all || exit 1
