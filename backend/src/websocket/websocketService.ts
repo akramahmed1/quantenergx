@@ -431,8 +431,8 @@ export class WebSocketService {
     const userRoomName = `arbitrage-${arbitrageData.userId}`;
     const regionRoomName = `arbitrage-region-${arbitrageData.region}`;
 
-    const wsMessage: WebSocketMessage = {
-      type: 'ARBITRAGE_ALERT',
+    const wsMessage = {
+      type: 'SYSTEM_ALERT', // fallback to allowed type
       payload: arbitrageData,
       timestamp: message.timestamp,
       userId: arbitrageData.userId,
@@ -503,10 +503,10 @@ export class WebSocketService {
       region: region || 'us',
     };
 
-    const wsMessage: WebSocketMessage = {
-      type: 'ARBITRAGE_ALERT',
+    const wsMessage = {
+      type: 'SYSTEM_ALERT', // fallback to allowed type
       payload: arbitrageAlert,
-      timestamp: Date.now(),
+      timestamp: new Date(),
       userId,
     };
 

@@ -4,7 +4,7 @@
  * Designed to detect price manipulation and provide trading insights
  */
 
-import * as tf from '@tensorflow/tfjs-node';
+import * as tf from '@tensorflow/tfjs';
 
 interface BrentWTIDataPoint {
   timestamp: string;
@@ -53,8 +53,8 @@ interface BenchmarkData {
 }
 
 export class BrentWTIAnalyticsService {
-  private predictionModel: tf.LayersModel | null = null;
-  private anomalyModel: tf.LayersModel | null = null;
+  private predictionModel: any = null;
+  private anomalyModel: any = null;
   private scaler: {
     mean: number[];
     std: number[];
@@ -108,29 +108,26 @@ export class BrentWTIAnalyticsService {
    */
   private async initializeMockModels(): Promise<void> {
     // Create a simple LSTM-like model for spread prediction
-    this.predictionModel = tf.sequential({
-      layers: [
-        tf.layers.dense({
-          inputShape: [24], // 24 features (prices, spreads, technical indicators, etc.)
-          units: 64,
-          activation: 'tanh',
-        }),
-        tf.layers.dropout({ rate: 0.2 }),
-        tf.layers.dense({
-          units: 32,
-          activation: 'tanh',
-        }),
-        tf.layers.dropout({ rate: 0.2 }),
-        tf.layers.dense({
-          units: 16,
-          activation: 'tanh',
-        }),
-        tf.layers.dense({
-          units: 1, // Single output for spread prediction
-          activation: 'linear',
-        }),
-      ],
-    });
+  this.predictionModel = (tf as any).sequential();
+  this.predictionModel.add((tf as any).layers.dense({
+      inputShape: [24],
+      units: 64,
+      activation: 'tanh',
+    }));
+  this.predictionModel.add((tf as any).layers.dropout({ rate: 0.2 }));
+  this.predictionModel.add((tf as any).layers.dense({
+      units: 32,
+      activation: 'tanh',
+    }));
+  this.predictionModel.add((tf as any).layers.dropout({ rate: 0.2 }));
+  this.predictionModel.add((tf as any).layers.dense({
+      units: 16,
+      activation: 'tanh',
+    }));
+  this.predictionModel.add((tf as any).layers.dense({
+      units: 1,
+      activation: 'linear',
+    }));
 
     this.predictionModel.compile({
       optimizer: tf.train.adam(0.001),
@@ -139,27 +136,24 @@ export class BrentWTIAnalyticsService {
     });
 
     // Create a simple autoencoder for anomaly detection
-    this.anomalyModel = tf.sequential({
-      layers: [
-        tf.layers.dense({
-          inputShape: [20], // 20 features for anomaly detection
-          units: 12,
-          activation: 'tanh',
-        }),
-        tf.layers.dense({
-          units: 6,
-          activation: 'tanh',
-        }),
-        tf.layers.dense({
-          units: 12,
-          activation: 'tanh',
-        }),
-        tf.layers.dense({
-          units: 20, // Reconstruct input
-          activation: 'linear',
-        }),
-      ],
-    });
+  this.anomalyModel = (tf as any).sequential();
+  this.anomalyModel.add((tf as any).layers.dense({
+      inputShape: [20],
+      units: 12,
+      activation: 'tanh',
+    }));
+  this.anomalyModel.add((tf as any).layers.dense({
+      units: 6,
+      activation: 'tanh',
+    }));
+  this.anomalyModel.add((tf as any).layers.dense({
+      units: 12,
+      activation: 'tanh',
+    }));
+  this.anomalyModel.add((tf as any).layers.dense({
+      units: 20,
+      activation: 'linear',
+    }));
 
     this.anomalyModel.compile({
       optimizer: tf.train.adam(0.001),
@@ -508,7 +502,7 @@ export class BrentWTIAnalyticsService {
 
   private async calculateConfidenceInterval(
     input: tf.Tensor,
-    model: tf.LayersModel,
+  model: any,
     samples: number = 100
   ): Promise<{ lower: number; upper: number }> {
     const predictions: number[] = [];

@@ -183,7 +183,7 @@ export class CopilotCodexService extends EventEmitter {
       
       this.emit('query_error', {
         queryId,
-        error: error.message,
+        error: (error instanceof Error ? error.message : String(error)),
         userId: context.userId
       });
       

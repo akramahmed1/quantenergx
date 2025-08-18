@@ -1,7 +1,6 @@
-import * as express from 'express';
-import { Application, Request, Response, NextFunction } from 'express';
-import * as cors from 'cors';
-import * as helmet from 'helmet';
+import express, { Application, Request, Response, NextFunction } from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
 import * as dotenv from 'dotenv';
 import * as winston from 'winston';
 import * as rateLimit from 'express-rate-limit';

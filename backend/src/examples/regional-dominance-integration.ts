@@ -1,3 +1,4 @@
+export {};
 /**
  * Regional Dominance Integration Example
  * 

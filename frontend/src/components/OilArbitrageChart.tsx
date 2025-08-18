@@ -288,8 +288,8 @@ const OilArbitrageChart: React.FC<OilArbitrageChartProps> = ({
 
       if (anomalyMarkers.length > 0) {
         traces.push({
-          x: anomalyMarkers.map(a => a?.x).filter(x => x !== undefined),
-          y: anomalyMarkers.map(a => a?.y).filter(y => y !== undefined),
+          x: anomalyMarkers.map(a => a?.x).filter((x): x is string => x !== undefined),
+          y: anomalyMarkers.map(a => a?.y).filter((y): y is number => y !== undefined),
           type: 'scatter',
           mode: 'markers',
           name: 'Anomalies',

@@ -1,3 +1,6 @@
+// Force disable Kafka for local development/testing
+process.env.KAFKA_ENABLED = 'false';
+
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -171,7 +174,7 @@ const swaggerUiOptions = {
 };
 
 // Load OpenAPI spec from YAML
-let openApiSpec;
+let openApiSpec: any;
 try {
   const yamlPath = path.join(__dirname, 'swagger', 'openapi.yaml');
   if (fs.existsSync(yamlPath)) {

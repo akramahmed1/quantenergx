@@ -64,9 +64,9 @@ export interface ShariaComplianceResult {
  * 6. Integration with Islamic banking compliance systems
  */
 export class ShariaComplianceService extends EventEmitter {
-  private prohibitedSectors: Set<string>;
-  private permittedContracts: Set<string>;
-  private hijriMonthNames: string[];
+  private prohibitedSectors: Set<string> = new Set();
+  private permittedContracts: Set<string> = new Set();
+  private hijriMonthNames: string[] = [];
   
   // EXTENSION POINT: Connect to actual AAOIFI standards database
   private readonly aaiofiStandards = {

@@ -1,4 +1,4 @@
-import { PluginInterface } from '@types/index';
+import { PluginInterface } from '../../types/index';
 import winston from 'winston';
 
 /**
@@ -7,6 +7,11 @@ import winston from 'winston';
  * Auto-generated plugin template
  */
 export default class BasicAnalyticsPlugin implements PluginInterface {
+  // Add a stub for performAnalysis to fix missing method error
+  private async performAnalysis(data: any): Promise<any> {
+    // TODO: Implement actual analysis logic
+    return { summary: 'Analysis result (stub)' };
+  }
   public readonly name = 'basic-analytics';
   public readonly version = '1.0.0';
   public readonly type = 'analytics' as const;

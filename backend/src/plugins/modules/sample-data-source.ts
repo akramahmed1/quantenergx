@@ -1,4 +1,4 @@
-import { PluginInterface } from '@types/index';
+import { PluginInterface } from '../../types/index';
 import winston from 'winston';
 
 /**
@@ -7,6 +7,11 @@ import winston from 'winston';
  * Auto-generated plugin template
  */
 export default class SampleDataSourcePlugin implements PluginInterface {
+  // Add a stub for fetchData to fix missing method error
+  private async fetchData(query: any): Promise<any[]> {
+    // TODO: Implement actual data fetching logic
+    return [{ sample: 'data (stub)' }];
+  }
   public readonly name = 'sample-data-source';
   public readonly version = '1.0.0';
   public readonly type = 'data_source' as const;
