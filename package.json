@@ -1,0 +1,27 @@
+{
+  "name": "quantenergx",
+  "private": true,
+  "version": "0.1.0",
+  "description": "QuantEnergx monorepo: frontend, backend, e2e, blockchain",
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "workspaces": [
+    "backend",
+    "frontend",
+    "e2e",
+    "blockchain"
+  ],
+  "scripts": {
+    "prepare": "husky install",
+    "start:all": "npm run -ws --if-present start",
+    "build:all": "npm run -ws --if-present build",
+    "test:all": "npm run -ws --if-present test",
+    "lint:all": "npm run -ws --if-present lint",
+    "typecheck:all": "npm run -ws --if-present typecheck",
+    "security:check": "bash ./scripts/guarded-security.sh"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}
