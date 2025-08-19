@@ -1,10 +1,14 @@
 name: Node.js CI with Security
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   NODE_VERSION: 20
@@ -13,6 +17,9 @@ jobs:
   security-scan:
     name: Security Vulnerability Scan
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
 

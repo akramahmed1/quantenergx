@@ -1,16 +1,14 @@
 name: Frontend CI/CD
 
 on:
-  push:
-    branches: [ main ]
-    paths: 
-      - 'frontend/**'
-      - '.github/workflows/frontend.yml'
-  pull_request:
-    branches: [ main ]
-    paths:
-      - 'frontend/**'
-      - '.github/workflows/frontend.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   NODE_VERSION: 20
@@ -51,6 +49,7 @@ jobs:
 
       - name: Check for vulnerabilities with Snyk
         uses: snyk/actions/node@master
+        if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.fork == false)
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -130,7 +129,7 @@ jobs:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
     needs: frontend-build
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.fork == false)
     
     steps:
       - uses: actions/checkout@v4
@@ -153,7 +152,7 @@ jobs:
     name: Security Headers Check
     runs-on: ubuntu-latest
     needs: frontend-deploy-vercel
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.fork == false)
     
     steps:
       - name: Check security headers
@@ -175,7 +174,7 @@ jobs:
     name: Notify Deployment
     runs-on: ubuntu-latest
     needs: [frontend-deploy-vercel, frontend-security-headers-check]
-    if: always() && github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: always() && (github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.fork == false))
     
     steps:
       - name: Slack Notification
