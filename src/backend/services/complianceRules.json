@@ -1,0 +1,6 @@
+{
+  "large_order_threshold": 2000000,
+  "restricted_symbols": ["EUA_TEST", "CL_TEST"],
+  "max_leverage": 8,
+  "regions_blocklist": ["KP", "IR"]
+}
