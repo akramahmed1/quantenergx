@@ -1,0 +1,31 @@
+name: "CodeQL Config"
+
+disable-default-queries: false
+
+queries:
+  - uses: security-and-quality
+
+paths:
+  - backend/
+  - frontend/
+  - quantum_service/
+  - src/
+  - scripts/
+
+paths-ignore:
+  - blockchain/
+  - docs/
+  - deployment/
+  - dist/
+  - build/
+  - node_modules/
+  - "**/*.min.js"
+  - "**/*.bundle.js"
+  - "**/coverage/"
+  - "**/test/"
+  - "**/tests/"
+  - "**/__tests__/"
+  - "**/*.test.js"
+  - "**/*.test.ts"
+  - "**/*.spec.js"
+  - "**/*.spec.ts"

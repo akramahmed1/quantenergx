@@ -1,13 +1,6 @@
 name: Trivy Security Scans
 
 on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
-  schedule:
-    # Run daily at 3 AM UTC
-    - cron: '0 3 * * *'
   workflow_dispatch:
     inputs:
       scan_type:
@@ -24,8 +17,10 @@ on:
 
 permissions:
   contents: read
-  security-events: write
-  actions: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   # Use the latest stable Trivy version
@@ -35,6 +30,9 @@ jobs:
   docker-scan:
     name: Docker Container Security Scan
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
     if: github.event.inputs.scan_type == 'docker' || github.event.inputs.scan_type == 'all' || github.event.inputs.scan_type == ''
     strategy:
       matrix:
@@ -118,6 +116,9 @@ jobs:
   filesystem-scan:
     name: Filesystem Security Scan
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
     if: github.event.inputs.scan_type == 'filesystem' || github.event.inputs.scan_type == 'all' || github.event.inputs.scan_type == ''
     steps:
       - name: Checkout code
@@ -184,6 +185,9 @@ jobs:
   config-scan:
     name: Configuration Security Scan
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
     if: github.event.inputs.scan_type == 'config' || github.event.inputs.scan_type == 'all' || github.event.inputs.scan_type == ''
     steps:
       - name: Checkout code
@@ -257,6 +261,9 @@ jobs:
   repository-scan:
     name: Repository Security Scan
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
     if: github.event.inputs.scan_type == 'repository' || github.event.inputs.scan_type == 'all' || github.event.inputs.scan_type == ''
     steps:
       - name: Checkout code

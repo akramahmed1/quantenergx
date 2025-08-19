@@ -1,10 +1,14 @@
 name: Comprehensive Code Quality and Security Pipeline
 
-on: 
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   NODE_VERSION: 20
@@ -158,6 +162,9 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
+        permissions:
+          security-events: write
+          contents: read
 
       # Upload security artifacts
       - name: Upload security reports
@@ -183,6 +190,7 @@ jobs:
       # SonarQube Analysis
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
+        if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.fork == false)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -190,6 +198,7 @@ jobs:
       # Snyk Security Scan
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/node@master
+        if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.fork == false)
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -198,7 +207,7 @@ jobs:
       # DeepSource Analysis
       - name: DeepSource Analysis
         uses: deepsourcelabs/test-coverage-action@master
-        if: always()
+        if: always() && (github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.fork == false))
         with:
           key: javascript
           coverage-file: coverage/lcov.info
