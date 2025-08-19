@@ -1,11 +1,14 @@
 name: Safe Copilot Read/Write Workflow
 
 on:
-  push:
-    branches: [main, dev, staging]
-  pull_request:
-    branches: [main, dev, staging]
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-test-check:
@@ -48,7 +51,7 @@ jobs:
 
   update-docs:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.fork == false)
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

@@ -1,10 +1,14 @@
 name: Node.js CI with Security
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   NODE_VERSION: 20
@@ -13,6 +17,9 @@ jobs:
   security-scan:
     name: Security Vulnerability Scan
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
@@ -45,7 +52,7 @@ jobs:
         run: python3 -m pip install pip-audit
 
       - name: Run pip-audit (backend)
-        run: pip-audit -r requirements.txt || echo "pip-audit: review output for actionable issues."
+        run: pip-audit -r requirements.txt || echo "pip-audit review output for actionable issues."
         working-directory: backend
         continue-on-error: true
 
@@ -118,6 +125,7 @@ jobs:
 
       - name: Run GitLeaks
         uses: gitleaks/gitleaks-action@v2
+        if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.head.repo.fork == false)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
