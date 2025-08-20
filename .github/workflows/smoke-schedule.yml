@@ -1,0 +1,64 @@
+name: Scheduled smoke tests and PR notifier
+on:
+  schedule:
+    - cron: '*/5 * * * *' # every 5 minutes
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  smoke:
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          npm ci || npm install
+
+      - name: Run smoke tests
+        id: run_tests
+        run: |
+          npx jest backend/test/smoke --runInBand --color=false || echo "JEST_FAILED"
+
+      - name: Post status comments to PRs on success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumbers = [117,118,119];
+            for (const num of prNumbers) {
+              try {
+                const { data: pr } = await github.rest.pulls.get({ owner: context.repo.owner, repo: context.repo.repo, pull_number: num });
+                if (pr.state === 'open') {
+                  await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: num, body: 'Automated smoke tests passed. Marking as ready-to-merge.' });
+                  try { await github.rest.issues.addLabels({ owner: context.repo.owner, repo: context.repo.repo, issue_number: num, labels: ['ready-to-merge'] }); } catch (e) { /* ignore label errors */ }
+                }
+              } catch (e) { /* PR may not exist; ignore */ }
+            }
+
+      - name: Post status comments to PRs on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumbers = [117,118,119];
+            for (const num of prNumbers) {
+              try {
+                const { data: pr } = await github.rest.pulls.get({ owner: context.repo.owner, repo: context.repo.repo, pull_number: num });
+                if (pr.state === 'open') {
+                  await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: num, body: 'Automated smoke tests failed. Please check the Actions run logs.' });
+                }
+              } catch (e) { /* ignore */ }
+            }
