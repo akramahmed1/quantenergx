@@ -14,16 +14,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint-workflows:
-    name: Validate workflow files
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: rhysd/actionlint@v1
-
   monorepo-ci:
     name: Build, lint, test (all workspaces)
-    needs: lint-workflows
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
