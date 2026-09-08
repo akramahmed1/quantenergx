@@ -129,7 +129,7 @@ This script will:
 
 ### Admin Access
 - **Username**: `admin`
-- **Password**: `Admin!2025Demo`
+- **Password**: `<set via ADMIN_DEMO_PASSWORD env var, not committed>`
 - **Login URL**: 
   - Local: http://localhost:3000/login
   - Production: https://your-app.vercel.app/login
@@ -139,17 +139,17 @@ For development and testing purposes:
 ```
 Admin User:
 - Username: admin
-- Password: Admin!2025Demo
+- Password: <set via ADMIN_DEMO_PASSWORD env var, not committed>
 - Role: Administrator
 
 Test Trader:
 - Username: trader1
-- Password: Trader!2025Demo  
+- Password: <set via TRADER_DEMO_PASSWORD env var, not committed>  
 - Role: Trader
 
 Test Risk Manager:
 - Username: risk1
-- Password: Risk!2025Demo
+- Password: <set via RISK_DEMO_PASSWORD env var, not committed>
 - Role: Risk Manager
 ```
 
@@ -517,7 +517,7 @@ The system includes a demo admin user for testing and initial setup:
 
 ### Default Credentials
 - **Username**: `admin`
-- **Password**: `Admin!2025Demo`
+- **Password**: `<set via ADMIN_DEMO_PASSWORD env var, not committed>`
 - **Email**: `admin@quantenergx.com`
 - **Role**: Administrator (full system access)
 
